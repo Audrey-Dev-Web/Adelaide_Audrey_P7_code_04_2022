@@ -110,6 +110,15 @@ exports.modifyProfile = (req, res, next) => {
                 res.status(404).json({ ERROR: "Ce profile n'existe pas !" });
             } else {
 
+
+                console.log("  ")
+                console.log("=====> profile.userId")
+                console.log("  ")
+                console.log(profile[0].id.toString())
+                console.log("  ")
+                console.log("=====> END profile.userId")
+                console.log("  ")
+
                 let updateProfile;
 
                 console.log("=======> User Profile Data 1")
