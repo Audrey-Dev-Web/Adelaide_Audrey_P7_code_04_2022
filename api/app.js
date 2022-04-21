@@ -11,10 +11,7 @@ const userProfileRoutes = require('./routes/user_profile');
 
 // =========> Import de config table users
 const createTableUsers = require('./config/tables.config/users');
-// createTableUsers();
 const createTableProfile = require('./config/tables.config/user_profile');
-// createTableProfile();
-const createRoles = require('./config/tables.config/roles');
 
 const connection = require('./config/db.config');
 
@@ -24,7 +21,6 @@ connection.connect((err) => {
     try {
         createTableUsers();
         createTableProfile();
-        createRoles();
     } catch (error) {
         console.log(error)
     }

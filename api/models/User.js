@@ -5,9 +5,10 @@ require("dotenv").config()
 const secretEmail = process.env.SECRET_EMAIL;
 
 class User {
-    constructor (email, password) {
+    constructor (email, password, role) {
         this.email = email;
         this.password = password;
+        this.role = role;
     }
     // METHODES pour chiffrer et déchiffrer l'email
     hashedEmail() {

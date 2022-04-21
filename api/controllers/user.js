@@ -4,18 +4,18 @@ const cryptojs = require('crypto-js');
 
 require("dotenv").config()
 
-const mysql = require("mysql");
+// const mysql = require("mysql");
 
 const connection = require('../config/db.user.config');
 
 const User = require("../models/User");
 
 // Connection to MySQL
-connection.getConnection((err, connection) => {
+// connection.getConnection((err, connection) => {
 
-    if (err) throw (err)
-    console.log("Connexion à la base de données réussie : " + connection.threadId)
-})
+//     if (err) throw (err)
+//     console.log("Connexion à la base de données réussie : " + connection.threadId)
+// })
 
 
 // ----------- SIGNUP
@@ -23,6 +23,7 @@ exports.signup = async (req, res, next) => {
     const emailRegex = `(.*)@(.*)\.(.*)`;
 
     const { email, password } = req.body;
+    const role = 'user';
     // console.log((email))
     // console.log(password)
 
@@ -32,7 +33,7 @@ exports.signup = async (req, res, next) => {
         // const secretEmail = process.env.SECRET_EMAIL;
 
         // Instance de la class User
-        const user = new User(email, password);
+        const user = new User(email, password, role);
         // console.log("-------> user");
         // console.log(user);
 
@@ -50,6 +51,7 @@ exports.signup = async (req, res, next) => {
                 const newUser = {
                     email: hashedEmail,
                     password: hash,
+                    role: role
                 };
 
                 connection.getConnection(async (err, connection) => {
@@ -87,14 +89,14 @@ exports.signup = async (req, res, next) => {
                                     // console.log("------> FOUND")
                                     // console.log(found[0].id.toString())
 
-                                    const userId = found[0].id.toString();
+                                    const user_id = found[0].id.toString();
 
                                     console.log("-------> userId")
-                                    console.log(userId)
+                                    console.log(user_id)
 
                                     const user_id_sql = `INSERT INTO users_profiles SET user_id = ?`
 
-                                    await connection.query(user_id_sql, userId, async (err, result) => {
+                                    await connection.query(user_id_sql, user_id, async (err, result) => {
                                         // connection.release();
                                         if (err) throw err;
 
@@ -103,14 +105,6 @@ exports.signup = async (req, res, next) => {
 
                                     });
                                 })
-
-                                // await connection.query(joinTable, (err, results, fields) => {
-                                //     if (err) throw err;
-                        
-                                //     console.log("------------------");
-                                //     console.log("Jointure des tables effectuées !")
-                                //     console.log(results)
-                                // });
                             });
                         }
                     });
@@ -136,13 +130,13 @@ exports.login = async (req, res, next) => {
         const searchUser = `SELECT * FROM users where email = ?`;
         // const search_query = mysql.format(searchUser, [emailCrypto]);
 
-        await connection.query(searchUser, emailCrypto, async (err, result) => {
+        await connection.query(searchUser, emailCrypto, async (err, found) => {
 
             connection.release();
 
             if (err) throw err;
 
-            if (result.length == 0) {
+            if (found.length == 0) {
 
                 res.status(404).json({ ERROR: "Cette utilisateur n'existe pas." });
                 
@@ -150,20 +144,20 @@ exports.login = async (req, res, next) => {
 
                 // Réécrire cette partie du login
 
-                const hashedPassword = result[0].password;
+                const hashedPassword = found[0].password;
                 const secret = process.env.SECRET_TOKEN;
 
                 if (await bcrypt.compare(password, hashedPassword)) {
-                    // console.log("------ Voici le userId")
-                    // console.log(result[0].id.toString())
 
                     // On converti l'id de l'utilisateur en chaine de caractère et on le renvoi pour le frontend
-                    const userId = result[0].id.toString();
+                    const user_id = found[0].id.toString();
+                    const user_role = found[0].role;
 
                     // On renvoi l'id de l'utilisateur et son token à destination du frontend
                     res.status(200).json({
-                        userId: userId,
-                        token: jwt.sign({ userId: userId }, secret, { expiresIn: "24h" }),
+                        userId: user_id,
+                        userRole: user_role,
+                        token: jwt.sign({ userId: user_id, role: user_role }, secret, { expiresIn: "24h" }),
                         // token: jwt.sign({ userId: userId, role: role }, secret, { expiresIn: "24h" }), ====> Suite mentorat
                     });
                 } else {
