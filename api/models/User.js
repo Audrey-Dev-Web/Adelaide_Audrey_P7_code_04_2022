@@ -13,7 +13,7 @@ class User {
     // METHODES pour chiffrer et déchiffrer l'email
     hashedEmail() {
         const emailCrypted = cryptojs.HmacSHA256(this.email, secretEmail).toString();
-
+        
         console.log("-------> this ")
         console.log(this)
 

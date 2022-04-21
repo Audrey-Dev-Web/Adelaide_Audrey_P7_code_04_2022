@@ -3,12 +3,17 @@ const connection = require('../config/db.user.config');
 const path = require("path");
 const fs = require("fs");
 
+const cryptojs = require('crypto-js');
+
+require("dotenv").config()
+const secretEmail = process.env.SECRET_EMAIL;
+
 // Voir tous les profiles
 exports.getAllProfile = (req, res, next) => {
     connection.getConnection((err, connection) => {
         if (err) throw err;
 
-        const searchAllProfile = `SELECT * FROM users INNER JOIN users_profiles ON users.id = users_profiles.user_id`;
+        const searchAllProfile = `SELECT * FROM users JOIN users_profiles ON users.id = users_profiles.user_id`;
 
         connection.query(searchAllProfile, (err, profiles) => {
             connection.release();
@@ -25,6 +30,8 @@ exports.getAllProfile = (req, res, next) => {
                         usersProfile: {
                             id: profile.id.toString(),
                             user_Id: profile.user_id.toString(),
+                            inscrit_le : profile.timestamp.toString(),
+                            role: profile.role,
                             first_name: profile.first_name,
                             last_name: profile.last_name,
                             birthdate: profile.birthdate,
@@ -46,49 +53,70 @@ exports.getOneProfile = (req, res, next) => {
     connection.getConnection((err, connection) => {
         if (err) throw err;
 
-        const profileId = req.params.id;
+        const profile_id = req.params.id;
 
         console.log("----> FoundProfile");
-        console.log(profileId);
+        console.log(profile_id);
 
         // const foundProfileSQL = `SELECT * FROM users INNER JOIN users_profiles ON users.id = ?`;
         // const foundProfileSQL = `SELECT * FROM users INNER JOIN users_profiles WHERE users.id = ?`;
 
         // ================ Tester le code ci-dessus ===================== //
 
-
-        const foundProfileSQL = `SELECT * FROM users_profiles WHERE user_id = ?`;
+        // const foundProfileSQL = `SELECT * FROM users_profiles JOIN users WHERE user_id = ?`;
         // const foundProfileSQL = `SELECT * FROM users JOIN users_profiles ON users.id = ?`;
+        
+        const foundUserSQL = `SELECT * FROM users WHERE id = ?`;
+        const foundProfileSQL = `SELECT * FROM users_profiles WHERE user_id = ?`;
 
-        connection.query(foundProfileSQL, profileId, (err, profile) => {
+        // On cherche l'utilisateur
+        connection.query(foundUserSQL, profile_id, (err, found) => {
             if (err) throw err;
 
             console.log("-------> Résultat de la recherche")
-            console.log(profile.length)
+            console.log(found.length)
 
-            if (profile.length == 0) {
-                res.status(404).json({ ERROR: "Ce profile n'existe pas !" });
+            if (found.length == 0) {
+                res.status(404).json({ ERROR: "Cet utilisateur n'existe pas !" });
+
             } else {
 
-                // console.log("-----> Profiles Trouvé")
-                // // console.log(profile[0].id.toString())
-                // console.log(profiles)
+                // ======= code pour decrypter l'email ========
+                // var emailCrypted = found[0].email;
+                // var bytes = cryptojs.AES.decrypt(emailCrypted, secretEmail);
+                // var originalEmail = bytes.toString(cryptojs.enc.Utf8);
+                // ======= code pour décrypter l'email
 
-                        const user_profile = {
-                            id: profile[0].id.toString(),
-                            user_Id: profile[0].user_id.toString(),
-                            // email: profile[0].email,
-                            first_name: profile[0].first_name,
-                            last_name: profile[0].last_name,
-                            birthdate: profile[0].birthdate,
-                            avatar: profile[0].avatar,
+                // Objet user, on uniquement l'id et le role
+                const user = {
+                    id: found[0].id.toString(),
+                    role: found[0].role,
+                    inscription: found[0].timestamp
+                };
+
+                // On cherche le profile de cet utilisateur
+                connection.query(foundProfileSQL, user.id, (err, foundProfile) => {
+                    if (err) throw err;
+
+                    if (foundProfile.length == 0) {
+                        res.status(404).json({ ERROR: "Ce profile n'existe pas !" });
+                    } else {
+
+                        // On récupère les données que l'on veut utiliser
+                        const profile = {
+                            id: foundProfile[0].id.toString(),
+                            user_id: foundProfile[0].user_id.toString(),
+                            inscrit_le : user.inscription.toString(),
+                            role: user.role,
+                            firstName: foundProfile[0].first_name,
+                            lastName: foundProfile[0].last_name,
+                            birthdate: foundProfile[0].birthdate,
+                            avatarUrl: foundProfile[0].avatar,
                         }
+                        res.status(200).json({ profile });
+                    }
+                });
 
-
-
-
-                res.status(200).json({ user_profile });
-                // res.status(200).json({ userProfile: user });
             }
         });
     });
@@ -99,10 +127,10 @@ exports.modifyProfile = (req, res, next) => {
     connection.getConnection((err, connection) => {
         if (err) throw err;
 
-        const profileId = req.params.id;
+        const profile_id = req.params.id;
         const searchProfile = `SELECT * FROM users INNER JOIN users_profiles WHERE users.id = ?`;
 
-        connection.query(searchProfile, profileId, (err, profile) => {
+        connection.query(searchProfile, profile_id, (err, profile) => {
             if (err) throw err;
 
 
@@ -130,10 +158,21 @@ exports.modifyProfile = (req, res, next) => {
                 // console.log(req.file)
 
                 if (req.file) {
-                    const avatarUrl = `${req.protocol}://${req.get("host")}/images/${req.file.filename}`;
 
+                    // On, récupère le chemin de l'ancienne image
+                    const file = profile[0].avatar.split("/")[4];
+                    const fileUrl = path.join("images/" + file);
+
+                    // On supprime l'ancienne
+                    fs.unlink(fileUrl, () => {
+                        console.log("IMAGE DELETED !")
+                    });
+
+                    // On indique le chemin de la nouvelle image
+                    const avatarUrl = `${req.protocol}://${req.get("host")}/images/${req.file.filename}`;
                     // SQL UPDATE s'il y a une image a ajouter ou modifier
                     updateProfile = `UPDATE users_profiles SET avatar = '${avatarUrl}' WHERE user_id = ?`;
+
 
                 } else {
 
@@ -145,11 +184,11 @@ exports.modifyProfile = (req, res, next) => {
                     WHERE user_id = ?`;
                 }
 
-                connection.query(updateProfile, profileId, (err, result) => {
+                connection.query(updateProfile, profile_id, (err, result) => {
                     if (err) throw err;
 
-                    console.log("=====> RESULT UPDATE");
-                    console.log(result);
+                    // console.log("=====> RESULT UPDATE");
+                    // console.log(result);
 
                     res.status(200).json({ MESSAGE: "Profile mis à jour avec succès" });
                 });

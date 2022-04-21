@@ -122,7 +122,9 @@ exports.login = async (req, res, next) => {
     const secretEmail = process.env.SECRET_EMAIL;
     const emailCrypto = cryptojs.HmacSHA256(email, secretEmail).toString();
 
-    const user = req.body.email;
+    console.log(emailCrypto)
+
+    // const user = req.body.email;
 
     connection.getConnection(async (err, connection) => {
         if (err) throw err;
