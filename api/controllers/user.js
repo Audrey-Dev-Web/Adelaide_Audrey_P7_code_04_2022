@@ -2,7 +2,8 @@ const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
 const cryptojs = require('crypto-js');
 
-require("dotenv").config()
+require("dotenv").config();
+const secretEmail = process.env.SECRET_EMAIL;
 
 // const mysql = require("mysql");
 
@@ -94,9 +95,16 @@ exports.signup = async (req, res, next) => {
                                     console.log("-------> userId")
                                     console.log(user_id)
 
-                                    const user_id_sql = `INSERT INTO users_profiles SET user_id = ?`
+                                    const emailProfile =  cryptojs.AES.encrypt(email, secretEmail).toString();
 
-                                    await connection.query(user_id_sql, user_id, async (err, result) => {
+                                    const newProfil = {
+                                        user_id: user_id,
+                                        email: emailProfile
+                                    }
+
+                                    const user_id_sql = `INSERT INTO users_profiles SET ?`
+
+                                    await connection.query(user_id_sql, newProfil, async (err, result) => {
                                         // connection.release();
                                         if (err) throw err;
 
@@ -121,8 +129,15 @@ exports.login = async (req, res, next) => {
     const password = req.body.password;
     const secretEmail = process.env.SECRET_EMAIL;
     const emailCrypto = cryptojs.HmacSHA256(email, secretEmail).toString();
+    // const emailCrypto = cryptojs.AES.encrypt(email, secretEmail).toString();
 
-    console.log(emailCrypto)
+    // ======= code pour decrypter l'email ========
+    // var emailCrypted = found[0].email;
+    // var bytes = cryptojs.AES.decrypt(emailCrypted, secretEmail);
+    // var originalEmail = bytes.toString(cryptojs.enc.Utf8);
+    // ======= code pour décrypter l'email
+
+    console.log(emailCrypto);
 
     // const user = req.body.email;
 
@@ -133,24 +148,19 @@ exports.login = async (req, res, next) => {
         // const search_query = mysql.format(searchUser, [emailCrypto]);
 
         await connection.query(searchUser, emailCrypto, async (err, found) => {
-
             connection.release();
 
             if (err) throw err;
 
             if (found.length == 0) {
-
                 res.status(404).json({ ERROR: "Cette utilisateur n'existe pas." });
-                
             } else {
-
                 // Réécrire cette partie du login
 
                 const hashedPassword = found[0].password;
                 const secret = process.env.SECRET_TOKEN;
 
                 if (await bcrypt.compare(password, hashedPassword)) {
-
                     // On converti l'id de l'utilisateur en chaine de caractère et on le renvoi pour le frontend
                     const user_id = found[0].id.toString();
                     const user_role = found[0].role;

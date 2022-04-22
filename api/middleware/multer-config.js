@@ -8,18 +8,28 @@ const MIME_TYPES = {
 };
 
 const storage = multer.diskStorage({
-    // On indique la destination des images 
+    fileFilter: (req, file, callback) => {
+        console.log(req.params.id);
+
+        if (req.params.id !== req.auth.userId) {
+            callback(null, false);
+        } else {
+            callback(null, true);
+        }
+    },
+    
     destination: (req, file, callback) => {
-            callback(null, 'images');
+        callback(null, "images");
     },
 
-    // Configuration du nom du fichier 
+
+    // Configuration du nom du fichier
     filename: (req, file, callback) => {
-        const name = file.originalname.split(' ').join('_');
+        const name = file.originalname.split(" ").join("_");
         const extension = MIME_TYPES[file.mimetype];
 
         callback(null, name + Date.now() + "." + extension);
-    }
+    },
 });
 
 module.exports = multer({ storage }).single('image');
