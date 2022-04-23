@@ -170,6 +170,7 @@ exports.modifyProfile = (req, res, next) => {
                 const searchUser = `SELECT * FROM users WHERE id = ?`;
                 const searchProfile = `SELECT * FROM users_profiles WHERE user_id = ?`;
 
+
                 connection.query(searchUser, profile_id, (err, foundUser) => {
                     if (err) throw err;
                     // Si l'id n'existe pas
@@ -184,31 +185,109 @@ exports.modifyProfile = (req, res, next) => {
                             res.status(404).json({ ERROR: "Ce profile n'existe pas." });
                         }
 
-                    /* 
+                        const updateProfile = `UPDATE users_profiles SET first_name = '${req.body.first_name}', last_name = '${req.body.last_name}', birthdate = '${req.body.birthdate}' WHERE user_id = ?`;
 
-                        ======= TO-DO =======
+                        // const avatarUrl = `${req.protocol}://${req.get("host")}/images/${req.file.filename}`;
 
-                        *] - Au niveau du frontend :
+                        // const toUpdate = {
+                        //     ...req.body,
+                        //     avatar: avatarUrl
+                        // }
 
-                        - Un bouton " Editer mon profil" afin de permettre à l'utilisateur de changer ses donnée
-                        En arrivant sur la page de modification avec le formulaire il doit être capable de modifier
-                        toutes les données ci-dessous.
-
-
-                        *] - A coder niveau API:
-
-                        - Modification de l'email
-                        - Modification du password
-                        - Modification de first_name
-                        - Modification de last_name
-                        - Modification de birthdate
-                        - Modification de l'avatar
+                        var emailAES = foundProfile[0].email;
+                        var decryptedEmail = cryptojs.AES.decrypt(emailAES, secretEmail).toString(cryptojs.enc.Utf8);
 
 
-                        */
+                        let newEmail;
+                        let newPassword;
 
-                       res.status(200).json({ MESSAGE: `Vous êtes autorisé à effectuer cette action.` });
+                        // Modifier les données de connexion
+                        if (req.body.email) {
 
+                            const email = req.body.email
+                            const emailUser = cryptojs.HmacSHA256(email, secretEmail).toString();
+                            const emailProfile =  cryptojs.AES.encrypt(email, secretEmail).toString();
+
+                            const newEmailSearch = `SELECT * FROM users WHERE email = ?`
+                            const updateTest = `UPDATE users SET email = '${emailUser}' WHERE id = ?`
+                            const updateTest2 = `UPDATE users_profiles SET email = '${emailProfile}' WHERE user_id = ?`
+
+                            connection.query(newEmailSearch, emailUser, (err, emailFound) => {
+                                if (err) throw err;
+
+                                if ( emailFound.length === 0) {
+                                    console.error("Cette adresse email existe déjà")
+                                    connection.query(updateTest, profile_id, (err, result) => {
+                                        if (err) throw err;
+
+                                        connection.query(updateTest2, profile_id, (err, result) => {
+                                            if (err) throw err;
+                                            
+                                            console.log("La modification de l'email fonctionne");
+                                            // console.log(result)
+                                        });
+                                    });
+                                } 
+                            })
+                        }
+
+                        if (req.body.password) {
+                            console.log("modifier le mot de pass");
+                            // Changer le password en utilisant bcrypt
+                        }
+
+                        if (req.body.first_name) {
+                            const newfirst_name = req.body.first_name;
+                            console.log("======> Nouveau nom")
+                            console.log(newfirst_name)
+                        }
+
+                        if (req.body.last_name) {
+                            const newlast_name = req.body.last_name;
+                            console.log("======> Nouveau prénom")
+                            console.log(newlast_name)
+                        }
+
+                        if (req.body.birthdate) {
+                            const newBirthdate = req.body.birthdate;
+                            console.log("======> Nouvelle date de naissance")
+                            console.log(newBirthdate)
+                        }
+
+                        let newAvatarUrl;
+
+                        if (req.body.avatar) {
+                            newAvatarUrl = `${req.protocol}://${req.get("host")}/images/${req.file.filename}`;
+                            console.log("======> Nouvelle photo de profile")
+                            console.log(newAvatarUrl)
+
+                        }
+
+                        // const profileToUpdate = {
+                        //     id: foundProfile[0].id.toString(),
+                        //     user_id: foundProfile[0].user_id.toString(),
+                        //     email: decryptedEmail,
+                        //     password: foundUser[0].password,
+                        //     firstName: foundProfile[0].first_name,
+                        //     lastName: foundProfile[0].last_name,
+                        //     birthdate: foundProfile[0].birthdate,
+                        //     avatarUrl: foundProfile[0].avatar,
+                        // };
+                        const profileToUpdate = {
+                            id: foundProfile[0].id.toString(),
+                            user_id: foundProfile[0].user_id.toString(),
+                            email: decryptedEmail,
+                            password: foundUser[0].password,
+                            first_name: req.body.first_name,
+                            last_name: req.body.last_name,
+                            birthdate: req.body.birthdate,
+                            avatar: newAvatarUrl,
+                        };
+
+                        console.log("=====> profileToUpdate");
+                        console.log(profileToUpdate);
+
+                        res.status(200).json({ MESSAGE: `Vous êtes autorisé à effectuer cette action.` });
                     });
                 });
 
