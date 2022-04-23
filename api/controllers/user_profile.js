@@ -1,4 +1,5 @@
 const connection = require('../config/db.user.config');
+const bcrypt = require("bcrypt");
 
 const path = require("path");
 const fs = require("fs");
@@ -212,6 +213,7 @@ exports.modifyProfile = (req, res, next) => {
                             const updateTest = `UPDATE users SET email = '${emailUser}' WHERE id = ?`
                             const updateTest2 = `UPDATE users_profiles SET email = '${emailProfile}' WHERE user_id = ?`
 
+                            // Modification de l'email
                             connection.query(newEmailSearch, emailUser, (err, emailFound) => {
                                 if (err) throw err;
 
@@ -231,120 +233,105 @@ exports.modifyProfile = (req, res, next) => {
                             })
                         }
 
+                        // Modification du password
                         if (req.body.password) {
+                            const password = req.body.password
+
+                            bcrypt.hash(password, 10)
+                            .then(hash => {
+
+                                const updatePassword = `UPDATE users SET password = '${hash}' WHERE id = ?`
+
+                                connection.query(updatePassword, profile_id, (err, result) => {
+                                    if (err) throw err;
+
+                                    console.log("Password modifié !")
+                                });
+                            }).catch(err => res.status(500).json({ err }));
+
                             console.log("modifier le mot de pass");
                             // Changer le password en utilisant bcrypt
                         }
 
                         if (req.body.first_name) {
                             const newfirst_name = req.body.first_name;
-                            console.log("======> Nouveau nom")
-                            console.log(newfirst_name)
+
+                            const update = `UPDATE users_profiles SET first_name = '${newfirst_name}' WHERE user_id = ?`
+
+                            connection.query(update, profile_id, (err, result) => {
+                                if (err) throw err;
+
+                                console.log("Nom modifié")
+                            });
+
                         }
 
                         if (req.body.last_name) {
                             const newlast_name = req.body.last_name;
-                            console.log("======> Nouveau prénom")
-                            console.log(newlast_name)
+                            
+                            const update = `UPDATE users_profiles SET last_name = '${newlast_name}' WHERE user_id = ?`
+
+                            connection.query(update, profile_id, (err, result) => {
+                                if (err) throw err;
+
+                                console.log("Prénom modifié")
+                            });
                         }
 
                         if (req.body.birthdate) {
                             const newBirthdate = req.body.birthdate;
-                            console.log("======> Nouvelle date de naissance")
-                            console.log(newBirthdate)
+                            
+                            const update = `UPDATE users_profiles SET birthdate = '${newBirthdate}' WHERE user_id = ?`
+
+                            connection.query(update, profile_id, (err, result) => {
+                                if (err) throw err;
+
+                                console.log("Date de naissance modifiée !")
+                            });
                         }
+
 
                         let newAvatarUrl;
+                            if (req.file) {
+                                newAvatarUrl = `${req.protocol}://${req.get("host")}/images/${req.file.filename}`;
+                                const update = `UPDATE users_profiles SET avatar = '${newAvatarUrl}' WHERE user_id = ?`;
 
-                        if (req.body.avatar) {
-                            newAvatarUrl = `${req.protocol}://${req.get("host")}/images/${req.file.filename}`;
-                            console.log("======> Nouvelle photo de profile")
-                            console.log(newAvatarUrl)
+                                if (foundProfile[0].avatar) {
+                                    const file = foundProfile[0].avatar.split("/")[4];
+                                    const fileUrl = path.join("images/" + file);
+    
+                                    // On supprime l'ancienne
+                                    fs.unlink(fileUrl, () => {
+                                        console.log("IMAGE DELETED !");
+                                    });
+                                }
 
-                        }
+                                connection.query(update, profile_id, (err, result) => {
+                                    if (err) throw err;
+
+                                    console.log("Nouvelle image de profile ajoutée");
+                                });
+                                console.log("======> Nouvelle photo de profile");
+                                console.log(newAvatarUrl);
+                            }
 
                         // const profileToUpdate = {
                         //     id: foundProfile[0].id.toString(),
                         //     user_id: foundProfile[0].user_id.toString(),
                         //     email: decryptedEmail,
                         //     password: foundUser[0].password,
-                        //     firstName: foundProfile[0].first_name,
-                        //     lastName: foundProfile[0].last_name,
-                        //     birthdate: foundProfile[0].birthdate,
-                        //     avatarUrl: foundProfile[0].avatar,
+                        //     first_name: req.body.first_name,
+                        //     last_name: req.body.last_name,
+                        //     birthdate: req.body.birthdate,
+                        //     avatar: newAvatarUrl,
                         // };
-                        const profileToUpdate = {
-                            id: foundProfile[0].id.toString(),
-                            user_id: foundProfile[0].user_id.toString(),
-                            email: decryptedEmail,
-                            password: foundUser[0].password,
-                            first_name: req.body.first_name,
-                            last_name: req.body.last_name,
-                            birthdate: req.body.birthdate,
-                            avatar: newAvatarUrl,
-                        };
 
-                        console.log("=====> profileToUpdate");
-                        console.log(profileToUpdate);
+                        // console.log("=====> profileToUpdate");
+                        // console.log(profileToUpdate);
 
-                        res.status(200).json({ MESSAGE: `Vous êtes autorisé à effectuer cette action.` });
+                        res.status(200).json({ MESSAGE: `Profile modifié avec succès !` });
                     });
                 });
-
-                // connection.query(searchProfile, profile_id, (err, profile) => {
-                //     if (err) throw err;
-
-                //     console.log(profile)
-
-                //     if (profile.UserId !== req.auth.userId) {
-                //         res.status(401).json({ ERROR : "Vous n'êtes pas autorisé à effectuer cette action" })
-                //     } else {
-
-                //         if (profile.length == 0) {
-                //             res.status(404).json({ ERROR: "Ce profile n'existe pas !" });
-                //         } else {
-
-                //             let updateProfile;
-
-                //             if (req.file) {
-
-                //                 // On, récupère le chemin de l'ancienne image
-                //                 const file = profile[0].avatar.split("/")[4];
-                //                 const fileUrl = path.join("images/" + file);
-
-                //                 // On supprime l'ancienne
-                //                 fs.unlink(fileUrl, () => {
-                //                     console.log("IMAGE DELETED !")
-                //                 });
-
-                //                 // On indique le chemin de la nouvelle image
-                //                 const avatarUrl = `${req.protocol}://${req.get("host")}/images/${req.file.filename}`;
-                //                 // SQL UPDATE s'il y a une image a ajouter ou modifier
-                //                 updateProfile = `UPDATE users_profiles SET avatar = '${avatarUrl}' WHERE user_id = ?`;
-
-                //             } else {
-
-                //                 // SQL UPDATE s'il n'y a pas d'image a ajouter ou modifier
-                //                 updateProfile = `UPDATE users_profiles SET
-                //                 first_name = '${req.body.first_name}',
-                //                 last_name = '${req.body.last_name}',
-                //                 birthdate = '${req.body.birthdate}'
-                //                 WHERE user_id = ?`;
-                //             }
-
-                //             connection.query(updateProfile, profile_id, (err, result) => {
-                //                 if (err) throw err;
-
-                //                 // console.log("=====> RESULT UPDATE");
-                //                 // console.log(result);
-
-                //                 res.status(200).json({ MESSAGE: "Profile mis à jour avec succès" });
-                //             });
-                //         }
-
-                //     }
-
-                // });
             });
         } catch (error) {
             res.status(500).json(error);
@@ -354,60 +341,63 @@ exports.modifyProfile = (req, res, next) => {
 
 // Supprimer son propre compte
 exports.deleteAccount = (req, res, next) => {
-    connection.getConnection((err, connection) => {
-        if (err) throw err;
 
-        const profileId = req.params.id;
+    const profile_id = req.params.id;
+    // On vérifis si c'est le propriétaire du compte
+    if (profile_id !== req.auth.userId) {
 
-        const searchUser = `SELECT * FROM users_profiles WHERE user_id = ?`;
-        const deleteAccount = `DELETE FROM users_profiles WHERE user_id = ?`;
-        const deleteLoginAcc = `DELETE FROM users WHERE id = ?`;
+        res.status(401).json({ ERROR : "Vous n'êtes pas autorisé à effectuer cette action." })
 
-        // On cherche le profile associé au compte Utilisateur
-        connection.query(searchUser, profileId, (err, found) => {
-            if(err) throw err;
-            if (found.length == 0) {
-                res.status(404).json({ ERROR: "Cet utilisateur n'existe pas !" })
-            }
+    } else {
 
-            // On supprime la photo de profile associée
-            if (found[0].avatar !== null) {
+        connection.getConnection((err, connection) => {
+            if (err) throw err;
 
-                console.log("Il y a un avatar !")
+            // const profileId = req.params.id;
 
-                const file = found[0].avatar.split("/")[4];
-                const fileUrl = path.join("images/" + file);
+            const searchUser = `SELECT * FROM users_profiles WHERE user_id = ?`;
+            const deleteAccount = `DELETE FROM users_profiles WHERE user_id = ?`;
+            const deleteLoginAcc = `DELETE FROM users WHERE id = ?`;
 
-                fs.unlink(fileUrl, () => {
-                    console.log("image supprimée avec succès")
-                });
-
-            } 
-
-            // On supprime le profile
-            connection.query(deleteAccount, profileId, (err, found) => {
+            // On cherche le profile associé au compte Utilisateur
+            connection.query(searchUser, profile_id, (err, found) => {
                 if(err) throw err;
+                if (found.length == 0) {
+                    res.status(404).json({ ERROR: "Cet utilisateur n'existe pas !" })
+                }
 
-                console.log("Profile supprimé avec succès")
+                // On supprime la photo de profile associée
+                if (found[0].avatar !== null) {
 
-                // On supprime le compte de connexion
-                connection.query(deleteLoginAcc, profileId, (err, profile) => {
+                    console.log("Il y a un avatar !")
+
+                    const file = found[0].avatar.split("/")[4];
+                    const fileUrl = path.join("images/" + file);
+
+                    fs.unlink(fileUrl, () => {
+                        console.log("image supprimée avec succès")
+                    });
+
+                } 
+
+                // On supprime le profile
+                connection.query(deleteAccount, profile_id, (err, found) => {
                     if(err) throw err;
 
-                    console.log("compte utilisateur supprimé avec succès !")
-                    // connection.release();
+                    console.log("Profile supprimé avec succès")
 
-                    res.status(200).json({ MESSAGE : "Compte supprimé avec succès !" })
+                    // On supprime le compte de connexion
+                    connection.query(deleteLoginAcc, profile_id, (err, profile) => {
+                        if(err) throw err;
+
+                        console.log("compte utilisateur supprimé avec succès !")
+                        // connection.release();
+
+                        res.status(200).json({ MESSAGE : "Compte supprimé avec succès !" })
+                    })
+
                 })
-
-            })
-
-            // res.status(200).json({ Message : found })
-
-            // On récupère l'image de profile qui va avec
-            // const file = userProfile
-            // console.log(userProfile)
-            // On supprime le tout
+            });
         });
-    });
+    }
 }
