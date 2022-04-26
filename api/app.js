@@ -8,10 +8,12 @@ require("dotenv").config();
 const adminRoutes = require("./routes/admin");
 const userRoutes = require('./routes/user');
 const userProfileRoutes = require('./routes/user_profile');
+const articlesRoutes = require('./routes/articles');
 
 // =========> Import de config table users
 const createTableUsers = require('./config/tables.config/users');
 const createTableProfile = require('./config/tables.config/user_profile');
+const createTableArticle = require("./config/tables.config/articles");
 
 const connection = require('./config/db.config');
 
@@ -21,6 +23,7 @@ connection.connect((err) => {
     try {
         createTableUsers();
         createTableProfile();
+        createTableArticle();
     } catch (error) {
         console.log(error)
     }
@@ -207,6 +210,7 @@ app.use('/images',express.static(path.join('images')));
 app.use("/api/admin", adminRoutes);
 app.use("/api/auth", userRoutes);
 app.use("/api/profiles", userProfileRoutes);
+app.use("/api/articles", articlesRoutes);
 // app.use('/api/posts', postsRoutes);
 
 

@@ -21,7 +21,7 @@ const role = 'admin';
 const searchAdmin =`SELECT * FROM users WHERE role = ?`
 const searchUser = `SELECT * FROM users WHERE email = ?`;
 const addNewAdmin = `INSERT INTO users SET ?`;
-const addAdminProfil = `INSERT INTO users_profiles SET user_id = ?`
+const addAdminProfil = `INSERT INTO users_profiles SET ?`
 
 
 exports.signup = (req, res, next) => {
@@ -56,7 +56,15 @@ exports.signup = (req, res, next) => {
                                     if (userFound.length != 0) {
                                         const user_id = userFound[0].id.toString();
 
-                                        connection.query(addAdminProfil, user_id, async (err, result) => {
+                                        const emailProfile =  cryptojs.AES.encrypt(email, secretEmail).toString();
+
+                                        const newProfil = {
+                                            user_id: user_id,
+                                            email: emailProfile
+                                        }
+
+                                        // On créé le profile admin
+                                        connection.query(addAdminProfil, newProfil, async (err, result) => {
                                             if (err) throw err;
                                         
                                             res.status(201).json({ Message: "Compte admin créé." });

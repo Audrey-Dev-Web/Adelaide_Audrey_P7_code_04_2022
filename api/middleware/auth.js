@@ -13,12 +13,7 @@ module.exports = (req, res, next) => {
         const decodedToken = jwt.verify(token, secret);
         const userId = decodedToken.userId;
         const userRole = decodedToken.role;
-        req.auth = { userId };
-
-        // console.log("=======> Contenu de auth.js userRole")
-        // console.log(userRole)
-        // console.log("------ Contenu de auth.js userId")
-        // console.log(userId)
+        req.auth = { userId, userRole };
 
         if (req.body.userId && req.body.userId !== userId) {
             throw "Utilisateur invalide";
@@ -27,7 +22,7 @@ module.exports = (req, res, next) => {
         }
 
     } catch (err) {
-        res.status(401).json({ ERROR : "Requête non authentifiée !" });
+        res.status(401).json({ ERROR : "Requête non autorisée !" });
     }
 
 };

@@ -81,6 +81,9 @@ exports.signup = async (req, res, next) => {
                             // On ajoute le nouvel utilisateur dans la base de données
                             await connection.query(addNewUser, newUser, async (err, result) => {
                                 connection.release();
+                                
+                                if (err) throw err;
+
                                 res.status(201).json({ Message: "Nouvel utilisateur créé avec succès." });
 
                                 await connection.query(`SELECT * FROM users WHERE email = ?`, hashedEmail, async (err, found) => {
