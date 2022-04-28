@@ -12,4 +12,6 @@ router.get('/:id', auth, articleCtrl.getOneArticle);
 router.put('/:id', auth, multer, articleCtrl.modifyArticle);
 router.delete('/:id', auth, articleCtrl.deleteArticle);
 
+router.post('/:id/like', auth, articleCtrl.likeArticle);
+
 module.exports = router;

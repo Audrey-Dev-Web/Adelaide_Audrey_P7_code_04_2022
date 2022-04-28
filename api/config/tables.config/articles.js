@@ -10,9 +10,6 @@ const articlesTable = () => {
         likes INT,
         dislikes INT,
         shares INT,
-        usersLiked JSON,
-        usersDisliked JSON,
-        usersShared JSON,
         timestamp DATETIME NOT NULL DEFAULT NOW()
         )`;
 

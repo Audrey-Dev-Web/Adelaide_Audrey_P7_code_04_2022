@@ -14,6 +14,10 @@ const articlesRoutes = require('./routes/articles');
 const createTableUsers = require('./config/tables.config/users');
 const createTableProfile = require('./config/tables.config/user_profile');
 const createTableArticle = require("./config/tables.config/articles");
+// ========> Relations tables
+const addLikesTable = require("./config/tables.config/likes");
+const addDislikesTable = require("./config/tables.config/dislikes");
+const addSharesTable = require("./config/tables.config/shares");
 
 const connection = require('./config/db.config');
 
@@ -24,6 +28,9 @@ connection.connect((err) => {
         createTableUsers();
         createTableProfile();
         createTableArticle();
+        addLikesTable();
+        addDislikesTable();
+        addSharesTable();
     } catch (error) {
         console.log(error)
     }

@@ -339,64 +339,255 @@ exports.deleteArticle = (req, res, next) => {
         console.log(req.auth)
 
     });
+};
 
+exports.likeArticle = (req, res, next) => {
+    const article_id = req.params.id;
+    const user_id = req.auth.userId;
 
-    // On vérifis si c'est le propriétaire du compte
-    // if (profile_id !== req.auth.userId ) {
+    connection.getConnection(async (err, connection) => {
+        if (err) throw err;
 
-    //     res.status(401).json({ ERROR : "Vous n'êtes pas autorisé à effectuer cette action." })
+        const searchArticle = `SELECT * FROM articles WHERE id = ?`;
 
-    // } else {
+        connection.query(searchArticle, article_id, (err, article) => {
+            if (err) throw err;
 
+            if (article.length == 0) {
+                return res.status(404).json({ ERROR: "Cet article est introuvable" });
+            }
 
-        // connection.getConnection((err, connection) => {
-        //     if (err) throw err;
+            const userObject = {
+                user_id: user_id,
+                articles_id: article_id,
+            };
 
-        //     // const profileId = req.params.id;
+            switch (req.body.like) {
+                case 0:
+                    try {
+                        const searchUserLiked = `SELECT * FROM usersliked WHERE user_id = '${user_id}' AND articles_id = ?`;
 
-        //     const searchUser = `SELECT * FROM users_profiles WHERE user_id = ?`;
-        //     const deleteAccount = `DELETE FROM users_profiles WHERE user_id = ?`;
-        //     const deleteLoginAcc = `DELETE FROM users WHERE id = ?`;
+                        connection.query(searchUserLiked, article_id, (err, userFound) => {
+                            if (err) throw err;
 
-        //     // On cherche le profile associé au compte Utilisateur
-        //     connection.query(searchUser, profile_id, (err, found) => {
-        //         if(err) throw err;
-        //         if (found.length == 0) {
-        //             res.status(404).json({ ERROR: "Cet utilisateur n'existe pas !" })
-        //         }
+                            if (userFound.length == 1) {
+                                const deleteUserLiked = `DELETE FROM usersliked WHERE user_id = '${user_id}' AND articles_id = ?`;
 
-        //         // On supprime la photo de profile associée
-        //         if (found[0].avatar !== null) {
+                                connection.query(deleteUserLiked, article_id, (err, userLikedDelete) => {
+                                    if (err) throw err;
 
-        //             console.log("Il y a un avatar !")
+                                    const searchLikesCount = `SELECT * FROM usersliked WHERE articles_id = ?`;
 
-        //             const file = found[0].avatar.split("/")[4];
-        //             const fileUrl = path.join("images/" + file);
+                                    connection.query(searchLikesCount, article_id, (err, founds) => {
+                                        if (err) throw err;
 
-        //             fs.unlink(fileUrl, () => {
-        //                 console.log("image supprimée avec succès")
-        //             });
+                                        if (founds.length <= 0) {
+                                            const updateLikes = `UPDATE articles SET likes = '0' WHERE id = ?`;
+                                            connection.query(updateLikes, article_id, (err, update) => {
+                                                if (err) throw err;
+                                                res.status(404).json({ ERROR: "Personne n'a encore like cet article" });
+                                            });
+                                        } else {
+                                            const updateLikes = `UPDATE articles SET likes = '${founds.length}' WHERE id = ?`;
+                                            connection.query(updateLikes, article_id, (err, update) => {
+                                                if (err) throw err;
 
-        //         } 
+                                                res.status(200).json({ MESSAGE: "Like annulé avec succès !" });
+                                            });
+                                        }
+                                    });
+                                });
+                            }
+                        });
 
-        //         // On supprime le profile
-        //         connection.query(deleteAccount, profile_id, (err, found) => {
-        //             if(err) throw err;
+                        const searchUserDisliked = `SELECT * FROM usersdisliked WHERE user_id = '${user_id}' AND articles_id = ?`;
 
-        //             console.log("Profile supprimé avec succès")
+                        connection.query(searchUserDisliked, article_id, (err, userFound) => {
+                            if (err) throw err;
 
-        //             // On supprime le compte de connexion
-        //             connection.query(deleteLoginAcc, profile_id, (err, profile) => {
-        //                 if(err) throw err;
+                            if (userFound.length == 1) {
+                                const deleteUserDisliked = `DELETE FROM usersdisliked WHERE user_id = '${user_id}' AND articles_id = ?`;
 
-        //                 console.log("compte utilisateur supprimé avec succès !")
-        //                 // connection.release();
+                                connection.query(deleteUserDisliked, article_id, (err, userDislikedDelete) => {
+                                    if (err) throw err;
 
-        //                 res.status(200).json({ MESSAGE : "Compte supprimé avec succès !" })
-        //             })
+                                    const searchDislikesCount = `SELECT * FROM usersdisliked WHERE articles_id = ?`;
 
-        //         })
-        //     });
-        // });
-    // }
+                                    connection.query(searchDislikesCount, article_id, (err, found) => {
+                                        if (err) throw err;
+
+                                        if (found.length <= 0) {
+                                            const updateDislikes = `UPDATE articles SET dislikes = '0' WHERE id = ?`;
+                                            connection.query(updateDislikes, article_id, (err, updated) => {
+                                                if (err) throw err;
+                                                res.status(404).json({
+                                                    ERROR: "Personne n'a encore dislike cet article",
+                                                });
+                                            });
+                                        } else {
+                                            const updateLikes = `UPDATE articles SET dislikes = '${found.length}' WHERE id = ?`;
+                                            connection.query(updateLikes, article_id, (err, updated) => {
+                                                if (err) throw err;
+
+                                                res.status(200).json({ MESSAGE: "Like annulé avec succès !" });
+                                            });
+                                        }
+                                    });
+                                });
+                            }
+                        });
+                    } catch (error) {
+                        res.status(500).json({ error });
+                    }
+
+                    break;
+
+                case 1:
+                    const searchIfDisliked = `SELECT * FROM usersdisliked WHERE articles_id = ?`;
+                    connection.query(searchIfDisliked, article_id, (err, found) => {
+                        if (err) throw err;
+
+                        let disliked = false;
+
+                        found.forEach((userDisliked) => {
+                            if (userDisliked.user_id.toString() === user_id) {
+                                disliked = true;
+                            } else {
+                                disliked = false;
+                            }
+                        });
+
+                        if (disliked) {
+                            const deleteDisliked = `DELETE FROM usersdisliked WHERE user_id = '${user_id}' AND articles_id = ?`;
+                            connection.query(deleteDisliked, article_id, (err, userDelete) => {
+                                if (err) throw err;
+
+                                console.log("l'utilisateur a été supprimé !");
+
+                                const dislikesCount = `SELECT * FROM usersdisliked WHERE articles_id = ?`;
+                                connection.query(dislikesCount, article_id, (err, count) => {
+                                    if (err) throw err;
+
+                                    console.log(count.length);
+
+                                    const updateDislikes = `UPDATE articles SET dislikes = ${count.length} WHERE id = ?`;
+                                    connection.query(updateDislikes, article_id, (err, updated) => {
+                                        if (err) throw err;
+
+                                        console.log(updated);
+                                    });
+                                });
+                            });
+                        }
+                    });
+
+                    // On cherche si l'utilisateur est déjà présent dans usersliked
+                    const searchUsersLiked = `SELECT * FROM usersliked WHERE user_id = '${user_id}' AND articles_id = ?`;
+                    connection.query(searchUsersLiked, article_id, (err, userFound) => {
+                        if (err) throw err;
+
+                        if (userFound.length <= 0) {
+                            const addUserLiked = `INSERT INTO usersliked SET ?`;
+                            connection.query(addUserLiked, userObject, (err, results) => {
+                                if (err) throw err;
+
+                                console.log(results);
+
+                                const searchLikesCount = `SELECT * FROM usersliked WHERE articles_id = ?`;
+                                connection.query(searchLikesCount, article_id, (err, found) => {
+                                    if (err) throw err;
+
+                                    console.log("found");
+
+                                    if (found.length >= 0) {
+                                        // On met à jour le nombre de likes
+                                        const addLikesCount = `UPDATE articles SET likes = '${found.length}' WHERE id = ?`;
+                                        connection.query(addLikesCount, article_id, (err, results) => {
+                                            if (err) throw err;
+                                            console.log(results);
+
+                                            res.status(200).json({
+                                                MESSAGE: "L'utilisateur a aimé l'article : " + article_id,
+                                            });
+                                        });
+                                    }
+                                });
+                            });
+                        } else {
+                            res.status(400).json({ ERROR: "Cet utilisateur a déjà donnée son avis positif" });
+                        }
+                    });
+
+                    break;
+
+                case -1:
+                    const searchIfLiked = `SELECT * FROM usersliked WHERE user_id = '${user_id}' AND articles_id = ?`;
+                    connection.query(searchIfLiked, article_id, (err, userFound) => {
+                        if (err) throw err;
+
+                        if (userFound.length > 0) {
+                            const deleteLiked = `DELETE FROM usersliked WHERE user_id = '${user_id}' AND articles_id = ?`;
+                            connection.query(deleteLiked, article_id, (err, userDelete) => {
+                                if (err) throw err;
+
+                                console.log("l'utilisateur a été supprimé !");
+
+                                const likesCount = `SELECT * FROM usersliked WHERE articles_id = ?`;
+                                connection.query(likesCount, article_id, (err, count) => {
+                                    if (err) throw err;
+
+                                    console.log(count.length);
+
+                                    const updateLikes = `UPDATE articles SET likes = '${count.length}' WHERE id = ?`;
+                                    connection.query(updateLikes, article_id, (err, updated) => {
+                                        if (err) throw err;
+
+                                        console.log(updated);
+                                    });
+                                });
+                            });
+                        }
+                    });
+
+                    // On cherche si l'utilisateur est déjà présent dans usersdisliked
+                    const searchUsersDisliked = `SELECT * FROM usersdisliked WHERE user_id = '${user_id}' AND articles_id = ?`;
+                    connection.query(searchUsersDisliked, article_id, (err, userFound) => {
+                        if (err) throw err;
+
+                        if (userFound.length <= 0) {
+                            const addUserDisliked = `INSERT INTO usersdisliked SET ?`;
+                            connection.query(addUserDisliked, userObject, (err, results) => {
+                                if (err) throw err;
+
+                                console.log(results);
+
+                                const searchDislikesCount = `SELECT * FROM usersdisliked WHERE articles_id = ?`;
+                                connection.query(searchDislikesCount, article_id, (err, found) => {
+                                    if (err) throw err;
+
+                                    console.log("found");
+
+                                    if (found.length >= 0) {
+                                        // On met à jour le nombre de likes
+                                        const addDislikesCount = `UPDATE articles SET dislikes = '${found.length}' WHERE id = ?`;
+                                        connection.query(addDislikesCount, article_id, (err, results) => {
+                                            if (err) throw err;
+                                            console.log(results);
+
+                                            res.status(200).json({
+                                                MESSAGE: "L'utilisateur n'aime pas l'article : " + article_id,
+                                            });
+                                        });
+                                    }
+                                });
+                            });
+                        } else {
+                            res.status(400).json({ ERROR: "Cet utilisateur a déjà donnée son avis positif" });
+                        }
+                    });
+
+                    break;
+            }
+        });
+    });
 };
