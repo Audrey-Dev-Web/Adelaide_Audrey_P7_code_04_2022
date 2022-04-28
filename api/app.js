@@ -9,11 +9,13 @@ const adminRoutes = require("./routes/admin");
 const userRoutes = require('./routes/user');
 const userProfileRoutes = require('./routes/user_profile');
 const articlesRoutes = require('./routes/articles');
+// const commentsRoutes = require('./routes/comments');
 
 // =========> Import de config table users
 const createTableUsers = require('./config/tables.config/users');
 const createTableProfile = require('./config/tables.config/user_profile');
 const createTableArticle = require("./config/tables.config/articles");
+const CommentsTable = require("./config/tables.config/comments");
 // ========> Relations tables
 const addLikesTable = require("./config/tables.config/likes");
 const addDislikesTable = require("./config/tables.config/dislikes");
@@ -31,6 +33,7 @@ connection.connect((err) => {
         addLikesTable();
         addDislikesTable();
         addSharesTable();
+        CommentsTable();
     } catch (error) {
         console.log(error)
     }
@@ -218,7 +221,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/auth", userRoutes);
 app.use("/api/profiles", userProfileRoutes);
 app.use("/api/articles", articlesRoutes);
-// app.use('/api/posts', postsRoutes);
+// app.use("/api/articles/:id/comments", commentsRoutes)
 
 
 // expore de app
