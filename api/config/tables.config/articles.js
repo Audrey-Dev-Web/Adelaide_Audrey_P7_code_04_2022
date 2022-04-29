@@ -7,6 +7,7 @@ const articlesTable = () => {
         title VARCHAR(300) NOT NULL,
         content VARCHAR(5000), 
         images VARCHAR(100),
+        comments INT,
         likes INT,
         dislikes INT,
         shares INT,

@@ -64,6 +64,7 @@ exports.createArticle = (req, res, next) => {
                 title: article.title,
                 content: article.content,
                 images: article.images,
+                comments: 0,
                 likes: 0,
                 dislikes: 0,
                 shares: 0,
@@ -88,18 +89,19 @@ exports.createArticle = (req, res, next) => {
 exports.getAllArticles = (req, res, next) => {
 
     try {
-    connection.getConnection((err, connection) => {
+    connection.getConnection(async(err, connection) => {
         if (err) throw err;
 
-        const showAllArticles = `SELECT * FROM users_profiles INNER JOIN articles ON users_profiles.user_id = articles.author_id`;
+        // On cherche tous les articles
+        const articles = `SELECT * FROM users_profiles JOIN articles ON users_profiles.user_id = articles.author_id`;
+        await connection.query(articles, async(err, found) => {
 
-        connection.query(showAllArticles, (err, found) => {
             connection.release();
 
             if (err) throw err;
 
             if (found.length == 0){
-                res.status(200).json({ MESSAGE : " Il n'y a aucun article à afficher pour le moment." })
+                return res.status(200).json({ MESSAGE : " Il n'y a aucun article à afficher pour le moment." })
             }
 
             let articlesFound = [];
@@ -114,6 +116,7 @@ exports.getAllArticles = (req, res, next) => {
                         title : article.title,
                         content : article.content,
                         images: article.images,
+                        comments: article.comments,
                         likes : article.likes,
                         dislikes : article.dislikes,
                         shares: article.shares
@@ -156,7 +159,6 @@ exports.getOneArticle = (req, res, next) => {
                     res.status(404).json({ ERROR : "Cet article n'existe pas" })
                 } else {
 
-
                     const articleFound = {
                         id: article[0].id.toString(),
                         author_firstName: article[0].first_name,
@@ -166,6 +168,7 @@ exports.getOneArticle = (req, res, next) => {
                         title: article[0].title,
                         content: article[0].content,
                         img: article[0].images,
+                        comments: article[0].comments,
 
                         likes: article[0].likes,
                         dislikes: article[0].dislikes,
