@@ -1,4 +1,18 @@
-# Getting Started with Create React App
+# GROUPOMANIA
+
+## Lancer l'application
+
+### Backend
+Fonctionne sur le port : 8080
+MySQL sur le port 3007
+
+Tapez npm start ou nodemon server si vous l'utilisez
+
+### Frontend
+Fonctionne sur le port : 3000
+
+tapez npm start
+
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
