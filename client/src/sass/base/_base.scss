@@ -1,0 +1,19 @@
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    background: $principal_bg;
+    color: $normal_text;
+}
+
+a {
+    text-decoration: none;
+}
+
+li {
+    padding-left: 0;
+    list-style-type: none;
+}

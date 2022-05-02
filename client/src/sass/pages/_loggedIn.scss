@@ -1,0 +1,13 @@
+.login {
+    border: 1px solid #fff;
+    border-top: 2px solid #ba4d55;
+    border-bottom: 2px solid #ba4d55;
+    border-radius: 10px;
+    width: 40%;
+    padding: 2%;
+    margin: auto;
+
+    &__branding {
+        text-align: center;
+    }
+}
