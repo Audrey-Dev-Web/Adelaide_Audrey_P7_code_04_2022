@@ -16,6 +16,8 @@ router.delete('/:id', auth, articleCtrl.deleteArticle);
 
 // Likes / Dislikes / Shares Routes
 router.post('/:id/like', auth, articleCtrl.likeArticle);
+router.post('/:id/share', auth, articleCtrl.shareArticle)
+router.post('/:id/share/:share_id', auth, articleCtrl.shareArticle)
 
 // Comments Routes
 router.post('/:id/comments', auth, commentCtrl.addComment)

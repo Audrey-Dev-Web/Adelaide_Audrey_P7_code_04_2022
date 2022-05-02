@@ -1,6 +1,7 @@
 const connection = require('../config/db.user.config');
 
 const Article = require("../models/Articles");
+const Share = require("../models/Share");
 const path = require("path");
 const fs = require("fs");
 
@@ -594,3 +595,155 @@ exports.likeArticle = (req, res, next) => {
         });
     });
 };
+
+exports.shareArticle = (req, res, next) => {
+    try{
+        const post_id = req.params.id;
+        const user_id = req.auth.userId;
+
+        // connection à la base de Données
+        connection.getConnection(async (err, connection) => {
+            if (err) throw err;
+
+            // On verifis que l'article existe
+            const searchPost = `SELECT * FROM articles 
+            JOIN users_profiles 
+            ON articles.author_id = users_profiles.user_id
+            WHERE articles.id = ?`
+
+            await connection.query(searchPost, post_id, async(err, postFound) => {
+                if (err) throw err;
+
+                if (postFound.length <= 0) {
+                    return res.status(404).json({ ERROR: "Ce post n'existe pas" })
+                }
+
+                const searchUsersShared = `SELECT * FROM users_shared WHERE user_id = '${user_id}' AND post_id = ?`
+
+
+
+
+                switch (req.body.share) {
+                    case 0: 
+                    
+                        await connection.query(searchUsersShared, post_id, async (err, userFound) => {
+                            if (err) throw err;
+
+                            if (userFound.length <= 0) {
+                                return res.status(401).json({ ERROR: "Vous n'avez pas encore partagé ce post" })
+                            }
+
+                            const delete_post_shared = `DELETE FROM posts_shared WHERE user_id = '${user_id}' AND post_id = ?`;
+
+                            await connection.query(delete_post_shared, post_id, async(err, deleted) => {
+                                if (err) throw err;
+
+                                console.log("delete post shared a fonctionné avec succès")
+
+                                const delete_user_shared = `DELETE FROM users_shared WHERE user_id = '${user_id}' AND post_id = ?`;
+                                await connection.query(delete_user_shared, post_id, async(err, deleted) => {
+                                    if (err) throw err;
+
+                                    console.log("delete user shared a fonctionné avec succès")
+
+                                    const update_shares = `UPDATE articles SET shares = shares-1 WHERE id = ?`
+
+                                    await connection.query(update_shares, post_id, async(err, updated) => {
+                                        if (err) throw err;
+
+                                        res.status(200).json({ MESSAGE: "Partage annulé avec succès !" })
+                                    })
+                                })
+                            })
+                        })
+    
+                    break;
+    
+                    case 1: 
+
+                        // On vérifis que l'utilisateur n'a pas déjà partagé ce post
+                        // On cherche donc la présence de l'utilisateur dans users_shared
+                        
+                        await connection.query(searchUsersShared, post_id, async (err, userFound) => {
+                            if (err) throw err;
+
+                            if (userFound.length > 0) {
+                                return res.status(401).json({ ERROR: "Vous avez déjà partagé ce post" })
+                            }
+
+                            // On récupère la data du post
+                            console.log("=====> Post Found")
+                        console.log(postFound)
+
+                        // const title = "Shared";
+                        const content = {
+                            id : postFound[0].id.toString(),
+                            avatar : postFound[0].avatar,
+                            author_firstName : postFound[0].first_name,
+                            author_lastName : postFound[0].last_name,
+                            title : postFound[0].title,
+                            post_content : postFound[0].content,
+                            images : postFound[0].images
+                        };
+
+                        // On passe le contenu dans Stringify afin de pouvoir l'ajouter dans MySQL
+                        const post_content = JSON.stringify(content);
+
+                        // requête SQL pour ajouter un nouvel article
+                        const sharePost = `INSERT INTO posts_shared SET ?`;
+
+                        // On créer un nouveau post à partir de celui-ci
+                        const post = new Share(user_id, post_id, post_content);
+
+                        let post_shared_Data = {
+                                user_id: post.user_id,
+                                post_id: post.post_id,
+                                post_content: post.post_content
+                                // comments: 0,
+                                // likes: 0,
+                                // dislikes: 0,
+                                // shares: 0,
+                        }
+
+                        console.log("=====> POST DATA")
+                        console.log(post_shared_Data)
+
+                        await connection.query(sharePost, post_shared_Data, async (err, result) => {
+                            // connection.release();
+                            if (err) throw err;
+
+                            const userObject = {
+                                user_id: user_id,
+                                post_id: post_id
+                            };
+                            // On ajoute l'id utilisateur dans usersshared
+                            const addUsersShared = `INSERT INTO users_shared SET ?`
+                            await connection.query(addUsersShared, userObject, async (err, userAdded) => {
+                                if (err) throw err;
+
+                                // const update = `UPDATE articles SET comments = comments-1 WHERE id = ? AND comments > 0`;
+                                // On mets à jour le nombre de partage de l'article
+                                const update_shares = `UPDATE articles SET shares = shares+1 WHERE id = ?`
+                                await connection.query(update_shares, post_id, async (err, updated) => {
+                                    if (err) throw err;
+            
+                                    console.log("=====> Update Réussi !")
+                                    console.log(updated)
+            
+                                    res.status(201).json({ MESSAGE: "Post partagé avec succès" });
+                                })
+
+                            })
+                        });
+                        })
+                    
+                        
+                break;
+            }
+            })
+        })
+
+    } catch (error) {
+        res.status(500).json({ error })
+    }
+}

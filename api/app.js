@@ -16,6 +16,8 @@ const createTableUsers = require('./config/tables.config/users');
 const createTableProfile = require('./config/tables.config/user_profile');
 const createTableArticle = require("./config/tables.config/articles");
 const CommentsTable = require("./config/tables.config/comments");
+const CreatePosts_shared = require("./config/tables.config/post_shared");
+const CreateUsers_shared = require("./config/tables.config/users_shared");
 // ========> Relations tables
 const addLikesTable = require("./config/tables.config/likes");
 const addDislikesTable = require("./config/tables.config/dislikes");
@@ -34,6 +36,8 @@ connection.connect((err) => {
         addDislikesTable();
         addSharesTable();
         CommentsTable();
+        CreatePosts_shared();
+        CreateUsers_shared();
     } catch (error) {
         console.log(error)
     }
