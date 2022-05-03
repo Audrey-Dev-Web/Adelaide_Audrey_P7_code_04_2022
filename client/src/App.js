@@ -7,8 +7,10 @@ import { Navigation, Footer, Login, Home, User_profile } from "./webpages";
 function App() {
     return (
         <div className="App">
+            <div className="App__bgColor"></div>
             <Router>
                 <Login />
+                {/* <Home /> */}
                 {/* <header className="App-header">
                     <Navigation />
                 </header>
@@ -20,7 +22,6 @@ function App() {
                 <Footer /> */}
             </Router>
         </div>
-
         // <div className="App">
         //     <header className="App-header">
         //         <img src={logo} className="App-logo" alt="logo" />
