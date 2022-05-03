@@ -5,5 +5,8 @@
 @import "./base/base.scss";
 @import "./base/fonts";
 
+// Components
+@import "./components/buttons";
+
 // Pages
 @import "./pages/loggedIn.scss";

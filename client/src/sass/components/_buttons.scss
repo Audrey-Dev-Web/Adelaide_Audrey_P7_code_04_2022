@@ -1,0 +1,20 @@
+.btn {
+    background: $accent_color_1;
+    color: $accent_color_2;
+    font-size: 1.1rem;
+    outline: none;
+    border: none;
+    border-radius: 15px;
+
+    // text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transition: all 100ms ease-in-out;
+
+    &:hover {
+        background: $accent_color_2;
+        color: $accent_color_1;
+    }
+}
