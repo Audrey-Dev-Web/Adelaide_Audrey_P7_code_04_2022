@@ -1,19 +1,19 @@
 const express = require("express");
 
 // const helmet = require('helmet');
-const path = require('path');
+const path = require("path");
 require("dotenv").config();
 
 // =========> IMPORTER LES ROUTES
 const adminRoutes = require("./routes/admin");
-const userRoutes = require('./routes/user');
-const userProfileRoutes = require('./routes/user_profile');
-const articlesRoutes = require('./routes/articles');
+const userRoutes = require("./routes/user");
+const userProfileRoutes = require("./routes/user_profile");
+const articlesRoutes = require("./routes/articles");
 // const commentsRoutes = require('./routes/comments');
 
 // =========> Import de config table users
-const createTableUsers = require('./config/tables.config/users');
-const createTableProfile = require('./config/tables.config/user_profile');
+const createTableUsers = require("./config/tables.config/users");
+const createTableProfile = require("./config/tables.config/user_profile");
 const createTableArticle = require("./config/tables.config/articles");
 const CommentsTable = require("./config/tables.config/comments");
 const CreatePosts_shared = require("./config/tables.config/post_shared");
@@ -23,7 +23,7 @@ const addLikesTable = require("./config/tables.config/likes");
 const addDislikesTable = require("./config/tables.config/dislikes");
 const addSharesTable = require("./config/tables.config/shares");
 
-const connection = require('./config/db.config');
+const connection = require("./config/db.config");
 
 connection.connect((err) => {
     if (err) throw err;
@@ -39,7 +39,7 @@ connection.connect((err) => {
         CreatePosts_shared();
         CreateUsers_shared();
     } catch (error) {
-        console.log(error)
+        console.log(error);
     }
 });
 
@@ -62,15 +62,13 @@ connection.connect((err) => {
 //     const user = process.env.DB_USER;
 //     const user_pass = process.env.DB_PASSWORD;
 
-
 //     if (err) throw err;
 
 //         // CREATE ADMIN ACC IF NOT EXISTS
 //         // let createAdminAcc = `CREATE USER IF NOT EXISTS '${admin}'@'localhost' IDENTIFIED BY '${admin_pass}'`;
 //         let createUserAcc = `CREATE USER IF NOT EXISTS '${user}'@'localhost' IDENTIFIED BY '${user_pass}'`; // OK
-//         // let adminPermissions = `GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, PROCESS, FILE, INDEX, ALTER, CREATE ROUTINE, ALTER ROUTINE, CREATE USER, EXECUTE ON *.* TO '${admin}'@'localhost'`;                       
+//         // let adminPermissions = `GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, PROCESS, FILE, INDEX, ALTER, CREATE ROUTINE, ALTER ROUTINE, CREATE USER, EXECUTE ON *.* TO '${admin}'@'localhost'`;
 //         let userPermissions = `GRANT SELECT, INSERT, UPDATE, DELETE, CREATE ON *.* TO '${user}'@'localhost'`; // OK
-
 
 //         // CREATION DU COMPTE ADMIN
 //         // connection.query(createAdminAcc, (err, results, fields) => {
@@ -96,7 +94,6 @@ connection.connect((err) => {
 //             });
 //         });
 
-
 //         // AJOUT DE PERMISSIONS AU COMPTE ADMIN
 //         // connection.query(adminPermissions, (err, results, fields) => {
 //         //     if (err) throw err;
@@ -105,14 +102,12 @@ connection.connect((err) => {
 //         //     // console.log("Permissions attribuées avec succès au Rôle Admin !");
 //         // });
 
-
 //     // Changement d'utilisateur afin de pouvoir créer une nouvelle table si elle n'est pas présente
 //     connection.changeUser({ user: admin_settings.user, password: admin_settings.password }, function(err) {
 //         if (err) throw err;
 
 //         // console.log("------------------");
 //         // console.log("Connectée en tant qu'Admin")
-            
 
 //         //========== USERS TABLE ===========
 //         const createUsersTable = `CREATE TABLE IF NOT EXISTS users(
@@ -120,8 +115,8 @@ connection.connect((err) => {
 //             email VARCHAR(100) NOT NULL UNIQUE,
 //             password VARCHAR(100) NOT NULL,
 //             role_id VARCHAR(10) NOT NULL,
-//             timestamp DATETIME NOT NULL DEFAULT NOW() 
-            
+//             timestamp DATETIME NOT NULL DEFAULT NOW()
+
 //         )`;
 
 //         connection.query(createUsersTable, (err, results, fields) => {
@@ -129,7 +124,6 @@ connection.connect((err) => {
 
 //             // console.log("------------------");
 //             // console.log("Table ajoutée avec succès !");
-
 
 //             // ============ USERS_PROFILES ===========
 //             const createUsersProfile = `CREATE TABLE IF NOT EXISTS users_profiles(
@@ -144,7 +138,7 @@ connection.connect((err) => {
 
 //             connection.query(createUsersProfile, (err, results, fields) => {
 //                 if (err) throw err;
-    
+
 //                 // console.log("------------------");
 //                 // console.log("Table profile ajoutée avec succès !");
 //             });
@@ -193,11 +187,10 @@ connection.connect((err) => {
 //     });
 // });
 
-
 // ==========> AJOUTER L'ANALYSE DU CORPS DE LA PAGE
 const app = express();
 app.use(express.json());
-    
+
 // ==========> AJOUTER HELMET
 // app.use(helmet());
 
@@ -206,17 +199,20 @@ app.use((req, res, next) => {
     // Permet de définir les origines autorisées à accéder à la ressource
     res.setHeader("Access-Control-Allow-Origin", "*");
     // Permet de définir les entêtes autorisés pour les origines
-    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content, Accept, Content-Type, Authorization");
+    res.setHeader(
+        "Access-Control-Allow-Headers",
+        "Origin, X-Requested-With, Content, Accept, Content-Type, Authorization"
+    );
     // Permet de définir les méthodes autorisées pour les origines
     res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
     // Permet d'utiliser les images lorsque helmet est activé
-    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+    res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
 
     next();
 });
 
 // ========> IMPORTER LE CHEMIN STATIQUE DES IMAGES
-app.use('/images',express.static(path.join('images')));
+app.use("/images", express.static(path.join("images")));
 // app.use('/images',express.static(path.join('images/avatar')));
 // app.use('/images',express.static(path.join('images/posts')));
 
@@ -226,7 +222,6 @@ app.use("/api/auth", userRoutes);
 app.use("/api/profiles", userProfileRoutes);
 app.use("/api/articles", articlesRoutes);
 // app.use("/api/articles/:id/comments", commentsRoutes)
-
 
 // expore de app
 module.exports = app;

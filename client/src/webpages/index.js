@@ -3,3 +3,4 @@ export { default as Footer } from "../components/Footer";
 export { default as Home } from "./Home";
 export { default as Login } from "./Login";
 export { default as User_profile } from "./User_profile";
+export { default as Post } from "./Post";

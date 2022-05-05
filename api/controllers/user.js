@@ -1,13 +1,13 @@
 const bcrypt = require("bcrypt");
-const jwt = require('jsonwebtoken');
-const cryptojs = require('crypto-js');
+const jwt = require("jsonwebtoken");
+const cryptojs = require("crypto-js");
 
 require("dotenv").config();
 const secretEmail = process.env.SECRET_EMAIL;
 
 // const mysql = require("mysql");
 
-const connection = require('../config/db.user.config');
+const connection = require("../config/db.user.config");
 
 const User = require("../models/User");
 
@@ -18,13 +18,12 @@ const User = require("../models/User");
 //     console.log("Connexion à la base de données réussie : " + connection.threadId)
 // })
 
-
 // ----------- SIGNUP
 exports.signup = async (req, res, next) => {
     const emailRegex = `(.*)@(.*)\.(.*)`;
 
     const { email, password } = req.body;
-    const role = 'user';
+    const role = "user";
     // console.log((email))
     // console.log(password)
 
@@ -43,7 +42,7 @@ exports.signup = async (req, res, next) => {
         // console.log("-------> user hashedEmail");
         // console.log(hashedEmail);
 
-            user.hashPassword()
+        user.hashPassword()
             .then((hash) => {
                 // console.log("-------> user hashedPassword response");
                 // console.log(hash);
@@ -52,7 +51,7 @@ exports.signup = async (req, res, next) => {
                 const newUser = {
                     email: hashedEmail,
                     password: hash,
-                    role: role
+                    role: role,
                 };
 
                 connection.getConnection(async (err, connection) => {
@@ -81,41 +80,44 @@ exports.signup = async (req, res, next) => {
                             // On ajoute le nouvel utilisateur dans la base de données
                             await connection.query(addNewUser, newUser, async (err, result) => {
                                 connection.release();
-                                
+
                                 if (err) throw err;
 
                                 res.status(201).json({ Message: "Nouvel utilisateur créé avec succès." });
 
-                                await connection.query(`SELECT * FROM users WHERE email = ?`, hashedEmail, async (err, found) => {
-                                    // connection.release();
-                                    if (err) throw err;
-
-                                    // console.log("------> FOUND")
-                                    // console.log(found[0].id.toString())
-
-                                    const user_id = found[0].id.toString();
-
-                                    console.log("-------> userId")
-                                    console.log(user_id)
-
-                                    const emailProfile =  cryptojs.AES.encrypt(email, secretEmail).toString();
-
-                                    const newProfil = {
-                                        user_id: user_id,
-                                        email: emailProfile
-                                    }
-
-                                    const user_id_sql = `INSERT INTO users_profiles SET ?`
-
-                                    await connection.query(user_id_sql, newProfil, async (err, result) => {
+                                await connection.query(
+                                    `SELECT * FROM users WHERE email = ?`,
+                                    hashedEmail,
+                                    async (err, found) => {
                                         // connection.release();
                                         if (err) throw err;
 
-                                        console.log("------ RESULT")
-                                        console.log(result)
+                                        // console.log("------> FOUND")
+                                        // console.log(found[0].id.toString())
 
-                                    });
-                                })
+                                        const user_id = found[0].id.toString();
+
+                                        console.log("-------> userId");
+                                        console.log(user_id);
+
+                                        const emailProfile = cryptojs.AES.encrypt(email, secretEmail).toString();
+
+                                        const newProfil = {
+                                            user_id: user_id,
+                                            email: emailProfile,
+                                        };
+
+                                        const user_id_sql = `INSERT INTO users_profiles SET ?`;
+
+                                        await connection.query(user_id_sql, newProfil, async (err, result) => {
+                                            // connection.release();
+                                            if (err) throw err;
+
+                                            console.log("------ RESULT");
+                                            console.log(result);
+                                        });
+                                    }
+                                );
                             });
                         }
                     });
@@ -124,7 +126,6 @@ exports.signup = async (req, res, next) => {
             .catch((err) => res.status(401).json({ ERROR: "Impossible de créer l'utilisateur." }));
     }
 };
-
 
 // -------- LOGIN
 exports.login = async (req, res, next) => {
@@ -156,7 +157,7 @@ exports.login = async (req, res, next) => {
             if (err) throw err;
 
             if (found.length == 0) {
-                res.status(404).json({ ERROR: "Cette utilisateur n'existe pas." });
+                res.status(404).send({ message: "Cette utilisateur n'existe pas." });
             } else {
                 // Réécrire cette partie du login
 

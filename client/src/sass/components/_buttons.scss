@@ -1,20 +1,25 @@
 .btn {
-    background: $accent_color_1;
+    background: $accent_color_3;
     color: $accent_color_2;
     font-size: 1.1rem;
     outline: none;
     border: none;
     border-radius: 15px;
 
+    padding: 15px 30px;
+    // height: 40px;
+
     // text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    // display: flex;
+    // align-items: center;
+    // justify-content: center;
+
+    @include flex-center;
 
     transition: all 100ms ease-in-out;
 
     &:hover {
         background: $accent_color_2;
-        color: $accent_color_1;
+        color: $accent_color_3;
     }
 }

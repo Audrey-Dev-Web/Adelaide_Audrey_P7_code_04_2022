@@ -10,5 +10,9 @@
 // Components
 @import "./components/buttons";
 
+// Layouts
+@import "./layout/navigation";
+
 // Pages
 @import "./pages/loggedIn.scss";
+@import "./pages/home";
