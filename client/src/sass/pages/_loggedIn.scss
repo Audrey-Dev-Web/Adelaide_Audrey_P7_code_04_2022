@@ -63,6 +63,11 @@
 
             & .item {
                 padding: 2%;
+                border-bottom: 3px solid transparent;
+
+                & .active {
+                    border-bottom: 3px solid $accent_color_3;
+                }
 
                 &:hover {
                     color: $accent_color_3;

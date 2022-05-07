@@ -1,27 +1,42 @@
 import React, { useState } from "react";
-import { Routes, Route, Link, Navigate } from "react-router-dom";
+// import { Routes, Route, Link, Navigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
+// import { Routes, Route, Link, Navigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import logo from "../images/icon.svg";
+
+// import Signup from "./Signup";
+
+// import Auth from "../components/Auth";
+
 // tutorial
 // import { useHistory } from "react-router-dom";
 
 // Import des icons de la page login
 import { BiLogInCircle, BiLockOpenAlt, BiShow, BiHide } from "react-icons/bi";
+// import Auth from "./Auth";
 
 function Login() {
+    let navigate = useNavigate();
+    // connexion
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+
+    // Creation du user connecté
+    const [user, setUser] = useState("");
+
+    // Message d'erreur
     const [msg, setMsg] = useState("");
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [token, setToken] = useState("");
-    const [userId, setUserId] = useState("");
 
     const url = `http://localhost:8080/api/auth/login`;
 
+    // L'objet user envoyer pour la connexion
     const userObject = {
         email: email,
         password: password,
     };
 
+    // La method
     const postLoggedIn = {
         method: "POST",
         body: JSON.stringify(userObject),
@@ -37,32 +52,29 @@ function Login() {
         try {
             let res = await fetch(url, postLoggedIn);
 
-            if (res.status == 404) {
-                console.log(res.status);
-                setIsLoggedIn(false);
+            if (res.status === 404) {
                 setMsg("Cet utilisateur n'existe pas !");
+            } else {
+                const data = await res.json();
+                setUser({ id: data.userId, pass: data.token });
             }
 
-            const data = await res.json();
-            // console.log(data);
-
-            setToken(data.token);
-            setUserId(data.userId);
-            setIsLoggedIn(true);
-
-            window.localStorage.setItem("user_token", JSON.stringify(data.token));
-            window.localStorage.setItem("user_id", JSON.stringify(data.userId));
-
-            window.location.reload(true);
+            // if (res.ok) {
+            // }
         } catch (error) {
-            if (error.res) {
-                setMsg(error.res.data.msg);
-            }
+            setMsg(error);
         }
     };
 
-    const [passwordShown, setPasswordShown] = useState(false);
+    if (user) {
+        sessionStorage.setItem("isAuthenticate", JSON.stringify(user));
+        window.location.reload(true);
+    }
+
+    // icon pour afficher le mot de pass
+
     // Pour afficher ou cacher le mot de passe
+    const [passwordShown, setPasswordShown] = useState(false);
     const [show, setShow] = useState(false);
 
     const togglePassword = () => {
@@ -70,7 +82,6 @@ function Login() {
         setShow(!passwordShown);
     };
 
-    // render() {
     return (
         <div className="login">
             <div className="login__container">
@@ -78,17 +89,20 @@ function Login() {
                     <img src={logo} alt="Logo Groupomania" />
                     <h1 className="login__title">Groupomania</h1>
                 </div>
-
-                {/* test de connexion */}
-                {/* {console.log(token)}
-                {console.log(userId)}
-                {console.log(isLoggedIn)} */}
-
+                <h2>Connexion Page</h2>
                 <div className="login__links">
                     <ul className="login__links--items">
-                        <li className="item">Connexion</li>
+                        <li className="item">
+                            <NavLink className="item" to="/">
+                                Connexion
+                            </NavLink>
+                        </li>
                         <p className="item">|</p>
-                        <li className="item">S'inscrire</li>
+                        <li className="item">
+                            <NavLink className="item" to="/signup">
+                                Inscription
+                            </NavLink>
+                        </li>
                     </ul>
                 </div>
 
@@ -152,10 +166,11 @@ function Login() {
                 </div> */}
 
                     <p>{msg}</p>
-                    <input className="login__btn btn" type="submit" value="Connexion" /*onClick={handleLogin}*/ />
+                    <input className="login__btn btn" type="submit" value="Connexion" />
                     {/* <p>
                     <li>Mot de passe oublié ?</li>
                 </p> */}
+                    {/* {isAuthenticated ? <Navigate to="/" replace /> : "Vous devez vous connecter"} */}
                 </form>
             </div>
         </div>

@@ -15,9 +15,12 @@ class Home extends React.Component {
     // const [msg, setMsg] = useState("");
 
     async componentDidMount() {
+        const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
+        console.log(user.pass);
+
         const url = `http://localhost:8080/api/articles`;
 
-        const token = JSON.parse(localStorage.getItem("user_token"));
+        const token = user.pass;
         const reqOptions = {
             method: "GET",
             headers: {
