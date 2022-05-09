@@ -1,4 +1,4 @@
-const connection = require('../config/db.user.config');
+const connection = require("../config/db.user.config");
 
 const Article = require("../models/Articles");
 const Share = require("../models/Share");
@@ -88,66 +88,61 @@ exports.createArticle = (req, res, next) => {
 
 // Afficher tous les articles
 exports.getAllArticles = (req, res, next) => {
-
     try {
-    connection.getConnection(async(err, connection) => {
-        if (err) throw err;
-
-        // On cherche tous les articles
-        const articles = `SELECT * FROM users_profiles JOIN articles ON users_profiles.user_id = articles.author_id`;
-        await connection.query(articles, async(err, found) => {
-
-            connection.release();
-
+        connection.getConnection(async (err, connection) => {
             if (err) throw err;
 
-            if (found.length == 0){
-                return res.status(200).json({ MESSAGE : " Il n'y a aucun article à afficher pour le moment." })
-            }
+            // On cherche tous les articles
+            const articles = `SELECT * FROM users_profiles JOIN articles ON users_profiles.user_id = articles.author_id`;
+            await connection.query(articles, async (err, found) => {
+                connection.release();
 
-            let articlesFound = [];
+                if (err) throw err;
 
-            found.forEach((article, index) => {
-                let articleFound = {
-                    article: {
-                        id : article.id.toString(),
-                        author : article.author_id.toString(),
-                        author_firstName: article.first_name,
-                        author_lastName: article.last_name,
-                        title : article.title,
-                        content : article.content,
-                        images: article.images,
-                        comments: article.comments,
-                        likes : article.likes,
-                        dislikes : article.dislikes,
-                        shares: article.shares
-                    }
+                if (found.length == 0) {
+                    return res.status(200).json({ MESSAGE: " Il n'y a aucun article à afficher pour le moment." });
                 }
 
-                articlesFound.push(articleFound);
+                let articlesFound = [];
+
+                found.forEach((article, index) => {
+                    let articleFound = {
+                        article: {
+                            id: article.id.toString(),
+                            author: article.author_id.toString(),
+                            author_firstName: article.first_name,
+                            author_lastName: article.last_name,
+                            author_avatar: article.avatar,
+                            title: article.title,
+                            content: article.content,
+                            images: article.images,
+                            comments: article.comments,
+                            likes: article.likes,
+                            dislikes: article.dislikes,
+                            shares: article.shares,
+                            timestamp: article.timestamp.toString(),
+                        },
+                    };
+
+                    articlesFound.push(articleFound);
+                });
+
+                // console.log(found)
+
+                res.status(200).json({ articlesFound });
             });
-
-            // console.log(found)
-
-            res.status(200).json({ articlesFound })
-        })
-
-
-    })
-} catch (error) {
-    res.status(500).json({ error })
-}
-
+        });
+    } catch (error) {
+        res.status(500).json({ error });
+    }
 };
 
 // Afficher l'article
 exports.getOneArticle = (req, res, next) => {
-
     const article_id = req.params.id;
-    const searchOne = `SELECT * FROM users_profiles JOIN articles ON users_profiles.user_id = articles.author_id WHERE articles.id = ?`
+    const searchOne = `SELECT * FROM users_profiles JOIN articles ON users_profiles.user_id = articles.author_id WHERE articles.id = ?`;
 
-    try{
-
+    try {
         connection.getConnection((err, connection) => {
             if (err) throw err;
 
@@ -157,9 +152,8 @@ exports.getOneArticle = (req, res, next) => {
                 if (err) throw err;
 
                 if (article.length == 0) {
-                    res.status(404).json({ ERROR : "Cet article n'existe pas" })
+                    res.status(404).json({ ERROR: "Cet article n'existe pas" });
                 } else {
-
                     const articleFound = {
                         id: article[0].id.toString(),
                         author_firstName: article[0].first_name,
@@ -173,123 +167,110 @@ exports.getOneArticle = (req, res, next) => {
 
                         likes: article[0].likes,
                         dislikes: article[0].dislikes,
-                        shares: article[0].shares
-                    }
+                        shares: article[0].shares,
+                    };
 
-                    res.status(200).json({ articleFound })
+                    res.status(200).json({ articleFound });
                     // res.status(200).json({ article })
-                    console.log(articleFound)
+                    console.log(articleFound);
                 }
-            })
-        })
-
-    } catch(error){
-        res.status(500).json({ error })
+            });
+        });
+    } catch (error) {
+        res.status(500).json({ error });
     }
-
 };
 
 // Modifier l'article
 exports.modifyArticle = (req, res, next) => {
+    const article_id = req.params.id;
+    const searchOne = `SELECT * FROM articles WHERE articles.id = ?`;
 
+    try {
+        connection.getConnection((err, connection) => {
+            if (err) throw err;
 
-        const article_id = req.params.id;
-        const searchOne = `SELECT * FROM articles WHERE articles.id = ?`
+            connection.query(searchOne, article_id, (err, article) => {
+                connection.release();
 
-        try{
-
-            connection.getConnection((err, connection) => {
                 if (err) throw err;
 
-                connection.query(searchOne, article_id, (err, article) => {
-                    connection.release();
+                if (article.length == 0) {
+                    res.status(404).json({ ERROR: "Cet article n'existe pas" });
+                } else {
+                    const author_id = article[0].author_id.toString();
 
-                    if (err) throw err;
-
-                    if (article.length == 0) {
-                        res.status(404).json({ ERROR : "Cet article n'existe pas" })
+                    if (author_id !== req.auth.userId) {
+                        // Si l'utilisateur n'est pas le propriétaire du compte :
+                        res.status(401).json({ ERROR: "Vous n'êtes pas autorisé à effectuer cette action." });
                     } else {
+                        // const articleFound = {
+                        //     id: article[0].id.toString(),
+                        //     title: article[0].title,
+                        //     content: article[0].content,
+                        //     img: article[0].images,
+                        // }
 
-                        const author_id = article[0].author_id.toString();
+                        const { title, content } = req.body;
+                        const images = `${req.protocol}://${req.get("host")}/images/${req.file.filename}`;
 
-                        if (author_id !== req.auth.userId) {
-                            // Si l'utilisateur n'est pas le propriétaire du compte :
-                            res.status(401).json({ ERROR : "Vous n'êtes pas autorisé à effectuer cette action." })
-                        } else {
+                        if (title) {
+                            console.log("modifier le titre de l'article");
 
-                            // const articleFound = {
-                            //     id: article[0].id.toString(),
-                            //     title: article[0].title,
-                            //     content: article[0].content,
-                            //     img: article[0].images,
-                            // }
-    
-                            const { title, content } = req.body;
-                            const images = `${req.protocol}://${req.get("host")}/images/${req.file.filename}`;
+                            const newTitle = title;
+                            const newTitleSQL = `UPDATE articles SET title = '${newTitle}' WHERE id = ?`;
 
-                            if (title){
-                                console.log("modifier le titre de l'article")
-
-                                const newTitle = title
-                                const newTitleSQL = `UPDATE articles SET title = '${newTitle}' WHERE id = ?`
-
-                                connection.query(newTitleSQL, article_id, (err, result) => {
-
-                                    if (err) throw err;
-                                })
-                            }
-    
-                            if (content){
-                                console.log("modifier le contenu de l'article")
-
-                                const newContent = content
-                                const newContentSQL = `UPDATE articles SET content = "${newContent}" WHERE id = ?`
-
-                                connection.query(newContentSQL, article_id, (err, result) => {
-
-                                    if (err) throw err;
-                                })
-                            }
-    
-
-                            let newImgUrl;
-
-                            if (req.file) {
-                                console.log("modifier les images");
-
-                                newImgUrl = `${req.protocol}://${req.get("host")}/images/${req.file.filename}`;
-                                const newImgSQL = `UPDATE articles SET images = '${newImgUrl}' WHERE id = ?`;
-
-                                if (article[0].images) {
-                                    const file = article[0].images.split("/")[4];
-                                    const fileUrl = path.join("images/" + file);
-
-                                    // On supprime l'ancienne
-                                    fs.unlink(fileUrl, () => {
-                                        console.log("IMAGE DELETED !");
-                                    });
-                                }
-
-                                connection.query(newImgSQL, article_id, (err, result) => {
-                                    if (err) throw err;
-
-                                    console.log("Nouvelle image d'article ajoutée");
-                                });
-                                console.log("======> Nouvelle image article");
-                                console.log(newImgUrl);
-                            }
-    
-                            res.status(200).json({ MESSAGE : "Article modifié avec succès!" })
+                            connection.query(newTitleSQL, article_id, (err, result) => {
+                                if (err) throw err;
+                            });
                         }
 
+                        if (content) {
+                            console.log("modifier le contenu de l'article");
+
+                            const newContent = content;
+                            const newContentSQL = `UPDATE articles SET content = "${newContent}" WHERE id = ?`;
+
+                            connection.query(newContentSQL, article_id, (err, result) => {
+                                if (err) throw err;
+                            });
+                        }
+
+                        let newImgUrl;
+
+                        if (req.file) {
+                            console.log("modifier les images");
+
+                            newImgUrl = `${req.protocol}://${req.get("host")}/images/${req.file.filename}`;
+                            const newImgSQL = `UPDATE articles SET images = '${newImgUrl}' WHERE id = ?`;
+
+                            if (article[0].images) {
+                                const file = article[0].images.split("/")[4];
+                                const fileUrl = path.join("images/" + file);
+
+                                // On supprime l'ancienne
+                                fs.unlink(fileUrl, () => {
+                                    console.log("IMAGE DELETED !");
+                                });
+                            }
+
+                            connection.query(newImgSQL, article_id, (err, result) => {
+                                if (err) throw err;
+
+                                console.log("Nouvelle image d'article ajoutée");
+                            });
+                            console.log("======> Nouvelle image article");
+                            console.log(newImgUrl);
+                        }
+
+                        res.status(200).json({ MESSAGE: "Article modifié avec succès!" });
                     }
-                })
-            })
-
-        } catch(error){
-            res.status(500).json({ error })
-        }
-
+                }
+            });
+        });
+    } catch (error) {
+        res.status(500).json({ error });
+    }
 };
 
 // Supprimer l'article
@@ -301,8 +282,7 @@ exports.deleteArticle = (req, res, next) => {
 
     // Connection à la base de données MySQL
     connection.getConnection((err, connection) => {
-
-        // On recherche l'article 
+        // On recherche l'article
         const searchArticle = `SELECT * FROM articles WHERE id = ?`;
         const deleteArticle = `DELETE FROM articles WHERE id = ?`;
 
@@ -311,37 +291,33 @@ exports.deleteArticle = (req, res, next) => {
             if (err) throw err;
 
             if (article.length === 0) {
-                return res.status(404).json({ ERROR : "Cet article n'existe pas !" })
-            } 
+                return res.status(404).json({ ERROR: "Cet article n'existe pas !" });
+            }
 
             const author_id = article[0].author_id.toString();
-            
+
             // On vérifis que l'utilisateur connecté soit l'admin ou le créateur de l'article
-            if (author_id !== userAuth && userRole !== 'admin'){
-                return res.status(400).json({ ERROR : "Requête non autorisée !" })
-            } 
+            if (author_id !== userAuth && userRole !== "admin") {
+                return res.status(400).json({ ERROR: "Requête non autorisée !" });
+            }
 
             if (article[0].images) {
                 const file = article[0].images.split("/")[4];
                 const fileUrl = path.join("images/" + file);
 
-               fs.unlink(fileUrl, () => {
+                fs.unlink(fileUrl, () => {
                     // console.log("image supprimée avec succès")
 
                     connection.query(deleteArticle, article_id, (err, results) => {
                         if (err) throw err;
 
-                        res.status(201).json({ MESSAGE : "Article supprimé" })
+                        res.status(201).json({ MESSAGE: "Article supprimé" });
                     });
-
                 });
             }
-
-
         });
 
-        console.log(req.auth)
-
+        console.log(req.auth);
     });
 };
 
@@ -597,7 +573,7 @@ exports.likeArticle = (req, res, next) => {
 };
 
 exports.shareArticle = (req, res, next) => {
-    try{
+    try {
         const post_id = req.params.id;
         const user_id = req.auth.userId;
 
@@ -609,141 +585,133 @@ exports.shareArticle = (req, res, next) => {
             const searchPost = `SELECT * FROM articles 
             JOIN users_profiles 
             ON articles.author_id = users_profiles.user_id
-            WHERE articles.id = ?`
+            WHERE articles.id = ?`;
 
-            await connection.query(searchPost, post_id, async(err, postFound) => {
+            await connection.query(searchPost, post_id, async (err, postFound) => {
                 if (err) throw err;
 
                 if (postFound.length <= 0) {
-                    return res.status(404).json({ ERROR: "Ce post n'existe pas" })
+                    return res.status(404).json({ ERROR: "Ce post n'existe pas" });
                 }
 
-                const searchUsersShared = `SELECT * FROM users_shared WHERE user_id = '${user_id}' AND post_id = ?`
-
-
-
+                const searchUsersShared = `SELECT * FROM users_shared WHERE user_id = '${user_id}' AND post_id = ?`;
 
                 switch (req.body.share) {
-                    case 0: 
-                    
+                    case 0:
                         await connection.query(searchUsersShared, post_id, async (err, userFound) => {
                             if (err) throw err;
 
                             if (userFound.length <= 0) {
-                                return res.status(401).json({ ERROR: "Vous n'avez pas encore partagé ce post" })
+                                return res.status(401).json({ ERROR: "Vous n'avez pas encore partagé ce post" });
                             }
 
                             const delete_post_shared = `DELETE FROM posts_shared WHERE user_id = '${user_id}' AND post_id = ?`;
 
-                            await connection.query(delete_post_shared, post_id, async(err, deleted) => {
+                            await connection.query(delete_post_shared, post_id, async (err, deleted) => {
                                 if (err) throw err;
 
-                                console.log("delete post shared a fonctionné avec succès")
+                                console.log("delete post shared a fonctionné avec succès");
 
                                 const delete_user_shared = `DELETE FROM users_shared WHERE user_id = '${user_id}' AND post_id = ?`;
-                                await connection.query(delete_user_shared, post_id, async(err, deleted) => {
+                                await connection.query(delete_user_shared, post_id, async (err, deleted) => {
                                     if (err) throw err;
 
-                                    console.log("delete user shared a fonctionné avec succès")
+                                    console.log("delete user shared a fonctionné avec succès");
 
-                                    const update_shares = `UPDATE articles SET shares = shares-1 WHERE id = ?`
+                                    const update_shares = `UPDATE articles SET shares = shares-1 WHERE id = ?`;
 
-                                    await connection.query(update_shares, post_id, async(err, updated) => {
+                                    await connection.query(update_shares, post_id, async (err, updated) => {
                                         if (err) throw err;
 
-                                        res.status(200).json({ MESSAGE: "Partage annulé avec succès !" })
-                                    })
-                                })
-                            })
-                        })
-    
-                    break;
-    
-                    case 1: 
+                                        res.status(200).json({ MESSAGE: "Partage annulé avec succès !" });
+                                    });
+                                });
+                            });
+                        });
 
+                        break;
+
+                    case 1:
                         // On vérifis que l'utilisateur n'a pas déjà partagé ce post
                         // On cherche donc la présence de l'utilisateur dans users_shared
-                        
+
                         await connection.query(searchUsersShared, post_id, async (err, userFound) => {
                             if (err) throw err;
 
                             if (userFound.length > 0) {
-                                return res.status(401).json({ ERROR: "Vous avez déjà partagé ce post" })
+                                return res.status(401).json({ ERROR: "Vous avez déjà partagé ce post" });
                             }
 
                             // On récupère la data du post
-                            console.log("=====> Post Found")
-                        console.log(postFound)
+                            console.log("=====> Post Found");
+                            console.log(postFound);
 
-                        // const title = "Shared";
-                        const content = {
-                            id : postFound[0].id.toString(),
-                            avatar : postFound[0].avatar,
-                            author_firstName : postFound[0].first_name,
-                            author_lastName : postFound[0].last_name,
-                            title : postFound[0].title,
-                            post_content : postFound[0].content,
-                            images : postFound[0].images
-                        };
+                            // const title = "Shared";
+                            const content = {
+                                id: postFound[0].id.toString(),
+                                avatar: postFound[0].avatar,
+                                author_firstName: postFound[0].first_name,
+                                author_lastName: postFound[0].last_name,
+                                title: postFound[0].title,
+                                post_content: postFound[0].content,
+                                images: postFound[0].images,
+                            };
 
-                        // On passe le contenu dans Stringify afin de pouvoir l'ajouter dans MySQL
-                        const post_content = JSON.stringify(content);
+                            // On passe le contenu dans Stringify afin de pouvoir l'ajouter dans MySQL
+                            const post_content = JSON.stringify(content);
 
-                        // requête SQL pour ajouter un nouvel article
-                        const sharePost = `INSERT INTO posts_shared SET ?`;
+                            // requête SQL pour ajouter un nouvel article
+                            const sharePost = `INSERT INTO posts_shared SET ?`;
 
-                        // On créer un nouveau post à partir de celui-ci
-                        const post = new Share(user_id, post_id, post_content);
+                            // On créer un nouveau post à partir de celui-ci
+                            const post = new Share(user_id, post_id, post_content);
 
-                        let post_shared_Data = {
+                            let post_shared_Data = {
                                 user_id: post.user_id,
                                 post_id: post.post_id,
-                                post_content: post.post_content
+                                post_content: post.post_content,
                                 // comments: 0,
                                 // likes: 0,
                                 // dislikes: 0,
                                 // shares: 0,
-                        }
-
-                        console.log("=====> POST DATA")
-                        console.log(post_shared_Data)
-
-                        await connection.query(sharePost, post_shared_Data, async (err, result) => {
-                            // connection.release();
-                            if (err) throw err;
-
-                            const userObject = {
-                                user_id: user_id,
-                                post_id: post_id
                             };
-                            // On ajoute l'id utilisateur dans usersshared
-                            const addUsersShared = `INSERT INTO users_shared SET ?`
-                            await connection.query(addUsersShared, userObject, async (err, userAdded) => {
+
+                            console.log("=====> POST DATA");
+                            console.log(post_shared_Data);
+
+                            await connection.query(sharePost, post_shared_Data, async (err, result) => {
+                                // connection.release();
                                 if (err) throw err;
 
-                                // const update = `UPDATE articles SET comments = comments-1 WHERE id = ? AND comments > 0`;
-                                // On mets à jour le nombre de partage de l'article
-                                const update_shares = `UPDATE articles SET shares = shares+1 WHERE id = ?`
-                                await connection.query(update_shares, post_id, async (err, updated) => {
+                                const userObject = {
+                                    user_id: user_id,
+                                    post_id: post_id,
+                                };
+                                // On ajoute l'id utilisateur dans usersshared
+                                const addUsersShared = `INSERT INTO users_shared SET ?`;
+                                await connection.query(addUsersShared, userObject, async (err, userAdded) => {
                                     if (err) throw err;
-            
-                                    console.log("=====> Update Réussi !")
-                                    console.log(updated)
-            
-                                    res.status(201).json({ MESSAGE: "Post partagé avec succès" });
-                                })
 
-                            })
+                                    // const update = `UPDATE articles SET comments = comments-1 WHERE id = ? AND comments > 0`;
+                                    // On mets à jour le nombre de partage de l'article
+                                    const update_shares = `UPDATE articles SET shares = shares+1 WHERE id = ?`;
+                                    await connection.query(update_shares, post_id, async (err, updated) => {
+                                        if (err) throw err;
+
+                                        console.log("=====> Update Réussi !");
+                                        console.log(updated);
+
+                                        res.status(201).json({ MESSAGE: "Post partagé avec succès" });
+                                    });
+                                });
+                            });
                         });
-                        })
-                    
-                        
-                break;
-            }
-            })
-        })
 
+                        break;
+                }
+            });
+        });
     } catch (error) {
-        res.status(500).json({ error })
+        res.status(500).json({ error });
     }
-}
+};

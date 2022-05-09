@@ -1,8 +1,10 @@
 .navigation {
-    padding: 1%;
+    // padding: 1%;
     width: 100%;
 
     color: $normal_text;
+
+    transition: all 300ms ease-in-out;
 
     &__container {
         display: flex;
@@ -17,25 +19,94 @@
         &--logo {
             width: 51px;
             margin-right: 10px;
+
+            // @include mobile-only {
+            //     width: 30%;
+            // }
         }
 
         &--title {
             font-size: 2rem;
             color: $accent_color_3;
+
+            @include mobile-only {
+                font-size: 1.5rem;
+            }
         }
     }
 
     &__nav {
-        width: 50%;
+        width: 35%;
         text-align: right;
-        // &--items {
-        //     display: flex;
+        &--items {
+            display: flex;
+            align-items: center;
+            // flex-direction: row;
+            justify-content: space-around;
 
-        // }
+            @include mobile-only {
+                display: none;
+                position: absolute;
+                top: 10%;
+                right: 0;
+                padding: 2%;
+                width: 100%;
+                background: $principal_bg;
+                border-radius: 20px;
+
+                font-size: 1.5rem;
+
+                .btn {
+                    display: inline-block;
+                    width: 30%;
+                }
+            }
+        }
 
         &--item {
             display: inline-block;
             padding: 5px 1%;
+
+            @include mobile-only {
+                display: block;
+            }
+            &:hover {
+                background: $accent_color_3;
+            }
         }
+    }
+
+    &__responsive {
+        display: none;
+        cursor: pointer;
+        position: absolute;
+        right: 0;
+        top: 15px;
+
+        @include mobile-only {
+            display: block;
+            font-size: 2rem;
+        }
+    }
+
+    @include mobile-only {
+        .expanded {
+            .navigation__nav--items {
+                display: block;
+            }
+        }
+    }
+}
+
+.userLoggedIn {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    &__pix {
+        border-radius: 70px;
+        border: 3px solid $accent_color_3;
+        width: 50px;
+        height: 50px;
+        margin: 3%;
     }
 }

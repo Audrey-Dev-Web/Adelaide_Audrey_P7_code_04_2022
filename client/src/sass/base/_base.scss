@@ -24,26 +24,28 @@ li {
     // position: relative;
     width: 100%;
     height: 100vh;
+    // position: relative;
 
     // display: flex;
-
-    background: url(/images/background.jpg);
+    // background-color: $principal_bg;
+    // background: url(/images/background.jpg);
     background-repeat: no-repeat;
     background-size: cover;
+    background-attachment: fixed;
 
     display: flex;
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
 
-    &__bgColor {
-        position: absolute;
-        z-index: 1;
-        background: $principal_bg;
-        opacity: 0.9;
-        width: 100%;
-        height: 100vh;
-    }
+    // &__bgColor {
+    //     position: absolute;
+    //     z-index: 1;
+    //     background: $principal_bg;
+    //     opacity: 0.9;
+    //     width: 100%;
+    //     height: 100vh;
+    // }
 }
 
 .App-header {

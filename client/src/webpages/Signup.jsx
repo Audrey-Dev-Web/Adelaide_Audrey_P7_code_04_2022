@@ -110,7 +110,6 @@ function Signup() {
                     <img src={logo} alt="Logo Groupomania" />
                     <h1 className="login__title">Groupomania</h1>
                 </div>
-                <h2>Signup Page</h2>
                 <div className="login__links">
                     <ul className="login__links--items">
                         <li className="item">
