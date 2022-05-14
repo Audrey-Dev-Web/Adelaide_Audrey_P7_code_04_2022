@@ -18,6 +18,14 @@
 
     transition: all 100ms ease-in-out;
 
+    &__edit {
+        background: $principal_bg;
+    }
+
+    &__delete {
+        background: grey;
+    }
+
     &:hover {
         background: $accent_color_2;
         color: $accent_color_3;

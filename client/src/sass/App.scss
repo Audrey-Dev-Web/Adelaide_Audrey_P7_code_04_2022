@@ -10,10 +10,13 @@
 // Components
 @import "./components/buttons";
 @import "./components/social";
+@import "./components/initiales";
 
 // Layouts
 @import "./layout/navigation";
+@import "./layout/comments";
 
 // Pages
 @import "./pages/loggedIn.scss";
 @import "./pages/home";
+@import "./pages/post";

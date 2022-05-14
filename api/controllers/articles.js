@@ -7,43 +7,7 @@ const fs = require("fs");
 
 // Créer un nouvel article
 exports.createArticle = (req, res, next) => {
-    // const articleObject = JSON.parse(req.body);
     try {
-        // // const author_id = req.body.id;
-        // const { title, content } = req.body;
-        // let imageUrl = "";
-        // const img = [imageUrl];
-
-        // const article = new Article( title, content, img);
-
-        // if (req.file) {
-        //     imageUrl = `${req.protocol}://${req.get("host")}/images/${req.file.filename}`;
-        // }
-
-        // console.log("======> Article title")
-        // console.log(title)
-        // console.log("======> Article content")
-        // console.log(content)
-        // // SQL pour ajouter un nouvel article
-        // const addNewPost = `INSERT INTO articles SET ?`;
-        // console.log("=====> REQ BODY")
-        // console.log(req.auth.userId)
-        // console.log("=====> END")
-
-        // const newArticle = {
-        //     author_id: req.auth.userId,
-        //     title: req.body.title,
-        //     content: req.body.content,
-        //     images: img,
-        //     likes: 0,
-        //     dislikes: 0,
-        //     shares: 0
-        // };
-
-        // console.log("=====> CONTENU de article")
-        // console.log(newArticle)
-        // console.log("=====> ENDED article")
-
         connection.getConnection((err, connection) => {
             if (err) throw err;
 
@@ -71,11 +35,7 @@ exports.createArticle = (req, res, next) => {
                 shares: 0,
             };
 
-            // console.log(newArticle)
-
             connection.query(addNewPost, newArticle, (err, result) => {
-                // connection.release();
-
                 if (err) throw err;
 
                 res.status(201).json({ MESSAGE: "Nouvel article ajouté avec succès !" });
@@ -93,14 +53,14 @@ exports.getAllArticles = (req, res, next) => {
             if (err) throw err;
 
             // On cherche tous les articles
-            const articles = `SELECT * FROM users_profiles JOIN articles ON users_profiles.user_id = articles.author_id`;
+            const articles = `SELECT * FROM users_profiles JOIN articles ON users_profiles.user_id = articles.author_id ORDER by timestamp DESC`;
             await connection.query(articles, async (err, found) => {
                 connection.release();
 
                 if (err) throw err;
 
                 if (found.length == 0) {
-                    return res.status(200).json({ MESSAGE: " Il n'y a aucun article à afficher pour le moment." });
+                    return res.status(404).json({ MESSAGE: " Il n'y a aucun article à afficher pour le moment." });
                 }
 
                 let articlesFound = [];
@@ -154,17 +114,19 @@ exports.getOneArticle = (req, res, next) => {
                 if (article.length == 0) {
                     res.status(404).json({ ERROR: "Cet article n'existe pas" });
                 } else {
+                    console.log("=====> article");
+                    console.log(article);
                     const articleFound = {
                         id: article[0].id.toString(),
                         author_firstName: article[0].first_name,
                         author_lastName: article[0].last_name,
                         author_avatar: article[0].avatar,
-
+                        author_id: article[0].user_id.toString(),
                         title: article[0].title,
                         content: article[0].content,
+                        timestamp: article[0].timestamp.toString(),
                         img: article[0].images,
                         comments: article[0].comments,
-
                         likes: article[0].likes,
                         dislikes: article[0].dislikes,
                         shares: article[0].shares,

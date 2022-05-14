@@ -1,11 +1,19 @@
 .home {
-    z-index: 1;
+    // z-index: 1;
     margin: 2% 0;
-    // & img {
-    //     max-width: 300px;
-    // }
+    width: 100%;
+
+    &__container {
+        width: 1200px;
+
+        display: flex;
+        justify-content: space-between;
+        // width: 100%;
+    }
 
     &__article {
+        width: 70%;
+
         &--footer {
             // height: 50px;
             display: flex;
@@ -22,14 +30,41 @@
         }
     }
 
+    &__users {
+        margin: 2% 0;
+        width: 25%;
+        height: 100%;
+
+        padding: 2%;
+
+        background: darken($principal_bg, 5%);
+
+        & .user {
+            margin: 10% 0;
+            display: flex;
+            align-items: center;
+
+            & img {
+                width: 50px;
+                height: 50px;
+
+                margin-right: 5%;
+
+                border-radius: 100%;
+
+                border: 3px dotted solid rgb(85, 85, 85);
+            }
+        }
+    }
+
     @include mobile-only {
         width: 100%;
     }
 }
 
 .article {
-    width: 70%;
-    margin: 2%;
+    width: 100%;
+    margin: 5% 0;
     background: $principal_bg;
     border-radius: 20px;
     box-shadow: 0 0 5px rgb(48, 40, 40);
@@ -48,13 +83,15 @@
         &--author {
             display: flex;
             align-items: center;
-            & img {
-                width: 70px;
-                height: 70px;
-                margin-right: 1%;
-                border-radius: 150%;
-                border: 3px $accent_color_3;
-                border-style: dashed solid;
+            & .author {
+                &__img {
+                    width: 70px;
+                    height: 70px;
+                    margin-right: 1%;
+                    border-radius: 150%;
+                    border: 3px $accent_color_3;
+                    border-style: dashed solid;
+                }
             }
 
             & p {
@@ -64,14 +101,26 @@
         }
     }
 
+    &__social {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    &__img {
+        width: 100%;
+        margin: 3% 0 0;
+    }
+
     @include mobile-only {
         width: 100%;
+        margin: 1%;
     }
 }
 
 .newPost {
-    width: 70%;
-    margin: 2%;
+    width: 100%;
+    margin: 2% 0;
     background: $principal_bg;
     border-radius: 20px;
     box-shadow: 0 0 5px rgb(48, 40, 40);
@@ -109,5 +158,6 @@
 
     @include mobile-only {
         width: 100%;
+        margin: 1%;
     }
 }

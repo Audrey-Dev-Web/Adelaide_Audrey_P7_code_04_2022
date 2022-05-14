@@ -34,7 +34,7 @@ function Navigation() {
     return (
         <div className="navigation">
             <div className="container navigation__container">
-                <NavLink to="/Home" className="navigation__branding">
+                <NavLink to="/" className="navigation__branding">
                     <img className="navigation__branding--logo" src={logo} alt="Logo Groupomania" />
                     <h1 className="navigation__branding--title">Groupomania</h1>
                 </NavLink>

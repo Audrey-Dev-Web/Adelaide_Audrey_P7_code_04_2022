@@ -49,10 +49,30 @@ export default class UserLoggedIn extends Component {
                 </div>
             );
 
+        const firstName = userInfo.profile.firstName;
+        const lastName = userInfo.profile.lastName;
+        const fullName = `${firstName} ${lastName}`;
+        const initiales = fullName.match(/\b\w/g).join("").toUpperCase();
+        console.log(initiales);
+
+        const profileImgUrl = userInfo.profile.avatarUrl;
+        // if (!profileImgUrl) {
+        //     console.log("Il n'y a pas de photo de profile");
+        // } else {
+        //     console.log("Il y a bien une photo de profile");
+        // }
+
         return (
             // Ajouter un menu déroulant afin d'afficher la possibilité de modifier le profile
             <div className="userLoggedIn">
-                <img className="userLoggedIn__pix" src={userInfo.profile.avatarUrl} alt="Photo de profile" />
+                {!profileImgUrl ? (
+                    <div className="userLoggedIn__pix initiales">
+                        <p>{initiales}</p>
+                    </div>
+                ) : (
+                    <img className="userLoggedIn__pix" src={userInfo.profile.avatarUrl} alt="Photo de profile" />
+                )}
+                {/* <img className="userLoggedIn__pix" src={userInfo.profile.avatarUrl} alt="Photo de profile" /> */}
                 <span className="username">{userInfo.profile.firstName}</span>
             </div>
         );

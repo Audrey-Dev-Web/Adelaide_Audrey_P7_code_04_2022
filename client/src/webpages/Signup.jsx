@@ -9,6 +9,8 @@ import { BiLogInCircle, BiLockOpenAlt, BiShow, BiHide } from "react-icons/bi";
 function Signup() {
     const navigate = useNavigate();
     // connexion
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
@@ -24,6 +26,8 @@ function Signup() {
     const userObject = {
         email: email,
         password: password,
+        firstName: firstName,
+        lastName: lastName,
     };
 
     // La method
@@ -72,7 +76,7 @@ function Signup() {
                     setMsg("Cet utilisateur n'existe pas !");
                 } else {
                     const data = await resLogin.json();
-                    setUser({ id: data.userId, pass: data.token });
+                    setUser({ id: data.userId, pass: data.token, role: data.userRole });
 
                     console.log(user);
                     console.log(data);
@@ -128,6 +132,36 @@ function Signup() {
 
                 <form onSubmit={Signup} className="login__form">
                     <div className="login__input-edit">
+                        <div>
+                            <label className="login__label">
+                                <div className="login__icon">
+                                    <BiLogInCircle />
+                                </div>
+                                <input
+                                    className="login__input-text"
+                                    type="text"
+                                    name="firstName"
+                                    placeholder="Prénom"
+                                    value={firstName}
+                                    onChange={(e) => setFirstName(e.target.value)}
+                                />
+                            </label>
+                        </div>
+                        <div>
+                            <label className="login__label">
+                                <div className="login__icon">
+                                    <BiLogInCircle />
+                                </div>
+                                <input
+                                    className="login__input-text"
+                                    type="text"
+                                    name="lastName"
+                                    placeholder="Nom"
+                                    value={lastName}
+                                    onChange={(e) => setLastName(e.target.value)}
+                                />
+                            </label>
+                        </div>
                         <div>
                             <label className="login__label">
                                 <div className="login__icon">

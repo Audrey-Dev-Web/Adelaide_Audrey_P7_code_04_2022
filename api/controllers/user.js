@@ -105,6 +105,8 @@ exports.signup = async (req, res, next) => {
                                         const newProfil = {
                                             user_id: user_id,
                                             email: emailProfile,
+                                            first_name: req.body.firstName,
+                                            last_name: req.body.lastName,
                                         };
 
                                         const user_id_sql = `INSERT INTO users_profiles SET ?`;
@@ -170,12 +172,19 @@ exports.login = async (req, res, next) => {
                     const user_role = found[0].role;
 
                     // On renvoi l'id de l'utilisateur et son token à destination du frontend
+
+                    // res.cookie("access_token", token, { httpOnly: true, secure: "bro", })
+
                     res.status(200).json({
                         userId: user_id,
                         userRole: user_role,
                         token: jwt.sign({ userId: user_id, role: user_role }, secret, { expiresIn: "24h" }),
-                        // token: jwt.sign({ userId: userId, role: role }, secret, { expiresIn: "24h" }), ====> Suite mentorat
                     });
+                    // const token = jwt.sign({ userId: user_id, role: user_role }, secret, { expiresIn: "24h" });
+                    // res.cookie("access_token", token, { httpOnly: true, secure: process.env.NODE_ENV === "production" })
+                    //     .status(200)
+                    //     .json({ message: "Logged in succefully !" });
+                    // token: jwt.sign({ userId: userId, role: role }, secret, { expiresIn: "24h" }), ====> Suite mentorat
                 } else {
                     res.status(401).json({ ERROR: "Password incorrect !" });
                 }
@@ -183,3 +192,8 @@ exports.login = async (req, res, next) => {
         });
     });
 };
+
+// Déconnection
+// exports.logout = async (req, res, next) => {
+//     return res.clearCookie("access_token").status(200).json({ message: "Successfully logged out !" });
+// };

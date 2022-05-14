@@ -1,27 +1,26 @@
-const multer = require('multer');
+const multer = require("multer");
 
 const MIME_TYPES = {
-    'image/jpg': 'jpg',
-    'image/jpeg': 'jpg',
-    'image/png': 'png',
-    'image/webp': 'webp'
+    "image/jpg": "jpg",
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/webp": "webp",
 };
 
 const storage = multer.diskStorage({
-    fileFilter: (req, file, callback) => {
-        console.log(req.params.id);
+    // fileFilter: (req, file, callback) => {
+    //     console.log(req.params.id);
 
-        if (req.params.id !== req.auth.userId) {
-            callback(null, false);
-        } else {
-            callback(null, true);
-        }
-    },
-    
+    //     if (req.params.id !== req.auth.userId) {
+    //         callback(null, false);
+    //     } else {
+    //         callback(null, true);
+    //     }
+    // },
+
     destination: (req, file, callback) => {
         callback(null, "images");
     },
-
 
     // Configuration du nom du fichier
     filename: (req, file, callback) => {
@@ -32,4 +31,4 @@ const storage = multer.diskStorage({
     },
 });
 
-module.exports = multer({ storage }).single('image');
+module.exports = multer({ storage }).single("image");

@@ -1,0 +1,32 @@
+.comments {
+    width: 70%;
+    margin: 0 auto;
+
+    &__title {
+        margin: 2% 0;
+    }
+
+    &__post {
+        padding: 2%;
+        margin: 2% 0;
+        background: darken($principal_bg, 5%);
+        border-radius: 15px;
+    }
+
+    &__author {
+        display: flex;
+        align-items: center;
+        margin: 1% 0;
+
+        font-size: 1.1rem;
+        font-weight: 700;
+    }
+
+    &__timestamp {
+        margin: 1% 0;
+    }
+
+    &__content {
+        padding: 2%;
+    }
+}
