@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 function EditComment(props) {
-    // On récupère l'id de l'utilisateur avec props
+    // On récupère les données de l'utilisateur avec props
     const { post_id, author_id, comment_id, comment_value } = props;
 
     // On prépare le state local pour stocker les données à modifier

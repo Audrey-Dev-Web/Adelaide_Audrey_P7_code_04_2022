@@ -55,7 +55,7 @@ function Navigation() {
                             <NavLink to="/">Home</NavLink>
                         </li>
                         <li className="navigation__nav--item">
-                            <NavLink to="/profile">
+                            <NavLink to={"/profile/" + user_id}>
                                 {/* Afficher la photo de profile et le prénom de l'utilisateur connecté */}
                                 <UserLoggedIn userId={user_id} />
                             </NavLink>
