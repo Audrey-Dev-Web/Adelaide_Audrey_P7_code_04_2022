@@ -1,0 +1,87 @@
+.article {
+    width: 100%;
+    box-shadow: 0 0 5px rgb(48, 40, 40);
+
+    border-radius: 20px;
+    margin: 5% 0;
+
+    &__header {
+        width: 100%;
+        background: darken($principal_bg, 5%);
+        border-radius: 20px 20px 0 0;
+        padding: 2%;
+
+        &--shared {
+            background: $accent_color_3;
+            position: absolute;
+            padding: 1%;
+            border-radius: 20px;
+
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        &--title {
+            text-align: center;
+            font-size: 1.7rem;
+            margin: 1%;
+
+            border-bottom: 1px solid $accent_color_3;
+            padding-bottom: 3%;
+        }
+
+        &--author {
+            display: flex;
+            align-items: center;
+            padding-top: 2%;
+
+            .author {
+                &__img {
+                    width: 70px;
+                    height: 70px;
+                    border-radius: 100%;
+                    border: 3px $accent_color_3;
+                    border-style: dashed solid;
+
+                    margin-right: 2%;
+                }
+
+                &__name {
+                    font-size: 1.2rem;
+                    font-weight: 700;
+                    color: $accent_color_3;
+                }
+
+                &__postDate {
+                    font-size: 1rem;
+                    display: flex;
+
+                    .dateTime {
+                        margin-left: 5px;
+                    }
+                }
+            }
+        }
+    }
+
+    &__content {
+        width: 100%;
+        padding: 2%;
+        font-size: 1.1rem;
+
+        &--img {
+            width: 100%;
+            margin-top: 3%;
+        }
+    }
+
+    &__footer {
+        background: darken($principal_bg, 5%);
+        border-radius: 0 0 20px 20px;
+
+        &--social {
+            display: flex;
+            padding: 2%;
+        }
+    }
+}

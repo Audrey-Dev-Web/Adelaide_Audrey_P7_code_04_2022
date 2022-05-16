@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 
 import { BiEditAlt } from "react-icons/bi";
 
+import DateTime from "../../components/DateTime";
 import EditProfile from "../../components/Editprofile";
 
 function Profile() {
@@ -91,10 +92,10 @@ function Profile() {
                         )}
                         <div>
                             <h1 className="profile__title">
-                                {userData.profile.firstName + " " + userData.profile.lastName}
+                                {userData.profile.firstName + " " + userData.profile.lastName} <BiEditAlt />
                             </h1>
                             <p className="profile__signupDate">
-                                Inscrit le : <span>{userData.profile.inscrit_le}</span>
+                                Inscrit <DateTime datetime={userData.profile.inscrit_le} />
                             </p>
                         </div>
                     </div>
@@ -102,7 +103,10 @@ function Profile() {
                     <div className="profile__infos">
                         <div className="profile__user--margin">
                             <p>
-                                Date de naissance : <span>{userData.profile.birthdate}</span>
+                                Date de naissance :{" "}
+                                <span>
+                                    {userData.profile.birthdate} <BiEditAlt />
+                                </span>
                             </p>
                         </div>
 
@@ -114,7 +118,10 @@ function Profile() {
 
                         <div className="profile__user--margin">
                             <p>
-                                Email : <span>{userData.profile.email}</span>
+                                Email :
+                                <span>
+                                    {userData.profile.email} <BiEditAlt />
+                                </span>
                             </p>
                         </div>
 
@@ -122,6 +129,7 @@ function Profile() {
                         <p>Password : <span>{userData.profile.password}</span></p>
                     </div> */}
                     </div>
+                    <div>Modifier les informations de connexion</div>
                     <div className="profile__btn">
                         {/* <button className="profile__btn--edit btn">Edit</button> */}
                         {/* <button className="profile__btn--delete btn">Supprimer</button> */}

@@ -17,9 +17,6 @@ function Post() {
 
     const [isAuthor, setIsAuthor] = useState(false);
 
-    // console.log("=====> POST SLUG");
-    // console.log(postSlug);
-
     // Token de l'utilisateur
     const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
     const token = user.pass;

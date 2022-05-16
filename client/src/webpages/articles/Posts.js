@@ -3,6 +3,9 @@ import { Link, Outlet } from "react-router-dom";
 
 import { BiLike, BiDislike, BiShare, BiComment, BiCommentAdd } from "react-icons/bi";
 
+import DateTime from "../../components/DateTime";
+import Comments from "../../components/Comments";
+
 export default class Posts extends React.Component {
     constructor(props) {
         super(props);
@@ -16,6 +19,8 @@ export default class Posts extends React.Component {
     async componentDidMount() {
         const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
         const token = user.pass;
+
+        console.log(token);
 
         const url = `http://localhost:8080/api/articles`;
         const reqOptions = {
@@ -48,11 +53,16 @@ export default class Posts extends React.Component {
                 </div>
             );
 
-        const showPosts = posts.map((post, index) => {
+        const showPosts = posts.slice(0, 10).map((post) => {
             return (
                 <div className="article" key={post.article.id}>
                     <Link to={"/articles/" + post.article.id}>
                         <div className="article__header">
+                            {!post.article.is_shared ? null : (
+                                <div className="article__header--shared">
+                                    <p>Partage</p>
+                                </div>
+                            )}
                             <h2 className="article__header--title">{post.article.title}</h2>
                             <div className="article__header--author">
                                 {!post.article.author_avatar ? (
@@ -73,22 +83,28 @@ export default class Posts extends React.Component {
                                     <p className="author__name">
                                         {post.article.author_firstName + " " + post.article.author_lastName}
                                     </p>
-                                    <div className="article__header--datetime">{post.article.timestamp}</div>
+                                    {/* <div className="article__header--datetime">{post.article.timestamp}</div> */}
+
+                                    <p className="author__postDate">
+                                        Posté <DateTime datetime={post.article.timestamp} />
+                                    </p>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="home__article--content">
+                        <div className="article__content">
                             {post.article.content}
-                            <img
-                                className="article__img"
-                                src={post.article.images}
-                                alt={"Photo de l'article " + post.article.title}
-                            />
+                            {!post.article.images ? null : (
+                                <img
+                                    className="article__content--img"
+                                    src={post.article.images}
+                                    alt={"Photo de l'article " + post.article.title}
+                                />
+                            )}
                         </div>
                     </Link>
-                    <div className="home__article--footer">
-                        <div className="article__social">
+                    <div className="article__footer">
+                        <div className="article__footer--social">
                             <p className="social">
                                 <span className="social__icon">
                                     <BiLike />
@@ -117,8 +133,8 @@ export default class Posts extends React.Component {
                                 <BiCommentAdd />
                             </button>
                         </div>
-                        {/* <Outlet /> */}
                     </div>
+                    {/* <Comments post_id={post.article.id} /> */}
                 </div>
             );
         });

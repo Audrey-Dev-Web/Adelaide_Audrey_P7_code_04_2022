@@ -1,12 +1,12 @@
-const connection = require('../config/db.user.config');
+const connection = require("../config/db.user.config");
 const bcrypt = require("bcrypt");
 
 const path = require("path");
 const fs = require("fs");
 
-const cryptojs = require('crypto-js');
+const cryptojs = require("crypto-js");
 
-require("dotenv").config()
+require("dotenv").config();
 const secretEmail = process.env.SECRET_EMAIL;
 
 // Voir tous les profiles
@@ -14,7 +14,7 @@ exports.getAllProfile = (req, res, next) => {
     connection.getConnection((err, connection) => {
         if (err) throw err;
 
-        const searchAllProfile = `SELECT * FROM users JOIN users_profiles ON users.id = users_profiles.user_id`;
+        const searchAllProfile = `SELECT * FROM users JOIN users_profiles ON users.id = users_profiles.user_id ORDER by timestamp DESC`;
 
         connection.query(searchAllProfile, (err, profiles) => {
             connection.release();
@@ -31,7 +31,7 @@ exports.getAllProfile = (req, res, next) => {
                         usersProfile: {
                             id: profile.id.toString(),
                             user_Id: profile.user_id.toString(),
-                            inscrit_le : profile.timestamp.toString(),
+                            inscrit_le: profile.timestamp.toString(),
                             role: profile.role,
                             first_name: profile.first_name,
                             last_name: profile.last_name,
@@ -66,7 +66,7 @@ exports.getOneProfile = (req, res, next) => {
 
         // const foundProfileSQL = `SELECT * FROM users_profiles JOIN users WHERE user_id = ?`;
         // const foundProfileSQL = `SELECT * FROM users JOIN users_profiles ON users.id = ?`;
-        
+
         const foundUserSQL = `SELECT * FROM users WHERE id = ?`;
         const foundProfileSQL = `SELECT * FROM users_profiles WHERE user_id = ?`;
 
@@ -74,19 +74,17 @@ exports.getOneProfile = (req, res, next) => {
         connection.query(foundUserSQL, profile_id, (err, found) => {
             if (err) throw err;
 
-            console.log("-------> Résultat de la recherche")
-            console.log(found.length)
+            console.log("-------> Résultat de la recherche");
+            console.log(found.length);
 
             if (found.length == 0) {
                 res.status(404).json({ ERROR: "Cet utilisateur n'existe pas !" });
-
             } else {
-
                 // Objet user, on uniquement
                 const user = {
                     id: found[0].id.toString(),
                     role: found[0].role,
-                    inscription: found[0].timestamp
+                    inscription: found[0].timestamp,
                 };
 
                 // On cherche le profile de cet utilisateur
@@ -96,15 +94,14 @@ exports.getOneProfile = (req, res, next) => {
                     if (foundProfile.length == 0) {
                         res.status(404).json({ ERROR: "Ce profile n'existe pas !" });
                     } else {
-
-
                         // On vérifis que la req vient du propriétaire
                         if (profile_id === req.auth.userId) {
-
-                        // On decrypt l'email afin qu'il soit visible pour le propriétaire en cas de besoin de modifications du profile
-                        var emailAES = foundProfile[0].email;
-                        var decryptedEmail = cryptojs.AES.decrypt(emailAES, secretEmail).toString(cryptojs.enc.Utf8);
-                        // var originalEmail = bytes.toString(cryptojs.enc.Utf8);
+                            // On decrypt l'email afin qu'il soit visible pour le propriétaire en cas de besoin de modifications du profile
+                            var emailAES = foundProfile[0].email;
+                            var decryptedEmail = cryptojs.AES.decrypt(emailAES, secretEmail).toString(
+                                cryptojs.enc.Utf8
+                            );
+                            // var originalEmail = bytes.toString(cryptojs.enc.Utf8);
 
                             // On récupère les données que l'on veut utiliser
                             const profile = {
@@ -122,7 +119,6 @@ exports.getOneProfile = (req, res, next) => {
 
                             // On affiche les données avec l'email décrypté dans la réponse
                             res.status(200).json({ profile });
-
                         } else {
                             // On récupère les données que l'on veut utiliser
                             const profile = {
@@ -141,7 +137,6 @@ exports.getOneProfile = (req, res, next) => {
                         }
                     }
                 });
-
             }
         });
     });
@@ -149,14 +144,12 @@ exports.getOneProfile = (req, res, next) => {
 
 // Modifier un profile
 exports.modifyProfile = (req, res, next) => {
-
     const profile_id = req.params.id;
     // On vérifis si c'est le propriétaire du compte
     if (profile_id !== req.auth.userId) {
         // Si l'utilisateur n'est pas le propriétaire du compte :
-        res.status(401).json({ ERROR : "Vous n'êtes pas autorisé à effectuer cette action." })
+        res.status(401).json({ ERROR: "Vous n'êtes pas autorisé à effectuer cette action." });
     } else {
-
         try {
             // Si l'utilisateur est le propriétaire du compte :
             connection.getConnection((err, connection) => {
@@ -170,7 +163,6 @@ exports.modifyProfile = (req, res, next) => {
                 //1 - On veut chercher le profile qui correspond a l'id selectionné par l'utilisateur
                 const searchUser = `SELECT * FROM users WHERE id = ?`;
                 const searchProfile = `SELECT * FROM users_profiles WHERE user_id = ?`;
-
 
                 connection.query(searchUser, profile_id, (err, foundUser) => {
                     if (err) throw err;
@@ -198,56 +190,55 @@ exports.modifyProfile = (req, res, next) => {
                         var emailAES = foundProfile[0].email;
                         var decryptedEmail = cryptojs.AES.decrypt(emailAES, secretEmail).toString(cryptojs.enc.Utf8);
 
-
                         let newEmail;
                         let newPassword;
 
                         // Modifier les données de connexion
                         if (req.body.email) {
-
-                            const email = req.body.email
+                            const email = req.body.email;
                             const emailUser = cryptojs.HmacSHA256(email, secretEmail).toString();
-                            const emailProfile =  cryptojs.AES.encrypt(email, secretEmail).toString();
+                            const emailProfile = cryptojs.AES.encrypt(email, secretEmail).toString();
 
-                            const newEmailSearch = `SELECT * FROM users WHERE email = ?`
-                            const updateTest = `UPDATE users SET email = '${emailUser}' WHERE id = ?`
-                            const updateTest2 = `UPDATE users_profiles SET email = '${emailProfile}' WHERE user_id = ?`
+                            const newEmailSearch = `SELECT * FROM users WHERE email = ?`;
+                            const updateTest = `UPDATE users SET email = '${emailUser}' WHERE id = ?`;
+                            const updateTest2 = `UPDATE users_profiles SET email = '${emailProfile}' WHERE user_id = ?`;
 
                             // Modification de l'email
                             connection.query(newEmailSearch, emailUser, (err, emailFound) => {
                                 if (err) throw err;
 
-                                if ( emailFound.length === 0) {
-                                    console.error("Cette adresse email existe déjà")
+                                if (emailFound.length === 0) {
+                                    console.error("Cette adresse email existe déjà");
                                     connection.query(updateTest, profile_id, (err, result) => {
                                         if (err) throw err;
 
                                         connection.query(updateTest2, profile_id, (err, result) => {
                                             if (err) throw err;
-                                            
+
                                             console.log("La modification de l'email fonctionne");
                                             // console.log(result)
                                         });
                                     });
-                                } 
-                            })
+                                }
+                            });
                         }
 
                         // Modification du password
                         if (req.body.password) {
-                            const password = req.body.password
+                            const password = req.body.password;
 
-                            bcrypt.hash(password, 10)
-                            .then(hash => {
+                            bcrypt
+                                .hash(password, 10)
+                                .then((hash) => {
+                                    const updatePassword = `UPDATE users SET password = '${hash}' WHERE id = ?`;
 
-                                const updatePassword = `UPDATE users SET password = '${hash}' WHERE id = ?`
+                                    connection.query(updatePassword, profile_id, (err, result) => {
+                                        if (err) throw err;
 
-                                connection.query(updatePassword, profile_id, (err, result) => {
-                                    if (err) throw err;
-
-                                    console.log("Password modifié !")
-                                });
-                            }).catch(err => res.status(500).json({ err }));
+                                        console.log("Password modifié !");
+                                    });
+                                })
+                                .catch((err) => res.status(500).json({ err }));
 
                             console.log("modifier le mot de pass");
                             // Changer le password en utilisant bcrypt
@@ -256,64 +247,62 @@ exports.modifyProfile = (req, res, next) => {
                         if (req.body.first_name) {
                             const newfirst_name = req.body.first_name;
 
-                            const update = `UPDATE users_profiles SET first_name = '${newfirst_name}' WHERE user_id = ?`
+                            const update = `UPDATE users_profiles SET first_name = '${newfirst_name}' WHERE user_id = ?`;
 
                             connection.query(update, profile_id, (err, result) => {
                                 if (err) throw err;
 
-                                console.log("Nom modifié")
+                                console.log("Nom modifié");
                             });
-
                         }
 
                         if (req.body.last_name) {
                             const newlast_name = req.body.last_name;
-                            
-                            const update = `UPDATE users_profiles SET last_name = '${newlast_name}' WHERE user_id = ?`
+
+                            const update = `UPDATE users_profiles SET last_name = '${newlast_name}' WHERE user_id = ?`;
 
                             connection.query(update, profile_id, (err, result) => {
                                 if (err) throw err;
 
-                                console.log("Prénom modifié")
+                                console.log("Prénom modifié");
                             });
                         }
 
                         if (req.body.birthdate) {
                             const newBirthdate = req.body.birthdate;
-                            
-                            const update = `UPDATE users_profiles SET birthdate = '${newBirthdate}' WHERE user_id = ?`
+
+                            const update = `UPDATE users_profiles SET birthdate = '${newBirthdate}' WHERE user_id = ?`;
 
                             connection.query(update, profile_id, (err, result) => {
                                 if (err) throw err;
 
-                                console.log("Date de naissance modifiée !")
+                                console.log("Date de naissance modifiée !");
                             });
                         }
 
-
                         let newAvatarUrl;
-                            if (req.file) {
-                                newAvatarUrl = `${req.protocol}://${req.get("host")}/images/${req.file.filename}`;
-                                const update = `UPDATE users_profiles SET avatar = '${newAvatarUrl}' WHERE user_id = ?`;
+                        if (req.file) {
+                            newAvatarUrl = `${req.protocol}://${req.get("host")}/images/${req.file.filename}`;
+                            const update = `UPDATE users_profiles SET avatar = '${newAvatarUrl}' WHERE user_id = ?`;
 
-                                if (foundProfile[0].avatar) {
-                                    const file = foundProfile[0].avatar.split("/")[4];
-                                    const fileUrl = path.join("images/" + file);
-    
-                                    // On supprime l'ancienne
-                                    fs.unlink(fileUrl, () => {
-                                        console.log("IMAGE DELETED !");
-                                    });
-                                }
+                            if (foundProfile[0].avatar) {
+                                const file = foundProfile[0].avatar.split("/")[4];
+                                const fileUrl = path.join("images/" + file);
 
-                                connection.query(update, profile_id, (err, result) => {
-                                    if (err) throw err;
-
-                                    console.log("Nouvelle image de profile ajoutée");
+                                // On supprime l'ancienne
+                                fs.unlink(fileUrl, () => {
+                                    console.log("IMAGE DELETED !");
                                 });
-                                console.log("======> Nouvelle photo de profile");
-                                console.log(newAvatarUrl);
                             }
+
+                            connection.query(update, profile_id, (err, result) => {
+                                if (err) throw err;
+
+                                console.log("Nouvelle image de profile ajoutée");
+                            });
+                            console.log("======> Nouvelle photo de profile");
+                            console.log(newAvatarUrl);
+                        }
 
                         // const profileToUpdate = {
                         //     id: foundProfile[0].id.toString(),
@@ -337,19 +326,15 @@ exports.modifyProfile = (req, res, next) => {
             res.status(500).json(error);
         }
     }
-}
+};
 
 // Supprimer son propre compte
 exports.deleteAccount = (req, res, next) => {
-
     const profile_id = req.params.id;
     // On vérifis si c'est le propriétaire du compte
     if (profile_id !== req.auth.userId) {
-
-        res.status(401).json({ ERROR : "Vous n'êtes pas autorisé à effectuer cette action." })
-
+        res.status(401).json({ ERROR: "Vous n'êtes pas autorisé à effectuer cette action." });
     } else {
-
         connection.getConnection((err, connection) => {
             if (err) throw err;
 
@@ -361,43 +346,40 @@ exports.deleteAccount = (req, res, next) => {
 
             // On cherche le profile associé au compte Utilisateur
             connection.query(searchUser, profile_id, (err, found) => {
-                if(err) throw err;
+                if (err) throw err;
                 if (found.length == 0) {
-                    res.status(404).json({ ERROR: "Cet utilisateur n'existe pas !" })
+                    res.status(404).json({ ERROR: "Cet utilisateur n'existe pas !" });
                 }
 
                 // On supprime la photo de profile associée
                 if (found[0].avatar !== null) {
-
-                    console.log("Il y a un avatar !")
+                    console.log("Il y a un avatar !");
 
                     const file = found[0].avatar.split("/")[4];
                     const fileUrl = path.join("images/" + file);
 
                     fs.unlink(fileUrl, () => {
-                        console.log("image supprimée avec succès")
+                        console.log("image supprimée avec succès");
                     });
-
-                } 
+                }
 
                 // On supprime le profile
                 connection.query(deleteAccount, profile_id, (err, found) => {
-                    if(err) throw err;
+                    if (err) throw err;
 
-                    console.log("Profile supprimé avec succès")
+                    console.log("Profile supprimé avec succès");
 
                     // On supprime le compte de connexion
                     connection.query(deleteLoginAcc, profile_id, (err, profile) => {
-                        if(err) throw err;
+                        if (err) throw err;
 
-                        console.log("compte utilisateur supprimé avec succès !")
+                        console.log("compte utilisateur supprimé avec succès !");
                         // connection.release();
 
-                        res.status(200).json({ MESSAGE : "Compte supprimé avec succès !" })
-                    })
-
-                })
+                        res.status(200).json({ MESSAGE: "Compte supprimé avec succès !" });
+                    });
+                });
             });
         });
     }
-}
+};

@@ -3,7 +3,7 @@
     margin: 2% 0;
     &__data {
         width: 55%;
-        padding: 2%;
+        // padding: 2%;
         border-radius: 15px;
         margin: 0 auto;
         background: darken($principal_bg, 5%);
@@ -15,6 +15,11 @@
         flex-direction: row;
         align-items: center;
 
+        padding: 2%;
+
+        background: $accent_color_3;
+        border-radius: 20px 20px 0 0;
+
         &--margin {
             margin: 5%;
         }
@@ -22,10 +27,16 @@
 
     &__signupDate {
         font-size: 1rem;
+        display: flex;
+
+        .dateTime {
+            margin-left: 5px;
+        }
     }
 
     &__title {
         font-size: 1.5rem;
+        color: #fff;
     }
 
     &__btn {
@@ -34,5 +45,16 @@
 
     &__infos {
         margin: 10% 0;
+    }
+
+    &__img {
+        width: 150px;
+        height: 150px;
+        border-radius: 100%;
+
+        margin-right: 5%;
+
+        border: 3px #fff;
+        border-style: solid;
     }
 }

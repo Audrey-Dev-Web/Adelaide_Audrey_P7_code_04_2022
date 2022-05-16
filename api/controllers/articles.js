@@ -74,6 +74,7 @@ exports.getAllArticles = (req, res, next) => {
                             author_lastName: article.last_name,
                             author_avatar: article.avatar,
                             title: article.title,
+                            is_shared: article.is_shared,
                             content: article.content,
                             images: article.images,
                             comments: article.comments,
@@ -611,6 +612,7 @@ exports.shareArticle = (req, res, next) => {
                             // const title = "Shared";
                             const content = {
                                 id: postFound[0].id.toString(),
+                                is_shared: 1,
                                 avatar: postFound[0].avatar,
                                 author_firstName: postFound[0].first_name,
                                 author_lastName: postFound[0].last_name,
@@ -623,19 +625,44 @@ exports.shareArticle = (req, res, next) => {
                             const post_content = JSON.stringify(content);
 
                             // requête SQL pour ajouter un nouvel article
-                            const sharePost = `INSERT INTO posts_shared SET ?`;
+                            const sharePost = `INSERT INTO articles SET ?`;
 
                             // On créer un nouveau post à partir de celui-ci
-                            const post = new Share(user_id, post_id, post_content);
+                            const post = new Article(
+                                content.title,
+                                JSON.stringify(content.post_content),
+                                content.images
+                            );
 
-                            let post_shared_Data = {
-                                user_id: post.user_id,
-                                post_id: post.post_id,
-                                post_content: post.post_content,
-                                // comments: 0,
-                                // likes: 0,
-                                // dislikes: 0,
-                                // shares: 0,
+                            // let post_shared_Data = {
+                            //     user_id: post.user_id,
+                            //     post_id: post.post_id,
+                            //     post_content: post.post_content,
+                            //     // comments: 0,
+                            //     // likes: 0,
+                            //     // dislikes: 0,
+                            //     // shares: 0,
+                            // };
+
+                            //             author_id: author_id,
+                            // title: article.title,
+                            // content: article.content,
+                            // images: article.images,
+                            // comments: 0,
+                            // likes: 0,
+                            // dislikes: 0,
+                            // shares: 0,
+
+                            const post_shared_Data = {
+                                author_id: user_id,
+                                is_shared: 1,
+                                title: post.title,
+                                content: post.content,
+                                images: post.images,
+                                comments: 0,
+                                likes: 0,
+                                dislikes: 0,
+                                shares: 0,
                             };
 
                             console.log("=====> POST DATA");

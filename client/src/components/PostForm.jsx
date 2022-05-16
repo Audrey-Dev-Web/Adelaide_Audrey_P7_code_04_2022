@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 
-import UploadFile from "./UploadFile";
-
 function PostForm() {
     // ===========> CREATE NEW POST
 
@@ -79,7 +77,6 @@ function PostForm() {
                     <input className="newPost__add--send btn" type="submit" value="Envoyer" onClick={sendNewPost} />
                 </div>
             </form>
-            <UploadFile />
         </div>
     );
 }

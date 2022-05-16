@@ -1,44 +1,62 @@
 import React, { useState, useEffect } from "react";
 
-export default function Comments(props) {
-    const [comments, setComments] = useState(null);
+function Comments(props) {
+    const { post_id } = props;
+    const [msg, setMsg] = useState("");
+    const [comments, setComments] = useState([]);
+    const [dataIsLoaded, setDataIsLoaded] = useState(false);
 
-    const getPostComments = async (props) => {
-        // Rechercher les Commentaires
-        const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
-        const token = user.pass;
+    // Token de l'utilisateur
+    const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
+    const token = user.pass;
+    const user_id = user.id;
 
-        const urlComments = `http://localhost:8080/api/articles/${props}/comments`;
-        const reqOptions = {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${token}`,
-                Accept: "application/json",
-                "Content-Type": "application/json",
-            },
-        };
+    // Request Options
+    const url = `http://localhost:8080/api/articles/${post_id}/comments`;
+    const reqOptions = {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+            "Content-Type": "application/json",
+        },
+    };
 
-        const resComments = await fetch(urlComments, reqOptions);
-        const postsComments = await resComments.json();
-
-        // if (!resComments.ok) {
-        //     console.log("Pas de commentaire a afficher");
-        // }
-
-        setComments(postsComments);
-
-        // console.log("", comments);
+    const fetchComments = () => {
+        fetch(url, reqOptions)
+            .then((res) => {
+                if (res.ok) {
+                    return res.json();
+                }
+            })
+            .then((data) => {
+                // console.log(data);
+                if (!data) {
+                    setMsg("Aucun commentaire");
+                    // console.log(msg);
+                }
+                setComments(data);
+                setDataIsLoaded(true);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     };
 
     useEffect(() => {
-        getPostComments(props);
-    }, []);
+        fetchComments();
+    }, [post_id]);
 
-    return (
-        <div>
-            {props.post_id}
-            {/* <br />
-            Ici afficher les commentaires quand on clique sur le bouton ou il y a le nombre de commentaires */}
-        </div>
-    );
+    if (!dataIsLoaded)
+        return (
+            <div>
+                <h1> {msg} </h1>
+            </div>
+        );
+
+    console.log(comments);
+
+    return <div>Affichage des commentaires ICI !</div>;
 }
+
+export default Comments;
