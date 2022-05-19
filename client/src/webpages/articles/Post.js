@@ -4,9 +4,17 @@ import { Route } from "react-router-dom";
 
 import { BiLike, BiDislike, BiShare, BiComment, BiCommentAdd } from "react-icons/bi";
 
+// Import pour la gestion de l'article
+import EditPost from "../../components/EditPost";
+import DeletePost from "../../components/DeletePost";
+
+// Import pour la gestion des commentaires
 import CommentForm from "../../components/CommentForm";
 import EditComment from "../../components/EditComment";
 import DeleteComment from "../../components/DeleteComment";
+
+// Import Socials
+import SharePost from "../../components/SharePost";
 
 function Post() {
     let { postSlug } = useParams();
@@ -59,14 +67,6 @@ function Post() {
             </div>
         );
     }
-
-    // if (user_id == post.articleFound.author_id) {
-    //     setIsAuthor(true);
-    // }
-
-    // console.log("", post);
-
-    // console.log("", isAuthor);
 
     return (
         <div className="post">
@@ -146,17 +146,27 @@ function Post() {
                                 <span className="social__count">{post.articleFound.comments}</span>
                             </p>
 
-                            {!isAuthor ? null : (
+                            {/* {!isAuthor ? null : (
                                 <div className="post__settings">
                                     <button className="post_edit btn btn__edit">Editer</button>
                                     <button className="post_delete btn btn__delete">Supprimer</button>
                                 </div>
-                            )}
+                            )} */}
 
                             <button className="social__icon btn">
                                 <BiCommentAdd />
                             </button>
                         </div>
+
+                        <EditPost
+                            post_id={post.articleFound.id}
+                            author_id={post.articleFound.author_id}
+                            post_title={post.articleFound.title}
+                            post_content={post.articleFound.content}
+                            post_img={post.articleFound.img}
+                        />
+
+                        <DeletePost post_id={post.articleFound.id} author_id={post.articleFound.author_id} />
                     </div>
                     <div className="comments">
                         <h3 className="comments__title">Commentaires</h3>

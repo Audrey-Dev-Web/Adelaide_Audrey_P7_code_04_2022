@@ -174,16 +174,30 @@ exports.modifyArticle = (req, res, next) => {
                         //     img: article[0].images,
                         // }
 
-                        const { title, content } = req.body;
-                        const images = `${req.protocol}://${req.get("host")}/images/${req.file.filename}`;
+                        const { title, content, images } = req.body;
+                        // const images = `${req.protocol}://${req.get("host")}/images/${req.file.filename}`;
+
+                        // const editPost = new Article(title, content, images);
+
+                        // const editPostObject = {
+                        //     author_id: author_id,
+                        //     title: article.title,
+                        //     content: article.content,
+                        //     images: article.images,
+                        //     comments: 0,
+                        //     likes: 0,
+                        //     dislikes: 0,
+                        //     shares: 0,
+                        // };
 
                         if (title) {
                             console.log("modifier le titre de l'article");
 
                             const newTitle = title;
-                            const newTitleSQL = `UPDATE articles SET title = '${newTitle}' WHERE id = ?`;
+                            // const newTitleSQL = `UPDATE articles SET ? WHERE id = '${article_id}'`;
+                            const newTitleSQL = `UPDATE articles SET title = "${newTitle}" WHERE id = "${article_id}"`;
 
-                            connection.query(newTitleSQL, article_id, (err, result) => {
+                            connection.query(newTitleSQL, (err, result) => {
                                 if (err) throw err;
                             });
                         }
@@ -192,22 +206,41 @@ exports.modifyArticle = (req, res, next) => {
                             console.log("modifier le contenu de l'article");
 
                             const newContent = content;
-                            const newContentSQL = `UPDATE articles SET content = "${newContent}" WHERE id = ?`;
+                            const newContentSQL = `UPDATE articles SET content = "${newContent}" WHERE id = "${article_id}"`;
 
-                            connection.query(newContentSQL, article_id, (err, result) => {
+                            connection.query(newContentSQL, (err, result) => {
                                 if (err) throw err;
                             });
                         }
 
                         let newImgUrl;
 
+                        // if (images === null) {
+                        //     const file = article[0].images.split("/")[4];
+                        //     const fileUrl = path.join("images/" + file);
+
+                        //     const delImg = `UPDATE articles SET images = NULL WHERE id = ?`;
+
+                        //     // On supprime l'ancienne
+                        //     fs.unlink(fileUrl, () => {
+                        //         console.log("IMAGE DELETED !");
+                        //     });
+
+                        //     connection.query(delImg, article_id, (err, result) => {
+                        //         if (err) throw err;
+
+                        //         console.log("Nouvelle image d'article ajoutée");
+                        //     });
+                        // }
+
                         if (req.file) {
                             console.log("modifier les images");
 
                             newImgUrl = `${req.protocol}://${req.get("host")}/images/${req.file.filename}`;
-                            const newImgSQL = `UPDATE articles SET images = '${newImgUrl}' WHERE id = ?`;
+                            const newImgSQL = `UPDATE articles SET images = "${newImgUrl}" WHERE id = ?`;
 
-                            if (article[0].images) {
+                            if (article[0].images != null) {
+                                // console.log(article[0].images);
                                 const file = article[0].images.split("/")[4];
                                 const fileUrl = path.join("images/" + file);
 
@@ -236,6 +269,58 @@ exports.modifyArticle = (req, res, next) => {
     }
 };
 
+// exports.deletePostImg = (req, res, next) => {
+//     const article_id = req.params.id;
+//     const userRole = req.auth.userRole;
+//     const userAuth = req.auth.userId;
+
+//     const searchOne = `SELECT * FROM articles WHERE articles.id = ?`;
+
+//     const deleteImg = `UPDATE articles SET images = "NULL" WHERE id = ?`;
+
+//     try {
+//         connection.getConnection(async (err, connection) => {
+//             if (err) throw err;
+
+//             await connection.query(searchOne, article_id, async (err, result) => {
+//                 if (err) throw err;
+
+//                 if (result.length <= 0) {
+//                     return res.status(404).json({ error: "Ce poste n'existe pas" });
+//                 }
+
+//                 const author_id = result[0].author_id.toString();
+
+//                 if (author_id !== userAuth && userRole !== "admin") {
+//                     return res.status(400).json({ ERROR: "Requête non autorisée !" });
+//                 }
+
+//                 if (result[0].images) {
+//                     const file = result[0].images.split("/")[4];
+//                     const fileUrl = path.join("images/" + file);
+
+//                     // On supprime l'ancienne
+//                     fs.unlink(fileUrl, () => {
+//                         console.log("IMAGE DELETED !");
+//                     });
+//                 }
+
+//                 await connection.query(deleteImg, article_id, async (err, result) => {
+//                     if (err) throw err;
+
+//                     if (result.length <= 0) {
+//                         return res.status(404).json({ error: "Impossible de supprimer l'element" });
+//                     }
+
+//                     res.status(200).json({ MESSAGE: "Image supprimée avec succès !" });
+//                 });
+//             });
+//         });
+//     } catch (err) {
+//         res.status(500).json({ err });
+//     }
+// };
+
 // Supprimer l'article
 exports.deleteArticle = (req, res, next) => {
     const article_id = req.params.id;
@@ -250,37 +335,43 @@ exports.deleteArticle = (req, res, next) => {
         const deleteArticle = `DELETE FROM articles WHERE id = ?`;
 
         // On récupère l'article a supprimer
-        connection.query(searchArticle, article_id, (err, article) => {
+        connection.query(searchArticle, article_id, (err, found) => {
             if (err) throw err;
 
-            if (article.length === 0) {
+            console.log(found);
+
+            if (found.length === 0) {
                 return res.status(404).json({ ERROR: "Cet article n'existe pas !" });
             }
 
-            const author_id = article[0].author_id.toString();
+            const author_id = found[0].author_id.toString();
 
             // On vérifis que l'utilisateur connecté soit l'admin ou le créateur de l'article
             if (author_id !== userAuth && userRole !== "admin") {
                 return res.status(400).json({ ERROR: "Requête non autorisée !" });
             }
 
-            if (article[0].images) {
-                const file = article[0].images.split("/")[4];
+            if (found[0].images) {
+                const file = found[0].images.split("/")[4];
                 const fileUrl = path.join("images/" + file);
 
                 fs.unlink(fileUrl, () => {
-                    // console.log("image supprimée avec succès")
-
                     connection.query(deleteArticle, article_id, (err, results) => {
                         if (err) throw err;
 
                         res.status(201).json({ MESSAGE: "Article supprimé" });
                     });
                 });
+            } else {
+                connection.query(deleteArticle, article_id, (err, results) => {
+                    if (err) throw err;
+
+                    res.status(201).json({ MESSAGE: "Article supprimé" });
+                });
             }
         });
 
-        console.log(req.auth);
+        // console.log(req.auth);
     });
 };
 

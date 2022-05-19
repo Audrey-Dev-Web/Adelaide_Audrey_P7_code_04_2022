@@ -5,7 +5,7 @@ function CommentForm(props) {
 
     const { post_id } = props;
 
-    console.log(post_id);
+    // console.log(post_id);
 
     const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
     const token = user.pass;

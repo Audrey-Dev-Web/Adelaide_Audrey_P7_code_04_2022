@@ -17,7 +17,7 @@ exports.addComment = (req, res, next) => {
 
         const comment = new Comment(author_id, article_id, comment_content);
 
-        // requête SQL pour ajouter un nouvel article
+        // requête SQL pour ajouter un nouveau commentaire
         const addNewcomment = `INSERT INTO comments SET ?`;
 
         const newComment = {
@@ -62,13 +62,13 @@ exports.getAllcomments = (req, res, next) => {
         //                     JOIN articles ON (comments.article_id = article_id)
         //                     JOIN users_profiles ON (comments.author_comment_id = users_profiles.user_id)`;
 
-        await connection.query(showComments, article_id, async (err, comments) => {
+        await connection.query(showComments, article_id, async (err, found) => {
             if (err) throw err;
 
-            if (comments.length <= 0) {
-                return res.status(404).json({ ERROR: "Il n'y a aucun commentaire à afficher" });
+            if (found.length <= 0) {
+                return res.status(404).json({ error: "Il n'y a aucun commentaire à afficher" });
             }
-            console.log(comments);
+            console.log(found);
 
             let allComments = [];
 
@@ -76,7 +76,7 @@ exports.getAllcomments = (req, res, next) => {
             // author_lastName: author.last_name,
             // author_avatarUrl: author.avatar,
 
-            comments.forEach((comment) => {
+            found.forEach((comment) => {
                 let commentInfo = {
                     id: comment.comment_id.toString(),
                     article_id: comment.article_id.toString(),
@@ -90,51 +90,12 @@ exports.getAllcomments = (req, res, next) => {
 
                 allComments.push(commentInfo);
             });
-            console.log(allComments);
+            // console.log(allComments);
 
             res.status(200).json({ allComments });
         });
     });
 };
-
-// Afficher tous les commentaires d'un article dans une liste d'article : ex les articles
-// exports.getAllcommentsFrom = (req, res, next) => {
-//     // Afficher les commentaires de l'article
-//     const article_id = req.body.id;
-//     console.log(article_id);
-
-//     connection.getConnection(async (err, connection) => {
-//         if (err) throw err;
-
-//         const showComments = `SELECT * FROM comments
-//                             JOIN articles ON (comments.article_id = ?)
-//                             JOIN users_profiles ON (comments.author_comment_id = users_profiles.user_id)`;
-
-//         await connection.query(showComments, article_id, async (err, comments) => {
-//             if (err) throw err;
-
-//             console.log(comments);
-
-//             let allComments = [];
-
-//             comments.forEach((comment) => {
-//                 let commentInfo = {
-//                     id: comment.comment_id.toString(),
-//                     article_id: comment.article_id.toString(),
-//                     author_id: comment.author_comment_id.toString(),
-//                     firstName: comment.first_name,
-//                     lastName: comment.last_name,
-//                     comment: comment.comment,
-//                     timestamp: comment.timestamp.toString(),
-//                 };
-
-//                 allComments.push(commentInfo);
-//             });
-
-//             res.status(200).json({ allComments });
-//         });
-//     });
-// };
 
 // Afficher un commentaire
 exports.getOneComment = (req, res, next) => {
@@ -227,7 +188,7 @@ exports.modifyComment = (req, res, next) => {
                     return res.status(402).json({ ERROR: "Aucune modification effectuée!" });
                 }
                 // `UPDATE users_profiles SET first_name = '${req.body.first_name}', last_name = '${req.body.last_name}', birthdate = '${req.body.birthdate}' WHERE user_id = ?`;
-                const update_comment = `UPDATE comments SET comment = '${req.body.comment}' WHERE comment_id = ?`;
+                const update_comment = `UPDATE comments SET comment= "${req.body.comment}" WHERE comment_id = ?`;
                 await connection.query(update_comment, comment_id, async (err, comment_updated) => {
                     if (err) throw err;
 

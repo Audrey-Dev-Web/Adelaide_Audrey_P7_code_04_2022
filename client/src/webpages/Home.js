@@ -4,6 +4,7 @@ import React from "react";
 import Posts from "./articles/Posts";
 import PostForm from "../components/PostForm";
 import UsersProfile from "../components/UsersProfile";
+// import ErrorBoundary from "../components/ErrorBoundary";
 
 function Home() {
     return (
@@ -18,7 +19,6 @@ function Home() {
                         <Posts />
                     </div>
                 </div>
-
                 <UsersProfile />
             </div>
         </div>

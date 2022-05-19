@@ -79,7 +79,7 @@ function EditComment(props) {
         <div className="comments__editForm">
             {!isAuthor ? null : (
                 <button className="comments__edit btn btn__edit" onClick={toggleEdit}>
-                    Edit
+                    Editer
                 </button>
             )}
 

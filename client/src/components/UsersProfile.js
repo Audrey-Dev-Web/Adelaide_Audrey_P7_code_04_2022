@@ -33,7 +33,7 @@ function UsersProfile() {
                 }
             })
             .then((data) => {
-                console.log(data);
+                // console.log(data);
 
                 setUsers(data);
                 setDataIsLoaded(true);
@@ -44,7 +44,7 @@ function UsersProfile() {
         fetchUsers();
     }, []);
 
-    console.log(users);
+    // console.log(users);
 
     if (!dataIsLoaded) {
         return (

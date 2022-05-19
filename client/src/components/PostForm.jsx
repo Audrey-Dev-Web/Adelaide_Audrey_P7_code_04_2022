@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 function PostForm() {
     // ===========> CREATE NEW POST
@@ -6,6 +6,8 @@ function PostForm() {
     const [postTitle, setPostTitle] = useState(null);
     const [postContent, setPostContent] = useState(null);
     const [postImg, setPostImg] = useState(null);
+    const [fileDataURL, setFileDataURL] = useState(null);
+    const [message, setMessage] = useState(null);
 
     const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
     const token = user.pass;
@@ -16,36 +18,62 @@ function PostForm() {
         image: postImg,
     };
 
+    const formData = new FormData();
+    formData.append("title", postTitle);
+    formData.append("content", postContent);
+    formData.append("image", postImg);
     // console.log(postImg);
 
     // requêtes pour créer un nouvel article
     const sendNewPost = async (e) => {
         e.preventDefault();
 
-        try {
-            let res = await fetch("http://localhost:8080/api/articles/", {
-                method: "POST",
-                body: JSON.stringify(postObject),
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    Accept: "application/json",
-                    "Content-Type": "application/json",
-                },
-            });
+        if (!postTitle && !postContent && !postImg) {
+            setMessage("Vous avez ajouter au moins un titre avec du texte ou une image");
+        } else if (!postTitle && postContent && !postImg) {
+            setMessage("Vous avez ajouter au moins un titre");
+        } else if (!postTitle && !postContent && postImg) {
+            setMessage("Vous avez ajouter au moins un titre");
+        } else if (!postTitle && postContent && postImg) {
+            setMessage("Vous avez ajouter un titre a votre article");
+        } else {
+            try {
+                let res = await fetch("http://localhost:8080/api/articles/", {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
 
-            const data = await res.json();
-            console.log("======> Verifier l'envoi du post");
-            console.log(data);
+                const data = await res.json();
+                console.log("======> Verifier l'envoi du post");
+                console.log(data);
 
-            window.location.reload();
-        } catch (err) {
-            console.log(err);
+                window.location.reload();
+            } catch (err) {
+                console.log(err);
+            }
         }
     };
 
+    function handleChange(event) {
+        setPostImg(event.target.files[0]);
+
+        var file = event.target.files[0];
+        var reader = new FileReader();
+        reader.onload = function (event) {
+            // The file's text will be printed here
+            const { result } = event.target;
+            console.log(event.target.result);
+            setFileDataURL(result);
+        };
+        reader.readAsDataURL(file);
+    }
+
     return (
         <div>
-            <form className="newPost__add">
+            <form onSubmit={sendNewPost} className="newPost__add" method="POST" encType="multipart/form-data">
                 <label>
                     <input
                         className="newPost__add--title"
@@ -66,15 +94,14 @@ function PostForm() {
                     />
                 </label>
 
+                {!postImg ? null : <img width="300" src={fileDataURL} />}
                 <div className="newPost__btn">
-                    {/* <input className="newPost__add--img btn" type="file" onChange={(e) => setPostImg(e.target.value)} /> */}
-                    {/* <input className="btn" type="file" onChange={(e) => setPostImg(e.target.value)} /> */}
-                    <input className="btn" type="file" name="image" onChange={(e) => setPostImg(e.target.value)} />
-                    {/* <button className="newPost__add--img btn" type="submit">
-                        Upload
-                    </button> */}
-
-                    <input className="newPost__add--send btn" type="submit" value="Envoyer" onClick={sendNewPost} />
+                    {/* <label htmlFor="image"> */}
+                    <input className="btn" type="file" id="image" name="image" onChange={handleChange} />
+                    {/* </label> */}
+                    {/* <input className="btn" type="file" name="image" onChange={(e) => setPostImg(e.target.value)} /> */}
+                    {message}
+                    <input className="newPost__add--send btn" type="submit" value="Envoyer" />
                 </div>
             </form>
         </div>
