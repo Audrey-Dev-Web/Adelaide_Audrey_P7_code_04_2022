@@ -1,0 +1,41 @@
+.infobubble {
+    position: absolute;
+    cursor: help;
+    bottom: -170%;
+    width: auto;
+    padding: 2%;
+    color: #fff;
+    background: $principal_bg;
+    border: 2px solid dotted #fff;
+    border-radius: 15px;
+    box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.3), 0 0.0625rem 0.125rem rgba(0, 0, 0, 0.2);
+    display: none;
+    visibility: hidden;
+    opacity: 0;
+
+    &::before {
+        // layout
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 0;
+        bottom: 100%;
+        left: 3em; // offset should move with padding of parent
+        border: 0.75rem solid transparent;
+        border-top: none;
+
+        // looks
+        border-bottom-color: $principal_bg;
+        filter: drop-shadow(0 -0.0625rem 0.0625rem rgba(0, 0, 0, 0.1));
+    }
+}
+
+.btn {
+    &:hover {
+        .infobubble {
+            display: block;
+            visibility: visible;
+            opacity: 1;
+        }
+    }
+}

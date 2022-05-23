@@ -13,6 +13,8 @@ import CommentForm from "../../components/CommentForm";
 import EditComment from "../../components/EditComment";
 import DeleteComment from "../../components/DeleteComment";
 
+import ErrorBoundary from "../../components/ErrorBoundary";
+
 // Import Socials
 import SharePost from "../../components/SharePost";
 
@@ -50,6 +52,7 @@ function Post() {
                 setComments(dataComments);
                 setPostIsLoaded(true);
 
+                // console.log(dataPost);
                 if (user_id === dataPost.articleFound.author_id) {
                     setIsAuthor(true);
                 }
@@ -121,37 +124,33 @@ function Post() {
                         )}
 
                         <div className="post__footer">
-                            <p className="social">
+                            <div className="social">
                                 <span className="social__icon">
                                     <BiLike />
                                 </span>
                                 <span className="social__count">{post.articleFound.likes}</span>
-                            </p>
-                            <p className="social">
+                            </div>
+                            <div className="social">
                                 <span className="social__icon">
                                     <BiDislike />
                                 </span>
                                 <span className="social__count"> {post.articleFound.dislikes}</span>
-                            </p>
-                            <p className="social">
+                            </div>
+                            <div className="social">
                                 <span className="social__icon">
-                                    <BiShare />
+                                    {/* <BiShare /> */}
+                                    <ErrorBoundary>
+                                        <SharePost post_id={post.articleFound.id} />
+                                    </ErrorBoundary>
                                 </span>
                                 <span className="social__count">{post.articleFound.shares}</span>
-                            </p>
-                            <p className="social">
+                            </div>
+                            <div className="social">
                                 <span className="social__icon">
                                     <BiComment />
                                 </span>
                                 <span className="social__count">{post.articleFound.comments}</span>
-                            </p>
-
-                            {/* {!isAuthor ? null : (
-                                <div className="post__settings">
-                                    <button className="post_edit btn btn__edit">Editer</button>
-                                    <button className="post_delete btn btn__delete">Supprimer</button>
-                                </div>
-                            )} */}
+                            </div>
 
                             <button className="social__icon btn">
                                 <BiCommentAdd />

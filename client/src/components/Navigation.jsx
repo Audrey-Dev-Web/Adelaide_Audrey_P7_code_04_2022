@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 // import { Routes, Route, Link, Navigate } from "react-router-dom";
 // import logo from "./logo.svg";
+// import { useNavigate } from "react-router";
 import logo from "../images/icon.svg";
 
 import { NavLink, useNavigate } from "react-router-dom";
@@ -15,7 +16,9 @@ function Navigation() {
 
     const loggout = () => {
         sessionStorage.removeItem("isAuthenticate");
-        window.location.reload(true);
+        navigate("/");
+        window.location.reload();
+        // window.location.reload(true);
         // navigate("/", { replace: true });
     };
 

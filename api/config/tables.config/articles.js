@@ -5,6 +5,7 @@ const articlesTable = () => {
         id BINARY(16) NOT NULL PRIMARY KEY UNIQUE DEFAULT UUID(),
         author_id BINARY(16) NOT NULL,
         is_shared BOOLEAN NOT NULL DEFAULT FALSE,
+        shared_id BINARY(16),
         title VARCHAR(300) NOT NULL,
         content VARCHAR(5000), 
         images VARCHAR(100),

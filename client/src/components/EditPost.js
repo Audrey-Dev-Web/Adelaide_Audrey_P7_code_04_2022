@@ -9,14 +9,14 @@ function EditPost(props) {
     const [content, setContent] = useState(post_content);
     const [image, setImage] = useState(post_img);
 
-    const [editMod, setEditMod] = useState(false);
+    // const [editMod, setEditMod] = useState(false);
 
     // On récupère les données pour les authorisations
     const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
     const token = user.pass;
     const user_id = user.id;
 
-    const [isAuthor, setIsAuthor] = useState(false);
+    // const [isAuthor, setIsAuthor] = useState(false);
 
     // console.log(props);
 
@@ -37,15 +37,15 @@ function EditPost(props) {
     };
 
     // On vérifis si l'utilisateur est l'auteur du post
-    const set_author = () => {
-        if (user_id === author_id) {
-            setIsAuthor(true);
-        }
-    };
+    // const set_author = () => {
+    //     if (user_id === author_id) {
+    //         setIsAuthor(true);
+    //     }
+    // };
 
-    useEffect(() => {
-        set_author();
-    }, []);
+    // useEffect(() => {
+    //     set_author();
+    // }, []);
 
     // console.log("Est-ce que l'utilisateur est l'auteur du post ? ", isAuthor, author_id);
     // console.log(user_id);
@@ -74,27 +74,28 @@ function EditPost(props) {
     //     setImage(null);
     // }
 
-    const toggleEdit = () => {
-        if (!editMod) {
-            setEditMod(true);
-            console.log("mode edition activée !");
-        } else {
-            setEditMod(false);
-            console.log("mode edition désactivée !");
-        }
-    };
+    // const toggleEdit = () => {
+    //     if (!editMod) {
+    //         setEditMod(true);
+    //         console.log("mode edition activée !");
+    //     } else {
+    //         setEditMod(false);
+    //         console.log("mode edition désactivée !");
+    //     }
+    // };
 
-    console.log(image);
+    // console.log(image);
 
     return (
         <div>
-            {!isAuthor ? null : (
+            {/* {!isAuthor ? null : (
                 <button className="postForm__edit btn btn__edit" onClick={toggleEdit}>
                     Editer
                 </button>
-            )}
+            )} */}
 
-            <span className="postForm postForm__editMod editMod" style={{ display: editMod ? "block" : "none" }}>
+            {/* <span className="postForm postForm__editMod editMod" style={{ display: editMod ? "block" : "none" }}> */}
+            <span className="postForm postForm__editMod editMod">
                 <form onSubmit={editPost} className="postForm__edit--form" method="PUT" encType="multipart/form-data">
                     <h2>Modifier cet article</h2>
                     <label>

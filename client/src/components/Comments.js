@@ -4,6 +4,7 @@ import DateTime from "../components/DateTime";
 import CommentForm from "../components/CommentForm";
 import EditComment from "../components/EditComment";
 import DeleteComment from "../components/DeleteComment";
+import ErrorBoundary from "../components/ErrorBoundary";
 
 function Comments(props) {
     const { post_id } = props;
@@ -80,16 +81,21 @@ function Comments(props) {
 
     return (
         <div>
-            <button onClick={handleClick}>Fetch data</button>
+            <button className="btn" onClick={handleClick}>
+                Afficher les commentaires
+            </button>
+            {/* <ErrorBoundary>
+                <CommentForm post_id={post.article.id} />
+            </ErrorBoundary> */}
             <div className="showComments" style={{ display: showComments ? "block" : "none" }}>
                 {err && <h2>{err}</h2>}
                 {isLoading && <h2>Loading...</h2>}
                 {data.allComments?.map((comment) => {
                     return (
-                        <div className="comment" key={comment.id}>
-                            <div className="comment__author">
+                        <div className="comments__post" key={comment.id}>
+                            <div className="comments__author">
                                 {!comment.avatar ? (
-                                    <div className="comment__author--avatar initiales">
+                                    <div className="comments__author--avatar initiales">
                                         <p>
                                             {`${comment.firstName} ${comment.lastName}
                                             `
@@ -101,37 +107,37 @@ function Comments(props) {
                                 ) : (
                                     <img
                                         width="100"
-                                        className="comment__author--avatar"
+                                        className="comments__author--avatar"
                                         src={comment.avatar}
                                         alt={comment.firstName + " " + comment.lastName}
                                     />
                                 )}
 
-                                <div className="comment__author--infos">
+                                <div className="comments__author--infos">
                                     <p>{comment.firstName + " " + comment.lastName}</p>
-                                    <div className="comment__author--dateTime">
+                                    <div className="comments__author--dateTime">
                                         <p>Posté</p> <DateTime datetime={comment.timestamp} />
                                     </div>
                                 </div>
                             </div>
-                            <p>{comment.comment}</p>
+                            <div className="comments__content">
+                                <p>{comment.comment}</p>
+                            </div>
 
-                            <EditComment
-                                author_id={comment.author_id}
-                                post_id={comment.article_id}
-                                comment_id={comment.id}
-                                comment_value={comment.comment}
-                            />
+                            <div className="comments__buttons">
+                                <EditComment
+                                    author_id={comment.author_id}
+                                    post_id={comment.article_id}
+                                    comment_id={comment.id}
+                                    comment_value={comment.comment}
+                                />
 
-                            <DeleteComment
-                                author_id={comment.author_id}
-                                post_id={comment.article_id}
-                                comment_id={comment.id}
-                            />
-
-                            {/* <h2>{person.first_name}</h2>
-                    <h2>{person.last_name}</h2>
-                    <br /> */}
+                                <DeleteComment
+                                    author_id={comment.author_id}
+                                    post_id={comment.article_id}
+                                    comment_id={comment.id}
+                                />
+                            </div>
                         </div>
                     );
                 })}

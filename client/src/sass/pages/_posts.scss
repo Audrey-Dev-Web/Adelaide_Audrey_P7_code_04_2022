@@ -1,0 +1,30 @@
+// .article__editPost {
+//     opacity: 0;
+
+//     & .active {
+//         .article__editPost {
+//             opacity: 1;
+//             transition: opacity 200ms;
+//         }
+//     }
+// }
+
+// .article__editPost-active {
+//     opacity: 1;
+//     transition: opacity 200ms;
+// }
+// .my-node-exit {
+//   opacity: 1;
+// }
+// .my-node-exit-active {
+//   opacity: 0;
+//   transition: opacity 200ms;
+// }
+
+// .switch {
+//     & #toggle:checked ~ {
+//         & .article__editPost {
+//             display: block;
+//         }
+//     }
+// }

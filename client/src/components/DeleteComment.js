@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 
+import { BiTrash } from "react-icons/bi";
+
 function DeleteComment(props) {
     // On récupère l'id de l'utilisateur avec props
     const { post_id, author_id, comment_id } = props;
@@ -58,8 +60,9 @@ function DeleteComment(props) {
     return (
         <div>
             {!isAuthorized ? null : (
-                <button className="comments__delete btn btn__delete" onClick={(e) => deleteComment(e)}>
-                    Supprimer
+                <button className="comments__delete--btn btn" onClick={(e) => deleteComment(e)}>
+                    <BiTrash />
+                    <span className="infobubble">Supprimer</span>
                 </button>
             )}
         </div>

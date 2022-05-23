@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
-import { BiEditAlt } from "react-icons/bi";
+import { BiCalendarCheck, BiUserCheck, BiMailSend, BiTrash } from "react-icons/bi";
 
 import DateTime from "../../components/DateTime";
 import EditProfile from "../../components/Editprofile";
@@ -92,10 +92,10 @@ function Profile() {
                         )}
                         <div>
                             <h1 className="profile__title">
-                                {userData.profile.firstName + " " + userData.profile.lastName} <BiEditAlt />
+                                {userData.profile.firstName + " " + userData.profile.lastName} <BiUserCheck />
                             </h1>
                             <p className="profile__signupDate">
-                                Inscrit <DateTime datetime={userData.profile.inscrit_le} />
+                                <BiCalendarCheck /> Inscrit <DateTime datetime={userData.profile.inscrit_le} />
                             </p>
                         </div>
                     </div>
@@ -103,10 +103,7 @@ function Profile() {
                     <div className="profile__infos">
                         <div className="profile__user--margin">
                             <p>
-                                Date de naissance :{" "}
-                                <span>
-                                    {userData.profile.birthdate} <BiEditAlt />
-                                </span>
+                                <BiCalendarCheck /> Date de naissance : <span>{userData.profile.birthdate}</span>
                             </p>
                         </div>
 
@@ -118,21 +115,11 @@ function Profile() {
 
                         <div className="profile__user--margin">
                             <p>
-                                Email :
-                                <span>
-                                    {userData.profile.email} <BiEditAlt />
-                                </span>
+                                <BiMailSend /> Adresse email : <span>{userData.profile.email}</span>
                             </p>
                         </div>
-
-                        {/* <div className="profile__user--margin">
-                        <p>Password : <span>{userData.profile.password}</span></p>
-                    </div> */}
                     </div>
-                    <div>Modifier les informations de connexion</div>
                     <div className="profile__btn">
-                        {/* <button className="profile__btn--edit btn">Edit</button> */}
-                        {/* <button className="profile__btn--delete btn">Supprimer</button> */}
                         <EditProfile
                             userId={userSlug}
                             first_name={userData.profile.firstName}

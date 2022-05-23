@@ -1,6 +1,9 @@
 .comments {
-    width: 70%;
+    width: 100%;
     margin: 0 auto;
+    // background: red;
+    padding: 2%;
+    // position: relative;
 
     &__title {
         margin: 2% 0;
@@ -9,7 +12,7 @@
     &__post {
         padding: 2%;
         margin: 2% 0;
-        background: darken($principal_bg, 5%);
+        background: $principal_bg;
         border-radius: 15px;
     }
 
@@ -28,5 +31,18 @@
 
     &__content {
         padding: 2%;
+    }
+
+    &__buttons {
+        display: flex;
+        position: relative;
+        justify-content: space-between;
+    }
+}
+
+// Edit comments
+.comments__editForm {
+    &--btn {
+        margin: 2% 5% 2% 0;
     }
 }

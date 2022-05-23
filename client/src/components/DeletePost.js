@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useParams } from "react-router-dom";
 
+import { BiTrash } from "react-icons/bi";
+
 function DeletePost(props) {
     let navigate = useNavigate();
     let { postSlug } = useParams();
@@ -17,10 +19,6 @@ function DeletePost(props) {
     const user_id = user.id;
     const user_role = user.role;
     const role = "admin";
-
-    // console.log(token);
-    // console.log(user_id);
-    // console.log(author_id);
 
     // On configure la requête
     const url = `http://localhost:8080/api/articles/${post_id}`;
@@ -69,28 +67,13 @@ function DeletePost(props) {
         } catch (err) {
             console.log(err);
         }
-        // console.log("click");
-        // fetch(url, reqOptions)
-        //     .then((res) => {
-        //         if (res.ok) {
-        //             console.log(res);
-        //             return res.json();
-        //         }
-        //     })
-        //     .then((data) => {
-        //         console.log(data);
-        //         window.location.reload();
-        //     })
-        //     .catch((err) => {
-        //         console.log(err);
-        //     });
     };
 
     return (
         <div>
             {!isAuthorized ? null : (
                 <button className="post__delete btn btn__delete" onClick={(e) => del(e)}>
-                    Supprimer
+                    <BiTrash />
                 </button>
             )}
         </div>

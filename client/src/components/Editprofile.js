@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from "react";
 
+import { BiEditAlt, BiTrash } from "react-icons/bi";
+
+import DeleteAccount from "../components/DeleteAccount";
+
 function Editprofile(props) {
     // On récupère l'id de l'utilisateur avec props
     const { userId, first_name, last_name, birthDate, emailValue, password, avatar } = props;
 
     // State pour vérifier que c'est le bon utilisateur qui est connecté
     const [isAuthorized, setIsAuthorized] = useState(false);
-
-    // const convertDate = new Date(birthDate);
-
-    // console.log(birthDate.getDate() + 1);
+    const [changePwd, setChangePwd] = useState(false);
 
     const get_date = new Date(birthDate).getDate();
     const get_month = new Date(birthDate).getMonth() + 1; // On ajoute +1 afin de compenser la perte de 1 moi durant la convertion
@@ -18,54 +19,68 @@ function Editprofile(props) {
     const birth = `${get_year}-${get_month}-${get_date}`;
     console.log(birth);
 
-    // = 1985-12-14
-    // const formatYmd = (birthDate) => birthDate.toISOString().slice(0, 10);
-    // console.log(convertDate.toISOString().split("T")[0]);
-
-    // console.log(convertDate.toUTCString().split("T")[0]);
-
-    // = 15/12/1985
-    // let birthdateFr = convertDate.toLocaleString("fr-FR");
-    // console.log(birthdateFr.split(",")[0]);
-
     // On prépare le state local pour stocker les données à modifier
     const [firstName, setFirstName] = useState(first_name);
     const [lastName, setLastName] = useState(last_name);
     const [birthdate, setBirthdate] = useState(birth);
     const [email, setEmail] = useState(emailValue);
-    const [pwd, setpwd] = useState(password);
-    const [avatarUrl, setAvatarUrl] = useState(avatar);
+    const [pwd, setpwd] = useState();
+    const [image, setImage] = useState(avatar);
+    // const [formPwdData, setFormPwdData] = useState(null);
+
+    const [editMod, setEditMod] = useState(false);
 
     // On récupère les données de connexion de l'utilisateur loggé
     const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
     const token = user.pass;
     const user_id = user.id;
+    const user_role = user.role;
 
     // Création de l'object user
+    const formData = new FormData();
+    formData.append("image", image);
+    formData.append("first_name", firstName);
+    formData.append("last_name", lastName);
+    formData.append("birthdate", birthdate);
+    formData.append("email", email);
 
-    const userObject = {
-        first_name: firstName,
-        last_name: lastName,
-        birthdate: birthdate,
-        email: email,
-        password: pwd,
-        avatar: avatarUrl,
+    const formDataPwd = new FormData();
+    formDataPwd.append("password", pwd);
+
+    // const editPassword = () => {
+    //     if (changePwd) {
+    //         formData.append("password", pwd);
+    //     }
+    //     console.log(changePwd);
+    // };
+
+    const handleClick = (e) => {
+        e.preventDefault();
+        // editPassword();
+        setChangePwd(!changePwd);
     };
+
+    console.log(pwd);
 
     // Request options
     const url = `http://localhost:8080/api/profiles/${userId}`;
     const reqOptions = {
         method: "PUT",
-        body: JSON.stringify(userObject),
+        body: formData,
         headers: {
             Authorization: `Bearer ${token}`,
-            Accept: "application/json",
-            "Content-Type": "application/json",
+        },
+    };
+    const reqOptionsPwd = {
+        method: "PUT",
+        body: formDataPwd,
+        headers: {
+            Authorization: `Bearer ${token}`,
         },
     };
 
     const set_authorization = async () => {
-        if (userId === user.id) {
+        if (userId === user.id || user_role === "admin") {
             setIsAuthorized(true);
         }
     };
@@ -91,65 +106,151 @@ function Editprofile(props) {
         }
     };
 
+    const changePwdReq = async (e) => {
+        e.preventDefault();
+
+        try {
+            let res = await fetch(url, reqOptionsPwd);
+            let profileRes = await res.json();
+
+            console.log("=====> Reponse modification de profile");
+            console.log(profileRes);
+
+            // window.location.reload();
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
+    // Afficher ou masque le mode edition
+    const toggleEdit = () => {
+        if (!editMod) {
+            setEditMod(true);
+            console.log("mode edition activée !");
+        } else {
+            setEditMod(false);
+            console.log("mode edition désactivée !");
+        }
+    };
+
+    function handleChange(e) {
+        setImage(e.target.files[0]);
+    }
+
     // CREER MAIS PAS ENCORE ADD A LA PAGE PROFILE
     return (
-        <div>
-            <button className="profile__btn--edit btn">Edit</button>
+        <div className="profileForm">
+            {!isAuthorized ? null : (
+                <button className="comments__edit--btn btn" onClick={toggleEdit}>
+                    <BiEditAlt />
+                    {/* <span className="infobubble">Editer votre profile</span> */}
+                </button>
+            )}
 
-            <form onSubmit={modifyProfile}>
-                {/* <label>
-                    <input
-                        type="text"
-                        name="avatar"
-                        value={props.avatar}
-                        onChange={(e) => setAvatarUrl(e.target.value)}
-                    />
-                </label> */}
-                <label>
-                    <input
-                        type="text"
-                        name="first_name"
-                        placeholder="test"
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
-                    />
-                </label>
-                <label>
-                    <input
-                        type="text"
-                        name="last_name"
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
-                    />
-                </label>
+            {/* <button className="profile__btn--edit btn">Edit</button> */}
 
-                <label>
-                    {!birthDate ? (
-                        <input type="date" name="birthdate" onChange={(e) => setBirthdate(e.target.value)} />
-                    ) : (
+            <div style={{ display: editMod ? "block" : "none" }}>
+                <form onSubmit={modifyProfile} className="profileForm__form" method="PUT" encType="multipart/form-data">
+                    <label>
+                        <h3>Modifiez / Ajoutez une photo de profil</h3>
+                        <input className="btn" type="file" name="image" src={image} onChange={handleChange} />
+                        <img className="postForm__edit--imgPreview" src={image} />
+                    </label>
+                    <div className="profileForm__personnal">
+                        <h3>Modifiez vos informations personnels</h3>
+                        <div className="profileForm__personnal--inputs">
+                            <label>
+                                <input
+                                    className="profileForm__firstName"
+                                    type="text"
+                                    name="first_name"
+                                    placeholder="test"
+                                    value={firstName}
+                                    onChange={(e) => setFirstName(e.target.value)}
+                                />
+                            </label>
+                            <label>
+                                <input
+                                    className="profileForm__lastName"
+                                    type="text"
+                                    name="last_name"
+                                    value={lastName}
+                                    onChange={(e) => setLastName(e.target.value)}
+                                />
+                            </label>
+                        </div>
+
+                        <label>
+                            {!birthDate ? (
+                                <input
+                                    className="profileForm__birthdate"
+                                    type="date"
+                                    name="birthdate"
+                                    onChange={(e) => setBirthdate(e.target.value)}
+                                />
+                            ) : (
+                                <input
+                                    className="profileForm__birthdate"
+                                    type="date"
+                                    name="birthdate"
+                                    value={birthdate}
+                                    onChange={(e) => setBirthdate(e.target.value)}
+                                />
+                            )}
+                        </label>
+                    </div>
+
+                    <div className="profileForm__login">
+                        <h3>Modifiez vos informations de connexion</h3>
+                        <div className="profileForm__login--inputs">
+                            <label>
+                                <input
+                                    className="profileForm__email"
+                                    type="text"
+                                    name="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                />
+                            </label>
+                        </div>
+                    </div>
+                    <input className="profileForm__btn btn" type="submit" value="Envoyer" />
+                </form>
+
+                <form>
+                    <button className="setPwd btn" onClick={handleClick}>
+                        Changez votre mot de passe
+                    </button>
+                    <div style={{ display: changePwd ? "block" : "none" }}>
+                        <label>
+                            <input
+                                className="profileForm__password"
+                                type="password"
+                                name="password"
+                                placeholder="******"
+                                onChange={(e) => setpwd(e.target.value)}
+                            />
+                        </label>
                         <input
-                            type="date"
-                            name="birthdate"
-                            value={birthdate}
-                            onChange={(e) => setBirthdate(e.target.value)}
+                            className="profileForm__btn btn"
+                            type="submit"
+                            value="Envoyer votre nouveau mot de passe"
+                            onClick={changePwdReq}
                         />
-                    )}
-                </label>
+                    </div>
+                </form>
 
-                <label>
-                    <input type="text" name="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-                </label>
-                <label>
-                    <input
-                        type="password"
-                        name="password"
-                        placeholder="******"
-                        onChange={(e) => setpwd(e.target.value)}
-                    />
-                </label>
-
-                <input className="btn" type="submit" value="Envoyer" />
-            </form>
+                <div className="profile__delete">
+                    <p>
+                        <strong>Supprimez votre compte *</strong>
+                    </p>
+                    <p>* Attention ! cette action est définitive. </p>
+                    {/* <button className="btn">
+                        <BiTrash />
+                    </button> */}
+                    <DeleteAccount userId={userId} />
+                </div>
+            </div>
         </div>
     );
 }

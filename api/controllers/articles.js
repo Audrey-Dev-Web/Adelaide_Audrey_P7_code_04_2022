@@ -693,98 +693,105 @@ exports.shareArticle = (req, res, next) => {
                             if (err) throw err;
 
                             if (userFound.length > 0) {
-                                return res.status(401).json({ ERROR: "Vous avez déjà partagé ce post" });
-                            }
+                                // Supprimer l'utilisateur qu'il y a dans users_shared ou post id est post_id
+                                const cancelShare = `DELETE FROM users_shared WHERE user_id = "${user_id}" AND post_id = ?`;
+                                // Supprimer l'article partagé qui a is_shared = 1 et le shared_id = post_id
+                                const cancelPostSharing = `DELETE FROM articles WHERE is_shared = 1 AND shared_id = ?`;
+                                // On update le nombre de partage du post
+                                const updateShareCount = `UPDATE articles SET shares = shares-1 WHERE id = ?`;
 
-                            // On récupère la data du post
-                            console.log("=====> Post Found");
-                            console.log(postFound);
-
-                            // const title = "Shared";
-                            const content = {
-                                id: postFound[0].id.toString(),
-                                is_shared: 1,
-                                avatar: postFound[0].avatar,
-                                author_firstName: postFound[0].first_name,
-                                author_lastName: postFound[0].last_name,
-                                title: postFound[0].title,
-                                post_content: postFound[0].content,
-                                images: postFound[0].images,
-                            };
-
-                            // On passe le contenu dans Stringify afin de pouvoir l'ajouter dans MySQL
-                            const post_content = JSON.stringify(content);
-
-                            // requête SQL pour ajouter un nouvel article
-                            const sharePost = `INSERT INTO articles SET ?`;
-
-                            // On créer un nouveau post à partir de celui-ci
-                            const post = new Article(
-                                content.title,
-                                JSON.stringify(content.post_content),
-                                content.images
-                            );
-
-                            // let post_shared_Data = {
-                            //     user_id: post.user_id,
-                            //     post_id: post.post_id,
-                            //     post_content: post.post_content,
-                            //     // comments: 0,
-                            //     // likes: 0,
-                            //     // dislikes: 0,
-                            //     // shares: 0,
-                            // };
-
-                            //             author_id: author_id,
-                            // title: article.title,
-                            // content: article.content,
-                            // images: article.images,
-                            // comments: 0,
-                            // likes: 0,
-                            // dislikes: 0,
-                            // shares: 0,
-
-                            const post_shared_Data = {
-                                author_id: user_id,
-                                is_shared: 1,
-                                title: post.title,
-                                content: post.content,
-                                images: post.images,
-                                comments: 0,
-                                likes: 0,
-                                dislikes: 0,
-                                shares: 0,
-                            };
-
-                            console.log("=====> POST DATA");
-                            console.log(post_shared_Data);
-
-                            await connection.query(sharePost, post_shared_Data, async (err, result) => {
-                                // connection.release();
-                                if (err) throw err;
-
-                                const userObject = {
-                                    user_id: user_id,
-                                    post_id: post_id,
-                                };
-                                // On ajoute l'id utilisateur dans usersshared
-                                const addUsersShared = `INSERT INTO users_shared SET ?`;
-                                await connection.query(addUsersShared, userObject, async (err, userAdded) => {
+                                await connection.query(cancelShare, post_id, async (err, canceled) => {
                                     if (err) throw err;
 
-                                    // const update = `UPDATE articles SET comments = comments-1 WHERE id = ? AND comments > 0`;
-                                    // On mets à jour le nombre de partage de l'article
-                                    const update_shares = `UPDATE articles SET shares = shares+1 WHERE id = ?`;
-                                    await connection.query(update_shares, post_id, async (err, updated) => {
+                                    // if (!canceled) {
+
+                                    // }
+
+                                    await connection.query(cancelPostSharing, post_id, async (err, postCanceled) => {
                                         if (err) throw err;
 
-                                        console.log("=====> Update Réussi !");
-                                        console.log(updated);
+                                        await connection.query(updateShareCount, post_id, async (err, updated) => {
+                                            if (err) throw err;
 
-                                        res.status(201).json({ MESSAGE: "Post partagé avec succès" });
+                                            return res.status(201).json({ MESSAGE: "Partage annulé avec succès!" });
+                                        });
                                     });
                                 });
-                            });
+
+                                // return res.status(401).json({ ERROR: "Vous avez déjà partagé ce post" });
+                            } else {
+                                // On récupère la data du post
+                                console.log("=====> Post Found");
+                                console.log(postFound);
+
+                                // const title = "Shared";
+                                const content = {
+                                    id: postFound[0].id.toString(),
+                                    is_shared: 1,
+                                    avatar: postFound[0].avatar,
+                                    author_firstName: postFound[0].first_name,
+                                    author_lastName: postFound[0].last_name,
+                                    title: postFound[0].title,
+                                    post_content: postFound[0].content,
+                                    images: postFound[0].images,
+                                };
+
+                                // On passe le contenu dans Stringify afin de pouvoir l'ajouter dans MySQL
+                                const post_content = JSON.stringify(content);
+
+                                // requête SQL pour ajouter un nouvel article
+                                const sharePost = `INSERT INTO articles SET ?`;
+
+                                // On créer un nouveau post à partir de celui-ci
+                                const post = new Article(
+                                    content.title,
+                                    JSON.stringify(content.post_content),
+                                    content.images
+                                );
+
+                                const post_shared_Data = {
+                                    author_id: user_id,
+                                    is_shared: 1,
+                                    shared_id: post_id,
+                                    title: post.title,
+                                    content: post.content,
+                                    images: post.images,
+                                    comments: 0,
+                                    likes: 0,
+                                    dislikes: 0,
+                                    shares: 0,
+                                };
+
+                                console.log("=====> POST DATA");
+                                console.log(post_shared_Data);
+
+                                await connection.query(sharePost, post_shared_Data, async (err, result) => {
+                                    // connection.release();
+                                    if (err) throw err;
+
+                                    const userObject = {
+                                        user_id: user_id,
+                                        post_id: post_id,
+                                    };
+                                    // On ajoute l'id utilisateur dans usersshared
+                                    const addUsersShared = `INSERT INTO users_shared SET ?`;
+                                    await connection.query(addUsersShared, userObject, async (err, userAdded) => {
+                                        if (err) throw err;
+
+                                        // const update = `UPDATE articles SET comments = comments-1 WHERE id = ? AND comments > 0`;
+                                        // On mets à jour le nombre de partage de l'article
+                                        const update_shares = `UPDATE articles SET shares = shares+1 WHERE id = ?`;
+                                        await connection.query(update_shares, post_id, async (err, updated) => {
+                                            if (err) throw err;
+
+                                            console.log("=====> Update Réussi !");
+                                            console.log(updated);
+
+                                            res.status(201).json({ MESSAGE: "Post partagé avec succès" });
+                                        });
+                                    });
+                                });
+                            }
                         });
 
                         break;

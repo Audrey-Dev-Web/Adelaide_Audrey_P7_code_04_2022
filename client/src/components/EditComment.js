@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 
+import { BiEditAlt } from "react-icons/bi";
+
 function EditComment(props) {
     // On récupère les données de l'utilisateur avec props
     const { post_id, author_id, comment_id, comment_value } = props;
@@ -76,31 +78,34 @@ function EditComment(props) {
     // console.log(user_id);
 
     return (
-        <div className="comments__editForm">
+        <div>
             {!isAuthor ? null : (
-                <button className="comments__edit btn btn__edit" onClick={toggleEdit}>
-                    Editer
+                <button className="comments__edit--btn btn" onClick={toggleEdit}>
+                    <BiEditAlt />
+                    <span className="infobubble">Editer ce commentaire</span>
                 </button>
             )}
 
-            <span className="editMod" style={{ display: editMod ? "block" : "none" }}>
-                <h3>Modifier votre commentaire</h3>
-                <form className="comment_editForm--form" onSubmit={modifyComment}>
-                    <label>
-                        <textarea
-                            type="text"
-                            name="content"
-                            placeholder="Ajouter un nouveau commentaire"
-                            value={comment}
-                            onChange={(e) => setComment(e.target.value)}
-                        />
-                    </label>
+            <div className="comments__editForm">
+                <span className="editMod" style={{ display: editMod ? "block" : "none" }}>
+                    <h3>Modifier votre commentaire</h3>
+                    <form className="comment_editForm--form" onSubmit={modifyComment}>
+                        <label>
+                            <textarea
+                                type="text"
+                                name="content"
+                                placeholder="Ajouter un nouveau commentaire"
+                                value={comment}
+                                onChange={(e) => setComment(e.target.value)}
+                            />
+                        </label>
 
-                    <div>
-                        <input className="comment__send--btn btn" type="submit" value="Envoyer" />
-                    </div>
-                </form>
-            </span>
+                        <div>
+                            <input className="comment__send--btn btn" type="submit" value="Envoyer" />
+                        </div>
+                    </form>
+                </span>
+            </div>
         </div>
     );
 }
