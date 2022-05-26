@@ -14,11 +14,11 @@ function App() {
     const user = sessionStorage.getItem("isAuthenticate");
     const [isAuthenticated, setIsAuthenticated] = useState(user ? true : false);
 
-    function handleCookie() {
-        setCookie("user", "gowtham", {
-            path: "/",
-        });
-    }
+    // function handleCookie() {
+    //     setCookie("user", "gowtham", {
+    //         path: "/",
+    //     });
+    // }
 
     console.log(cookies);
 

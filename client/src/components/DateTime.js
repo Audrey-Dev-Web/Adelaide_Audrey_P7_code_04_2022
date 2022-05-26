@@ -45,7 +45,7 @@ function DateTime(props) {
 
     return (
         <div className="dateTime">
-            <span>depuis {timeAfter}</span>
+            <span>il y a {timeAfter}</span>
         </div>
     );
 }

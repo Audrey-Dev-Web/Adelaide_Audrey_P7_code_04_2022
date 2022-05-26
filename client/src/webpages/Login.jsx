@@ -2,11 +2,21 @@ import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import logo from "../images/icon.svg";
 
+import { useCookies } from "react-cookie";
+
 // Import des icons de la page login
 import { BiLogInCircle, BiLockOpenAlt, BiShow, BiHide } from "react-icons/bi";
 
 function Login() {
     let navigate = useNavigate();
+
+    const [cookies, setCookie] = useCookies(["user"]);
+
+    // function handleCookie() {
+    //     setCookie("user", "gowtham", {
+    //         path: "/",
+    //     });
+    // }
 
     // connexion
     const [email, setEmail] = useState("");
@@ -45,8 +55,20 @@ function Login() {
             if (res.status === 404) {
                 setMsg("Cet utilisateur n'existe pas !");
             } else {
+                if (res.status === 401) {
+                    setMsg("Mot de passe incorrect");
+                }
+
                 const data = await res.json();
                 setUser({ id: data.userId, pass: data.token, role: data.userRole });
+
+                setCookie("access", data.token, { path: "/" });
+                // setCookie("user", "gowtham", {
+                //     path: "/",
+                // });
+                // setCookie("user", "gowtham", {
+                //     path: "/",
+                // });
             }
 
             // if (res.ok) {

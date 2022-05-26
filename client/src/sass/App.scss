@@ -13,13 +13,18 @@
 @import "./components/initiales";
 @import "./components/postForm";
 @import "./components/infobubble";
+@import "./components/commentForm";
+@import "./components/share";
 
 // Layouts
 @import "./layout/navigation";
+@import "./layout/addPostForm";
+@import "./layout/editPostForm";
 @import "./layout/comments";
 @import "./layout/usersProfile";
 @import "./layout/dateTime";
 @import "./layout/posts";
+@import "./layout/realPostAuthor";
 
 // Pages
 @import "./pages/loggedIn.scss";

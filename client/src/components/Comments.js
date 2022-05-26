@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+
+import { BiPlus, BiX } from "react-icons/bi";
 
 import DateTime from "../components/DateTime";
 import CommentForm from "../components/CommentForm";
@@ -15,6 +17,9 @@ function Comments(props) {
     const [isLoading, setIsLoading] = useState(false);
     const [err, setErr] = useState("");
 
+    // State pour afficher ou non le formulaire de commentaire
+    const [createMod, setCreateMod] = useState(false);
+
     const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
     const token = user.pass;
 
@@ -28,8 +33,8 @@ function Comments(props) {
         },
     };
 
-    const handleClick = async () => {
-        toggleComments();
+    const fetchComments = async () => {
+        // toggleComments();
 
         if (isLoading) {
             setIsLoading(false);
@@ -59,6 +64,11 @@ function Comments(props) {
         }
     };
 
+    useEffect(() => {
+        fetchComments();
+    }, []);
+
+    // Lance le fetch au click
     const toggleComments = () => {
         if (!showComments) {
             setShowComments(true);
@@ -69,54 +79,64 @@ function Comments(props) {
         }
     };
 
-    // console.log(data);
-
-    // const showComments = data.allComments.map((comment) => {
-    //     return (
-    //         <div key={comment.id}>
-    //             <p>{comment.comment}</p>
-    //         </div>
-    //     );
-    // });
+    // Affiche le formulaire de commentaire au click
+    function toggleCreateMod(e) {
+        setCreateMod(!createMod);
+    }
 
     return (
         <div>
-            <button className="btn" onClick={handleClick}>
+            {/* <button className="btn" onClick={handleClick}>
                 Afficher les commentaires
-            </button>
+            </button> */}
             {/* <ErrorBoundary>
                 <CommentForm post_id={post.article.id} />
             </ErrorBoundary> */}
-            <div className="showComments" style={{ display: showComments ? "block" : "none" }}>
-                {err && <h2>{err}</h2>}
-                {isLoading && <h2>Loading...</h2>}
+            {/* <div className="showComments" style={{ display: showComments ? "block" : "none" }}> */}
+            <div className="showComments">
+                {/* AFFICHAGE DU FORMULAIRE DE COMMENTAIRE */}
+                <div className="showCommentForm">
+                    <button type="button" className="btn" onClick={toggleCreateMod}>
+                        Ajouter un commentaire
+                    </button>
+                    <div className="showCommentForm" style={{ display: createMod ? "block" : "none" }}>
+                        <ErrorBoundary>
+                            <CommentForm post_id={post_id} />
+                        </ErrorBoundary>
+                    </div>
+                </div>
+
+                {err ? <h2>{err}</h2> : <h2 className="comments__title">Commentaires :</h2>}
+
                 {data.allComments?.map((comment) => {
                     return (
                         <div className="comments__post" key={comment.id}>
-                            <div className="comments__author">
-                                {!comment.avatar ? (
-                                    <div className="comments__author--avatar initiales">
-                                        <p>
-                                            {`${comment.firstName} ${comment.lastName}
+                            <div className="comments__header">
+                                <div className="comments__author">
+                                    {!comment.avatar ? (
+                                        <div className="comments__author--avatar initiales">
+                                            <p>
+                                                {`${comment.firstName} ${comment.lastName}
                                             `
-                                                .match(/\b\w/g)
-                                                .join("")
-                                                .toUpperCase()}
-                                        </p>
-                                    </div>
-                                ) : (
-                                    <img
-                                        width="100"
-                                        className="comments__author--avatar"
-                                        src={comment.avatar}
-                                        alt={comment.firstName + " " + comment.lastName}
-                                    />
-                                )}
+                                                    .match(/\b\w/g)
+                                                    .join("")
+                                                    .toUpperCase()}
+                                            </p>
+                                        </div>
+                                    ) : (
+                                        <img
+                                            width="100"
+                                            className="comments__author--avatar"
+                                            src={comment.avatar}
+                                            alt={comment.firstName + " " + comment.lastName}
+                                        />
+                                    )}
 
-                                <div className="comments__author--infos">
-                                    <p>{comment.firstName + " " + comment.lastName}</p>
-                                    <div className="comments__author--dateTime">
-                                        <p>Posté</p> <DateTime datetime={comment.timestamp} />
+                                    <div className="comments__author--infos">
+                                        <p>{comment.firstName + " " + comment.lastName}</p>
+                                        <div className="comments__author--dateTime">
+                                            <p>Posté</p> <DateTime datetime={comment.timestamp} />
+                                        </div>
                                     </div>
                                 </div>
                             </div>

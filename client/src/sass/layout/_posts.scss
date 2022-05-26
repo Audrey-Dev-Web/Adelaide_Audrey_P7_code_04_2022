@@ -5,26 +5,39 @@
     border-radius: 20px;
     margin: 5% 0;
 
+    &__info {
+        &--wrapper {
+            display: flex;
+            align-items: center;
+        }
+    }
+
+    & .sharedFlex {
+        display: flex;
+        align-items: center;
+        background: $principal_bg;
+        border-radius: 10px;
+        margin-top: 2%;
+        width: 200px;
+    }
+
     &__header {
-        width: 100%;
         background: darken($principal_bg, 5%);
         border-radius: 20px 20px 0 0;
         padding: 2%;
 
         &--shared {
-            background: $accent_color_3;
-            position: absolute;
-            padding: 1%;
-            border-radius: 20px;
-
-            text-transform: uppercase;
-            font-weight: 700;
+            color: $accent_color_3;
+            font-size: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         &--title {
             text-align: center;
             font-size: 1.7rem;
-            margin: 1%;
+            margin: 1% 0 5%;
 
             border-bottom: 1px solid $accent_color_3;
             padding-bottom: 3%;
@@ -33,7 +46,6 @@
         &--author {
             display: flex;
             align-items: center;
-            padding-top: 2%;
 
             .author {
                 &__img {
@@ -50,11 +62,14 @@
                     font-size: 1.2rem;
                     font-weight: 700;
                     color: $accent_color_3;
+
+                    margin-right: 10px;
                 }
 
                 &__postDate {
                     font-size: 1rem;
                     display: flex;
+                    // font-style: italic;
 
                     .dateTime {
                         margin-left: 5px;
@@ -80,9 +95,33 @@
         background: darken($principal_bg, 5%);
         border-radius: 0 0 20px 20px;
 
+        position: relative;
+
         &--social {
             display: flex;
+            justify-content: space-between;
             padding: 2%;
         }
     }
+}
+
+.social {
+    // width: auto;
+    margin: 0 10px;
+
+    &__wrapper {
+        display: flex;
+    }
+
+    &__postManage {
+        display: flex;
+    }
+}
+
+.shareBtn {
+    border: none;
+    outline: none;
+    font-size: 1.5rem;
+    background: none;
+    color: #fff;
 }

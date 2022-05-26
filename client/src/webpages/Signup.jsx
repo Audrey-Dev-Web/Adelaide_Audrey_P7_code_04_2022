@@ -66,12 +66,6 @@ function Signup() {
 
                 let resLogin = await fetch(loginUrl, postLogin);
 
-                // console.log(resLogin);
-
-                // const data = await resLogin.json();
-
-                // console.log(data);
-
                 if (resLogin.status === 404) {
                     setMsg("Cet utilisateur n'existe pas !");
                 } else {

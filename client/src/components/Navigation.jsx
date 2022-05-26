@@ -1,7 +1,4 @@
 import React, { useState } from "react";
-// import { Routes, Route, Link, Navigate } from "react-router-dom";
-// import logo from "./logo.svg";
-// import { useNavigate } from "react-router";
 import logo from "../images/icon.svg";
 
 import { NavLink, useNavigate } from "react-router-dom";

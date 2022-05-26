@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 
+import { BiSend, BiImageAdd } from "react-icons/bi";
+
 function EditPost(props) {
     // On récupère les données utiles
     const { post_id, author_id, post_title, post_content, post_img } = props;
@@ -8,6 +10,7 @@ function EditPost(props) {
     const [title, setTitle] = useState(post_title);
     const [content, setContent] = useState(post_content);
     const [image, setImage] = useState(post_img);
+    const [fileDataURL, setFileDataURL] = useState(null);
 
     // const [editMod, setEditMod] = useState(false);
 
@@ -66,76 +69,75 @@ function EditPost(props) {
         }
     };
 
-    function handleChange(e) {
+    function handleImgChange(e) {
         setImage(e.target.files[0]);
+
+        var file = e.target.files[0];
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            // The file's text will be printed here
+            const { result } = e.target;
+            // console.log(e.target.result);
+            setFileDataURL(result);
+        };
+        reader.readAsDataURL(file);
     }
 
-    // function handleDelete(e) {
-    //     setImage(null);
-    // }
-
-    // const toggleEdit = () => {
-    //     if (!editMod) {
-    //         setEditMod(true);
-    //         console.log("mode edition activée !");
-    //     } else {
-    //         setEditMod(false);
-    //         console.log("mode edition désactivée !");
-    //     }
-    // };
-
-    // console.log(image);
-
     return (
-        <div>
-            {/* {!isAuthor ? null : (
-                <button className="postForm__edit btn btn__edit" onClick={toggleEdit}>
-                    Editer
-                </button>
-            )} */}
-
-            {/* <span className="postForm postForm__editMod editMod" style={{ display: editMod ? "block" : "none" }}> */}
-            <span className="postForm postForm__editMod editMod">
+        <div className="postForm">
+            <span className="postForm__editMod editMod">
                 <form onSubmit={editPost} className="postForm__edit--form" method="PUT" encType="multipart/form-data">
                     <h2>Modifier cet article</h2>
                     <label>
                         <input
-                            className="postForm__edit--title"
+                            className="postForm__input--title"
                             type="text"
                             name="title"
                             value={title}
-                            placeholder="Votre titre ici..."
+                            placeholder="Titre"
                             onChange={(e) => setTitle(e.target.value)}
                         />
                     </label>
 
                     <label>
                         <textarea
-                            className="postForm__edit--textarea"
+                            className="postForm__input--content"
                             type="text"
                             name="content"
                             value={content}
-                            placeholder="Votre text ici...."
+                            placeholder="Teste (Optionnal)"
                             onChange={(e) => setContent(e.target.value)}
                         />
                     </label>
 
-                    <img className="postForm__edit--imgPreview" src={image} />
-                    {/* <button type="button" onClick={handleDelete}>
-                        Delete img
-                    </button> */}
+                    {/* Ici, si le post n'a pas d'image on affiche rien, s'il en a une on l'affiche, si une image 
+                    a été uploadé on l'affiche à la place de l'image actuelle de l'article */}
+                    {!fileDataURL ? (
+                        <div>
+                            <p className="previewTxt">Image preview</p>
+                            {!image ? null : <img className="postForm__imgPreview" src={image} />}
+                        </div>
+                    ) : (
+                        <div>
+                            <p className="previewTxt">Image preview</p>
+                            <img className="postForm__imgPreview" src={fileDataURL} />
+                        </div>
+                    )}
 
-                    <div className="postForm__edit--btn">
-                        {/* <button className="btn btn__file">Ajouter une image</button> */}
-                        {/* <input
-                            className="btn hide"
+                    <div className="postForm__inputBtn">
+                        <label htmlFor="changeImg" className="btn">
+                            <BiImageAdd className="imgIcon" />
+                        </label>
+
+                        <input
+                            className="postForm__inputImg btn"
                             type="file"
+                            id="changeImg"
                             name="image"
-                            onChange={(e) => setImage(setImage(e.target.files[0]))}
-                        /> */}
-                        {/* <input className="btn hide" type="file" name="image" onChange={handleChange} /> */}
-                        <input className="btn" type="file" name="image" src={image} onChange={handleChange} />
-                        <input className="postForm__edit--send btn" type="submit" value="Envoyer" />
+                            // src={image}
+                            onChange={handleImgChange}
+                        />
+                        <input className="postForm__send btn" type="submit" value="Envoyer" />
                     </div>
                 </form>
             </span>

@@ -1,12 +1,12 @@
 .social {
-    // background: $accent_color_2;
+    background: $principal_bg;
     // color: $accent_color_3;
     padding: 1% 2%;
     border-radius: 20px;
     width: 70px;
 
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
 
     &__icon {
@@ -15,8 +15,6 @@
         transition: color 300ms ease-in-out;
         &:hover {
             color: $accent_color_3;
-            // animation: shake 0.5s;
-            // animation-iteration-count: infinite;
         }
     }
 

@@ -6,6 +6,8 @@ function DeleteComment(props) {
     // On récupère l'id de l'utilisateur avec props
     const { post_id, author_id, comment_id } = props;
 
+    // On ajoute la double validation avant suppression
+
     // useState pour stocker le boolean si oui ou non l'utilisateur est autorisé à supprimer
     const [isAuthorized, setIsAuthorized] = useState(false);
 
@@ -40,7 +42,7 @@ function DeleteComment(props) {
     }, []);
 
     const deleteComment = async (e) => {
-        e.preventDefault();
+        // e.preventDefault();
         try {
             let res = await fetch(url, reqOptions);
             let commentRes = await res.json();
@@ -54,15 +56,42 @@ function DeleteComment(props) {
         }
     };
 
+    /*
+
+    onClick : 
+    <span> Voulez-vous vraiment supprimer ce commentaire ? </span>
+        if (!question) {
+            setQuestion(false)
+        } else {
+            setQuestion(true)
+        }
+    */
+
+    // doubleValidator = () => {
+    //     if (!isOk) {
+    //         setDelete(false)
+    //     } else {}
+    // }
+
     // console.log("=====> Est-ce que l'utilisateur est autorisé à effectuer cette action ?");
     // console.log(isAuthorized);
 
     return (
         <div>
             {!isAuthorized ? null : (
-                <button className="comments__delete--btn btn" onClick={(e) => deleteComment(e)}>
+                // <button className="comments__delete--btn btn" onClick={(e) => deleteComment(e)}>
+                <button
+                    className="comments__delete--btn btn"
+                    onClick={() => {
+                        const confirmBox = window.confirm("Voulez vous vraiment supprimer ce commentaire ?");
+
+                        if (confirmBox === true) {
+                            deleteComment();
+                        }
+                    }}
+                >
                     <BiTrash />
-                    <span className="infobubble">Supprimer</span>
+                    {/* <span className="infobubble">Supprimer</span> */}
                 </button>
             )}
         </div>

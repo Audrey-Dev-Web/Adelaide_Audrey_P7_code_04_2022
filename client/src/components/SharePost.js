@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import { BiShare } from "react-icons/bi";
+import { BiShare, BiRepost } from "react-icons/bi";
 
 function SharePost(props) {
     const { post_id, userId } = props;
@@ -42,6 +42,11 @@ function SharePost(props) {
             .then((data) => {
                 console.log(data);
                 setMessage(data.MESSAGE);
+                setShared(true);
+
+                window.setTimeout(function () {
+                    window.location.reload();
+                }, 3000);
             })
             .catch((err) => {
                 setMessage("Une erreur est survenue ! " + err);
@@ -50,11 +55,13 @@ function SharePost(props) {
 
     return (
         <div>
-            <button onClick={(e) => shareButton()}>
-                <BiShare />
+            <button type="button" className="social__icon shareBtn" onClick={(e) => shareButton()}>
+                <BiRepost />
             </button>
 
-            <div>{message}</div>
+            <span className="share__message" style={{ display: shared ? "block" : "none" }}>
+                {message}
+            </span>
         </div>
     );
 }

@@ -6,7 +6,12 @@
     // position: relative;
 
     &__title {
-        margin: 2% 0;
+        margin: 5% 0 0;
+    }
+
+    &__header {
+        padding: 2%;
+        border-bottom: 1px solid $accent_color_3;
     }
 
     &__post {
@@ -23,20 +28,45 @@
 
         font-size: 1.1rem;
         font-weight: 700;
+
+        &--avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 100%;
+            border: 3px $accent_color_3;
+            border-style: dashed solid;
+
+            margin-right: 2%;
+        }
+
+        &--dateTime {
+            display: flex;
+            color: $accent_color_3;
+            font-size: 1rem;
+
+            margin: 2% 0;
+
+            & p {
+                margin-right: 5px;
+                font-weight: normal;
+            }
+        }
     }
 
-    &__timestamp {
-        margin: 1% 0;
-    }
+    // &__timestamp {
+    //     margin: 1% 0;
+    // }
 
     &__content {
-        padding: 2%;
+        padding: 4% 2%;
     }
 
     &__buttons {
         display: flex;
         position: relative;
         justify-content: space-between;
+        border-top: 1px solid $accent_color_3;
+        padding-top: 2%;
     }
 }
 

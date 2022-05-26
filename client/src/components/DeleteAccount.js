@@ -44,7 +44,7 @@ function DeleteAccount(props) {
 
     // Requête pour supprimer le compte
     const delAccount = async (e) => {
-        e.preventDefault();
+        // e.preventDefault();
 
         console.log("click");
         try {
@@ -75,7 +75,17 @@ function DeleteAccount(props) {
     return (
         <div>
             {!isAuthorized ? null : (
-                <button className="account__delete btn btn__delete" onClick={(e) => delAccount(e)}>
+                // <button className="account__delete btn btn__delete" onClick={(e) => delAccount(e)}>
+                <button
+                    className="account__delete btn btn__delete"
+                    onClick={() => {
+                        const confirmBox = window.confirm("Voulez vous vraiment supprimer votre compte ?");
+
+                        if (confirmBox === true) {
+                            delAccount();
+                        }
+                    }}
+                >
                     <BiTrash />
                 </button>
             )}

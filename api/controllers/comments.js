@@ -54,7 +54,7 @@ exports.getAllcomments = (req, res, next) => {
     connection.getConnection(async (err, connection) => {
         if (err) throw err;
 
-        const showComments = `SELECT * FROM comments INNER JOIN users_profiles ON comments.author_comment_id = users_profiles.user_id WHERE article_id = ?`;
+        const showComments = `SELECT * FROM comments INNER JOIN users_profiles ON comments.author_comment_id = users_profiles.user_id WHERE article_id = ? ORDER by timestamp ASC`;
 
         // const showComments = `SELECT * FROM comments WHERE article_id = ?`;
 

@@ -43,14 +43,12 @@ function DeletePost(props) {
     }, []);
 
     const del = async (e) => {
-        e.preventDefault();
+        // e.preventDefault();
 
         console.log("click");
         try {
             let res = await fetch(url, reqOptions);
             let deleteRes = await res.json();
-            // console.log("=====> Réponse commentaire envoyé : ");
-            // console.log(deleteRes);
 
             if (res.ok) {
                 // window.location.reload();
@@ -72,7 +70,17 @@ function DeletePost(props) {
     return (
         <div>
             {!isAuthorized ? null : (
-                <button className="post__delete btn btn__delete" onClick={(e) => del(e)}>
+                // <button className="post__delete btn btn__delete" onClick={(e) => del(e)}>
+                <button
+                    className="post__delete btn btn__delete"
+                    onClick={() => {
+                        const confirmBox = window.confirm("Voulez vous vraiment supprimer ce post ?");
+
+                        if (confirmBox === true) {
+                            del();
+                        }
+                    }}
+                >
                     <BiTrash />
                 </button>
             )}

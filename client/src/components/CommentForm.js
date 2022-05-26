@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 
+import { BiCommentAdd } from "react-icons/bi";
+
 function CommentForm(props) {
     const [comment, setComment] = useState(null);
+    const [message, setMessage] = useState(null);
 
     const { post_id } = props;
 
@@ -32,6 +35,9 @@ function CommentForm(props) {
             let res = await fetch(url, reqOptions);
             let commentRes = await res.json();
 
+            if (res.ok) {
+                setMessage("Commentaire ajouté avec succès");
+            }
             console.log("=====> Réponse commentaire envoyé : ");
             console.log(commentRes);
 
@@ -42,11 +48,12 @@ function CommentForm(props) {
     };
 
     return (
-        <div className="comments__send">
-            <h1>Ajouter un commentaire</h1>
-            <form onSubmit={sendComment}>
+        <div className="commentForm">
+            {/* <h2 className="commentForm__title">Ajouter un commentaire</h2> */}
+            <form onSubmit={sendComment} className="commentForm__form">
                 <label>
                     <textarea
+                        className="commentForm__form--textarea"
                         type="text"
                         name="content"
                         placeholder="Ajouter un nouveau commentaire"
@@ -55,9 +62,14 @@ function CommentForm(props) {
                 </label>
 
                 <div>
-                    <input className="comment__send--btn btn" type="submit" value="Envoyer" />
+                    {/* <BiCommentAdd />
+                    <input className="commentForm__form--btn btn" type="submit" value="Envoyer" /> */}
+                    <button className="commentForm__form--btn btn" type="submit">
+                        <BiCommentAdd />
+                    </button>
                 </div>
             </form>
+            {message}
         </div>
     );
 }

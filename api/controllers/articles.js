@@ -65,7 +65,15 @@ exports.getAllArticles = (req, res, next) => {
 
                 let articlesFound = [];
 
+                console.log(found);
+
                 found.forEach((article, index) => {
+                    let real_author;
+
+                    if (article.original_author_id !== null) {
+                        real_author = article.original_author_id.toString();
+                    }
+
                     let articleFound = {
                         article: {
                             id: article.id.toString(),
@@ -73,14 +81,17 @@ exports.getAllArticles = (req, res, next) => {
                             author_firstName: article.first_name,
                             author_lastName: article.last_name,
                             author_avatar: article.avatar,
+                            original_author_id: real_author,
                             title: article.title,
                             is_shared: article.is_shared,
+                            // shared_id: shared_id,
                             content: article.content,
                             images: article.images,
                             comments: article.comments,
                             likes: article.likes,
                             dislikes: article.dislikes,
                             shares: article.shares,
+                            post_shared_timestamp: article.post_shared_timestamp,
                             timestamp: article.timestamp.toString(),
                         },
                     };
@@ -117,8 +128,25 @@ exports.getOneArticle = (req, res, next) => {
                 } else {
                     console.log("=====> article");
                     console.log(article);
+
+                    let real_author;
+                    let shared_id;
+                    if (article.original_author_id == null) {
+                        real_author = null;
+                    } else {
+                        real_author = article[0].original_author_id.toString();
+                    }
+
+                    if (article.shared_id == null) {
+                        shared_id = null;
+                    } else {
+                        shared_id = article[0].shared_id.toString();
+                    }
+
                     const articleFound = {
                         id: article[0].id.toString(),
+                        shared_id: shared_id,
+                        original_author_id: real_author,
                         author_firstName: article[0].first_name,
                         author_lastName: article[0].last_name,
                         author_avatar: article[0].avatar,
@@ -127,6 +155,7 @@ exports.getOneArticle = (req, res, next) => {
                         content: article[0].content,
                         timestamp: article[0].timestamp.toString(),
                         img: article[0].images,
+                        is_shared: article.is_shared,
                         comments: article[0].comments,
                         likes: article[0].likes,
                         dislikes: article[0].dislikes,
@@ -134,7 +163,7 @@ exports.getOneArticle = (req, res, next) => {
                     };
 
                     res.status(200).json({ articleFound });
-                    // res.status(200).json({ article })
+
                     console.log(articleFound);
                 }
             });
@@ -167,28 +196,7 @@ exports.modifyArticle = (req, res, next) => {
                         // Si l'utilisateur n'est pas le propriétaire du compte :
                         res.status(401).json({ ERROR: "Vous n'êtes pas autorisé à effectuer cette action." });
                     } else {
-                        // const articleFound = {
-                        //     id: article[0].id.toString(),
-                        //     title: article[0].title,
-                        //     content: article[0].content,
-                        //     img: article[0].images,
-                        // }
-
                         const { title, content, images } = req.body;
-                        // const images = `${req.protocol}://${req.get("host")}/images/${req.file.filename}`;
-
-                        // const editPost = new Article(title, content, images);
-
-                        // const editPostObject = {
-                        //     author_id: author_id,
-                        //     title: article.title,
-                        //     content: article.content,
-                        //     images: article.images,
-                        //     comments: 0,
-                        //     likes: 0,
-                        //     dislikes: 0,
-                        //     shares: 0,
-                        // };
 
                         if (title) {
                             console.log("modifier le titre de l'article");
@@ -214,24 +222,6 @@ exports.modifyArticle = (req, res, next) => {
                         }
 
                         let newImgUrl;
-
-                        // if (images === null) {
-                        //     const file = article[0].images.split("/")[4];
-                        //     const fileUrl = path.join("images/" + file);
-
-                        //     const delImg = `UPDATE articles SET images = NULL WHERE id = ?`;
-
-                        //     // On supprime l'ancienne
-                        //     fs.unlink(fileUrl, () => {
-                        //         console.log("IMAGE DELETED !");
-                        //     });
-
-                        //     connection.query(delImg, article_id, (err, result) => {
-                        //         if (err) throw err;
-
-                        //         console.log("Nouvelle image d'article ajoutée");
-                        //     });
-                        // }
 
                         if (req.file) {
                             console.log("modifier les images");
@@ -268,58 +258,6 @@ exports.modifyArticle = (req, res, next) => {
         res.status(500).json({ error });
     }
 };
-
-// exports.deletePostImg = (req, res, next) => {
-//     const article_id = req.params.id;
-//     const userRole = req.auth.userRole;
-//     const userAuth = req.auth.userId;
-
-//     const searchOne = `SELECT * FROM articles WHERE articles.id = ?`;
-
-//     const deleteImg = `UPDATE articles SET images = "NULL" WHERE id = ?`;
-
-//     try {
-//         connection.getConnection(async (err, connection) => {
-//             if (err) throw err;
-
-//             await connection.query(searchOne, article_id, async (err, result) => {
-//                 if (err) throw err;
-
-//                 if (result.length <= 0) {
-//                     return res.status(404).json({ error: "Ce poste n'existe pas" });
-//                 }
-
-//                 const author_id = result[0].author_id.toString();
-
-//                 if (author_id !== userAuth && userRole !== "admin") {
-//                     return res.status(400).json({ ERROR: "Requête non autorisée !" });
-//                 }
-
-//                 if (result[0].images) {
-//                     const file = result[0].images.split("/")[4];
-//                     const fileUrl = path.join("images/" + file);
-
-//                     // On supprime l'ancienne
-//                     fs.unlink(fileUrl, () => {
-//                         console.log("IMAGE DELETED !");
-//                     });
-//                 }
-
-//                 await connection.query(deleteImg, article_id, async (err, result) => {
-//                     if (err) throw err;
-
-//                     if (result.length <= 0) {
-//                         return res.status(404).json({ error: "Impossible de supprimer l'element" });
-//                     }
-
-//                     res.status(200).json({ MESSAGE: "Image supprimée avec succès !" });
-//                 });
-//             });
-//         });
-//     } catch (err) {
-//         res.status(500).json({ err });
-//     }
-// };
 
 // Supprimer l'article
 exports.deleteArticle = (req, res, next) => {
@@ -703,10 +641,6 @@ exports.shareArticle = (req, res, next) => {
                                 await connection.query(cancelShare, post_id, async (err, canceled) => {
                                     if (err) throw err;
 
-                                    // if (!canceled) {
-
-                                    // }
-
                                     await connection.query(cancelPostSharing, post_id, async (err, postCanceled) => {
                                         if (err) throw err;
 
@@ -717,8 +651,6 @@ exports.shareArticle = (req, res, next) => {
                                         });
                                     });
                                 });
-
-                                // return res.status(401).json({ ERROR: "Vous avez déjà partagé ce post" });
                             } else {
                                 // On récupère la data du post
                                 console.log("=====> Post Found");
@@ -728,6 +660,8 @@ exports.shareArticle = (req, res, next) => {
                                 const content = {
                                     id: postFound[0].id.toString(),
                                     is_shared: 1,
+                                    post_shared_timestamp: postFound[0].timestamp,
+                                    original_author_id: postFound[0].author_id.toString(),
                                     avatar: postFound[0].avatar,
                                     author_firstName: postFound[0].first_name,
                                     author_lastName: postFound[0].last_name,
@@ -743,16 +677,14 @@ exports.shareArticle = (req, res, next) => {
                                 const sharePost = `INSERT INTO articles SET ?`;
 
                                 // On créer un nouveau post à partir de celui-ci
-                                const post = new Article(
-                                    content.title,
-                                    JSON.stringify(content.post_content),
-                                    content.images
-                                );
+                                const post = new Article(content.title, content.post_content, content.images);
 
                                 const post_shared_Data = {
                                     author_id: user_id,
+                                    original_author_id: content.original_author_id,
                                     is_shared: 1,
                                     shared_id: post_id,
+                                    post_shared_timestamp: content.post_shared_timestamp,
                                     title: post.title,
                                     content: post.content,
                                     images: post.images,
