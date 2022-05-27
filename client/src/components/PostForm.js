@@ -4,7 +4,8 @@ import UserAvatar from "./UserAvatar";
 
 import { BiPlus, BiImageAdd } from "react-icons/bi";
 
-function PostForm() {
+function PostForm(props) {
+    const { access } = props;
     // ===========> CREATE NEW POST
 
     const [postTitle, setPostTitle] = useState(null);
@@ -14,9 +15,13 @@ function PostForm() {
     const [message, setMessage] = useState(null);
     const [createMod, setCreateMod] = useState(false);
 
-    const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
-    const token = user.pass;
-    const user_id = user.id;
+    // const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
+    // const token = user.pass;
+    // const user_id = user.id;
+
+    const token = access.token;
+    const user_id = access.user_id;
+    const user_role = access.role;
 
     const postObject = {
         title: postTitle,

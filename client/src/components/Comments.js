@@ -9,7 +9,7 @@ import DeleteComment from "../components/DeleteComment";
 import ErrorBoundary from "../components/ErrorBoundary";
 
 function Comments(props) {
-    const { post_id } = props;
+    const { post_id, access } = props;
 
     const [data, setData] = useState({ data: [] });
     const [showComments, setShowComments] = useState(false);
@@ -20,8 +20,12 @@ function Comments(props) {
     // State pour afficher ou non le formulaire de commentaire
     const [createMod, setCreateMod] = useState(false);
 
-    const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
-    const token = user.pass;
+    // const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
+    // const token = user.pass;
+
+    const token = access.token;
+    const user_id = access.user_id;
+    const user_role = access.role;
 
     const url = `http://localhost:8080/api/articles/${post_id}/comments`;
     const reqOptions = {
@@ -101,7 +105,7 @@ function Comments(props) {
                     </button>
                     <div className="showCommentForm" style={{ display: createMod ? "block" : "none" }}>
                         <ErrorBoundary>
-                            <CommentForm post_id={post_id} />
+                            <CommentForm post_id={post_id} access={access} />
                         </ErrorBoundary>
                     </div>
                 </div>
@@ -135,7 +139,7 @@ function Comments(props) {
                                     <div className="comments__author--infos">
                                         <p>{comment.firstName + " " + comment.lastName}</p>
                                         <div className="comments__author--dateTime">
-                                            <p>Posté</p> <DateTime datetime={comment.timestamp} />
+                                            <p>Posté</p> <DateTime datetime={comment.timestamp} acces={access} />
                                         </div>
                                     </div>
                                 </div>
@@ -150,12 +154,14 @@ function Comments(props) {
                                     post_id={comment.article_id}
                                     comment_id={comment.id}
                                     comment_value={comment.comment}
+                                    access={access}
                                 />
 
                                 <DeleteComment
                                     author_id={comment.author_id}
                                     post_id={comment.article_id}
                                     comment_id={comment.id}
+                                    access={access}
                                 />
                             </div>
                         </div>

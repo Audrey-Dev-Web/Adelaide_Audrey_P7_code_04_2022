@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import logo from "../images/icon.svg";
 
+import jwt_decode from "jwt-decode";
+
 import { useCookies } from "react-cookie";
 
 // Import des icons de la page login
@@ -63,12 +65,9 @@ function Login() {
                 setUser({ id: data.userId, pass: data.token, role: data.userRole });
 
                 setCookie("access", data.token, { path: "/" });
-                // setCookie("user", "gowtham", {
-                //     path: "/",
-                // });
-                // setCookie("user", "gowtham", {
-                //     path: "/",
-                // });
+
+                // let token = data.token;
+                // let decodedToken = jwt_decode(token);
             }
 
             // if (res.ok) {

@@ -1,13 +1,20 @@
 import React, { useState } from "react";
 import logo from "../images/icon.svg";
 
+// import { useCookies } from "react-cookie";
+// import jwt_decode from "jwt-decode";
+
 import { NavLink, useNavigate } from "react-router-dom";
 
 import { BiMenuAltRight } from "react-icons/bi";
 
 import UserLoggedIn from "./UserLoggedIn";
 
-function Navigation() {
+function Navigation(props) {
+    const { access } = props;
+
+    console.log(access);
+
     const navigate = useNavigate();
     let user = localStorage.getItem("user_id");
 
@@ -15,6 +22,9 @@ function Navigation() {
         sessionStorage.removeItem("isAuthenticate");
         navigate("/");
         window.location.reload();
+
+        // REMPLACER  REMOVEITEM PAR UNE SUPPRESSION DE COOKIE
+
         // window.location.reload(true);
         // navigate("/", { replace: true });
     };
@@ -55,9 +65,9 @@ function Navigation() {
                             <NavLink to="/">Home</NavLink>
                         </li>
                         <li className="navigation__nav--item">
-                            <NavLink to={"/profile/" + user_id}>
+                            <NavLink to={"/profile/" + access.user_id}>
                                 {/* Afficher la photo de profile et le prénom de l'utilisateur connecté */}
-                                <UserLoggedIn userId={user_id} />
+                                <UserLoggedIn userId={access} access={access} />
                             </NavLink>
                         </li>
                         <li className="navigation__nav--item">

@@ -8,7 +8,8 @@ import UsersProfile from "../components/UsersProfile";
 
 import { BiPlus, BiX } from "react-icons/bi";
 
-function Home() {
+function Home(props) {
+    const { access } = props;
     return (
         <div className="home">
             <div className="home__container container">
@@ -26,7 +27,7 @@ function Home() {
                                 <BiPlus />
                             </span>
 
-                           
+
                         </button> */}
 
                         {/* <div className={createMod ? "createMod createPost__show" : "createMod createPost__hide"}> */}
@@ -40,15 +41,15 @@ function Home() {
                                     <BiX />
                                 </span>
                             </button> */}
-                        <PostForm />
+                        <PostForm access={access} />
                         {/* </div> */}
                     </div>
 
                     <div className="home__articles">
-                        <Posts />
+                        <Posts access={access} />
                     </div>
                 </div>
-                <UsersProfile />
+                <UsersProfile access={access} />
             </div>
         </div>
     );

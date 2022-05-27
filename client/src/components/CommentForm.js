@@ -6,12 +6,16 @@ function CommentForm(props) {
     const [comment, setComment] = useState(null);
     const [message, setMessage] = useState(null);
 
-    const { post_id } = props;
+    const { post_id, access } = props;
 
     // console.log(post_id);
 
-    const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
-    const token = user.pass;
+    // const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
+    // const token = user.pass;
+
+    const token = access.token;
+    const user_id = access.user_id;
+    const user_role = access.role;
 
     const commentObject = {
         comment: comment,

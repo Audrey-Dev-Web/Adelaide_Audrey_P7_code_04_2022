@@ -3,10 +3,11 @@ import React, { useState, useEffect } from "react";
 import { BiEditAlt, BiTrash } from "react-icons/bi";
 
 import DeleteAccount from "../components/DeleteAccount";
+import ErrorBoundary from "../components/ErrorBoundary";
 
 function Editprofile(props) {
     // On récupère l'id de l'utilisateur avec props
-    const { userId, first_name, last_name, birthDate, emailValue, password, avatar } = props;
+    const { userId, first_name, last_name, birthDate, emailValue, password, avatar, access } = props;
 
     // State pour vérifier que c'est le bon utilisateur qui est connecté
     const [isAuthorized, setIsAuthorized] = useState(false);
@@ -17,7 +18,13 @@ function Editprofile(props) {
     const get_year = new Date(birthDate).getFullYear();
 
     const birth = `${get_year}-${get_month}-${get_date}`;
-    console.log(birth);
+    // console.log(birth);
+    console.log(access);
+    // const userObject = {
+    //     token: access.token,
+    //     user_id: access.user_id,
+    //     role: access.role,
+    // };
 
     // On prépare le state local pour stocker les données à modifier
     const [firstName, setFirstName] = useState(first_name);
@@ -31,10 +38,14 @@ function Editprofile(props) {
     const [editMod, setEditMod] = useState(false);
 
     // On récupère les données de connexion de l'utilisateur loggé
-    const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
-    const token = user.pass;
-    const user_id = user.id;
-    const user_role = user.role;
+    // const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
+    // const token = user.pass;
+    // const user_id = user.id;
+    // const user_role = user.role;
+
+    const token = access.token;
+    const user_id = access.user_id;
+    const user_role = access.role;
 
     // Création de l'object user
     const formData = new FormData();
@@ -60,7 +71,7 @@ function Editprofile(props) {
         setChangePwd(!changePwd);
     };
 
-    console.log(pwd);
+    // console.log(pwd);
 
     // Request options
     const url = `http://localhost:8080/api/profiles/${userId}`;
@@ -80,7 +91,7 @@ function Editprofile(props) {
     };
 
     const set_authorization = async () => {
-        if (userId === user.id || user_role === "admin") {
+        if (userId === user_id || user_role === "admin") {
             setIsAuthorized(true);
         }
     };
@@ -248,7 +259,9 @@ function Editprofile(props) {
                     {/* <button className="btn">
                         <BiTrash />
                     </button> */}
-                    <DeleteAccount userId={userId} />
+                    <ErrorBoundary>
+                        <DeleteAccount userId={userId} access={access} />
+                    </ErrorBoundary>
                 </div>
             </div>
         </div>

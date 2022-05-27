@@ -101,7 +101,6 @@ exports.getOneProfile = (req, res, next) => {
                             var decryptedEmail = cryptojs.AES.decrypt(emailAES, secretEmail).toString(
                                 cryptojs.enc.Utf8
                             );
-                            // var originalEmail = bytes.toString(cryptojs.enc.Utf8);
 
                             // On récupère les données que l'on veut utiliser
                             const profile = {
@@ -113,7 +112,7 @@ exports.getOneProfile = (req, res, next) => {
                                 password: found[0].password,
                                 firstName: foundProfile[0].first_name,
                                 lastName: foundProfile[0].last_name,
-                                birthdate: foundProfile[0].birthdate.toString(),
+                                birthdate: foundProfile[0].birthdate,
                                 avatarUrl: foundProfile[0].avatar,
                             };
 
@@ -331,8 +330,10 @@ exports.modifyProfile = (req, res, next) => {
 // Supprimer son propre compte
 exports.deleteAccount = (req, res, next) => {
     const profile_id = req.params.id;
+    const userRole = req.auth.userRole;
+    const userAuth = req.auth.userId;
     // On vérifis si c'est le propriétaire du compte
-    if (profile_id !== req.auth.userId) {
+    if (profile_id !== userAuth && userRole !== "admin") {
         res.status(401).json({ ERROR: "Vous n'êtes pas autorisé à effectuer cette action." });
     } else {
         connection.getConnection((err, connection) => {

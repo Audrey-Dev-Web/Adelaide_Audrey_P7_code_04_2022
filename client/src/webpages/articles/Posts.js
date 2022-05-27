@@ -1,7 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-// import { useCookies } from "react-cookie"; ========== [ A CONFIGURER ]
+// import { instanceOf } from "prop-types";
+// import { useCookies, Cookies } from "react-cookie";
+import jwt_decode from "jwt-decode";
 
 import { BiComment, BiEditAlt, BiRepost } from "react-icons/bi";
 
@@ -16,6 +18,7 @@ import CommentForm from "../../components/CommentForm";
 import EditPost from "../../components/EditPost";
 import DeletePost from "../../components/DeletePost";
 
+// Permet d'afficher les informations de l'utilisateur qui a créé un post losque celui-ci est un post partagé
 import RealAuthor from "../../components/usersProfile/RealAuthor";
 
 // Import pour la gestion des erreurs
@@ -25,14 +28,21 @@ import ErrorBoundary from "../../components/ErrorBoundary";
 import SharePost from "../../components/SharePost";
 
 class Posts extends React.Component {
+    // static propTypes = {
+    //     cookies: instanceOf(Cookies).isRequired,
+    // };
+
     constructor(props) {
         super(props);
 
         this.state = {
             posts: [],
             DataIsLoaded: false,
-            display: false,
+            // display: false,
+            access: this.props.access, // On récupère le cookie
+            role: [],
         };
+
         this.handleClick = this.handleClick.bind(this);
         this.showComments = this.showComments.bind(this);
     }
@@ -52,11 +62,21 @@ class Posts extends React.Component {
     }
 
     async componentDidMount() {
-        const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
-        const token = user.pass;
+        const { access } = this.state;
+        // console.log(first);
+        // const cookies = Cookies.get(["access"]);
+
+        const token = access.token;
+        const decoded = jwt_decode(token);
+        const user_role = decoded.role;
+        const user_id = decoded.id;
+        // console.log(token);
+
+        // const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
+        // const token = user.pass;
         // const user_id = user.id;
 
-        console.log(token);
+        // console.log(token);
 
         const url = `http://localhost:8080/api/articles`;
         const reqOptions = {
@@ -72,21 +92,32 @@ class Posts extends React.Component {
             const res = await fetch(url, reqOptions);
             const data = await res.json();
 
-            this.setState({ posts: data.articlesFound, DataIsLoaded: true });
-            console.log(this.state);
+            this.setState({ posts: data.articlesFound, DataIsLoaded: true, role: decoded.role });
+            // console.log(this.state);
         } catch (err) {
             console.log(err);
         }
     }
 
     render() {
-        const { DataIsLoaded, posts } = this.state;
-        const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
-        const user_id = user.id;
-
+        const { DataIsLoaded, posts, access, role } = this.state;
+        // const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
         // const user_id = user.id;
-        // console.log(cookies);
-        console.log("", posts);
+
+        console.log(role);
+
+        // On récupère de nouveau le cookie
+        const token = access.token;
+        // On décode le cookie
+        const decoded = jwt_decode(token);
+        // Pour récupérer l'id de l'utilisateur
+        const user_id = decoded.userId;
+        // et son role
+        // const user_role = decoded.role;
+        // console.log(user_role);
+
+        // On vérifi si l'utilisateur a le bon role ou le bon user_id
+
         if (!DataIsLoaded)
             return (
                 <div>
@@ -95,8 +126,6 @@ class Posts extends React.Component {
             );
 
         const showPosts = posts.slice(0, 10).map((post) => {
-            // console.log(post);
-
             return (
                 <div className="article" key={post.article.id}>
                     {/* {user && <p>{user}</p>}
@@ -104,15 +133,6 @@ class Posts extends React.Component {
 
                     <Link to={"/articles/" + post.article.id}>
                         <div className="article__header">
-                            {/* {!post.article.is_shared ? null : (
-                                <div className="sharedFlex">
-                                    <div className="article__header--shared">
-                                        <BiRepost />
-                                    </div>
-                                    <p>a partagé cet article</p>
-                                </div>
-                            )} */}
-                            {/* <h2 className="article__header--title">{post.article.title}</h2> */}
                             <div className="article__header--author">
                                 {!post.article.author_avatar ? (
                                     <div className="author__img initiales">
@@ -133,9 +153,8 @@ class Posts extends React.Component {
                                         <p className="author__name">
                                             {post.article.author_firstName + " " + post.article.author_lastName}
                                         </p>
-                                        {/* <div className="article__header--datetime">{post.article.timestamp}</div> */}
                                         <div className="author__postDate">
-                                            <p>Posté</p> <DateTime datetime={post.article.timestamp} />
+                                            <p>Posté</p> <DateTime datetime={post.article.timestamp} access={access} />
                                         </div>
                                     </div>
 
@@ -156,6 +175,7 @@ class Posts extends React.Component {
                             <RealAuthor
                                 realAuthor_id={post.article.original_author_id}
                                 dateTime={post.article.post_shared_timestamp}
+                                access={access}
                             />
                             <h2 className="article__header--title">{post.article.title}</h2>
 
@@ -178,7 +198,7 @@ class Posts extends React.Component {
                                 <div className="social">
                                     <span className="social__icon">
                                         <ErrorBoundary>
-                                            <SharePost post_id={post.article.id} />
+                                            <SharePost post_id={post.article.id} access={access} />
                                         </ErrorBoundary>
                                     </span>
                                     <span className="social__count">{post.article.shares}</span>
@@ -199,9 +219,21 @@ class Posts extends React.Component {
                             </div>
 
                             {/* BOUTONS POUR MODIFIER ET SUPPRIMER LE POST */}
-                            {user_id === post.article.author ? (
-                                <div className="social__icon social__postManage">
-                                    {post.article.is_shared ? null : (
+
+                            {/* <div className="social__icon social__postManage"> */}
+                            {/* On vérifis que c'est l'auteur du post qui souhaite le modifier */}
+                            {/* {user_id === post.article.author ? (
+                                    // Si le post est un partage alors on cache le bouton editer
+                                    post.article.is_shared ? (
+
+                                        // BOUTON CANCEL SHARE SEULEMENT SUR LES PARTAGES
+                                        <div className="social social__icon deletePost">
+                                            <button type="button" className="btn">
+                                                cancel
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        // BOUTON EDIT SEULEMENT SUR LES POST
                                         <div className="social social__icon editPost">
                                             <button
                                                 type="button"
@@ -211,12 +243,64 @@ class Posts extends React.Component {
                                                 <BiEditAlt />
                                             </button>
                                         </div>
-                                    )}
+                                    )
+                                ) : null}
+
+                                {/* Si l'utilisateur est le propriétaire du post ou possède le role admin alors il peut supprimer le post */}
+                            {/* {user_id === post.article.author || role === "admin" ? (
                                     <div className="social social__icon deletePost">
                                         <DeletePost post_id={post.article.id} author_id={post.article.author} />
                                     </div>
+                                ) : null}  */}
+
+                            {post.article.is_shared ? (
+                                user_id === post.article.author ? (
+                                    <div className="social__icon social__postManage">
+                                        <div className="social social__icon deletePost">
+                                            <button type="button" className="btn">
+                                                cancel
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : null
+                            ) : role === "admin" ? (
+                                <div className="social__icon social__postManage">
+                                    <div className="social social__icon deletePost">
+                                        <DeletePost
+                                            post_id={post.article.id}
+                                            author_id={post.article.author}
+                                            access={this.props.access}
+                                        />
+                                    </div>
                                 </div>
-                            ) : null}
+                            ) : (
+                                <div className="social__icon social__postManage">
+                                    <div className="social social__icon editPost">
+                                        <button
+                                            type="button"
+                                            className="btn"
+                                            onClick={() => this.handleClick(post.article.id)}
+                                        >
+                                            <BiEditAlt />
+                                        </button>
+                                    </div>
+
+                                    <div className="social social__icon deletePost">
+                                        <DeletePost
+                                            post_id={post.article.id}
+                                            author_id={post.article.author}
+                                            access={access}
+                                        />
+                                    </div>
+                                </div>
+                            )}
+                            {/* </div> */}
+
+                            {/* {role === "admin" ? (
+                                <div className="social social__icon deletePost">
+                                    <DeletePost post_id={post.article.id} author_id={post.article.author} />
+                                </div>
+                            ) : null} */}
                         </div>
 
                         {/* AFFICHAGE DES COMPOSANTS DE L'ARTICLE */}
@@ -237,6 +321,7 @@ class Posts extends React.Component {
                                             post_title={post.article.title}
                                             post_content={post.article.content}
                                             post_img={post.article.images}
+                                            access={access}
                                         />
                                     </ErrorBoundary>
                                 </div>
@@ -251,7 +336,7 @@ class Posts extends React.Component {
                                         style={{ display: this.state.isShowOn ? "block" : "none" }}
                                     >
                                         <ErrorBoundary>
-                                            <Comments post_id={post.article.id} />
+                                            <Comments post_id={post.article.id} access={access} />
                                         </ErrorBoundary>
                                     </div>
                                 ) : null}

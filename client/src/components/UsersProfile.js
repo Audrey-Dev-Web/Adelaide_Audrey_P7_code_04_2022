@@ -7,13 +7,19 @@ import { NavLink } from "react-router-dom";
 
 import DateTime from "../components/DateTime";
 
-function UsersProfile() {
+function UsersProfile(props) {
+    const { access } = props;
+
     const [users, setUsers] = useState([]);
     const [dataIsLoaded, setDataIsLoaded] = useState(false);
     const [showMore, setShowMore] = useState(false);
 
-    const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
-    const token = user.pass;
+    // const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
+    // const token = user.pass;
+
+    const token = access.token;
+    const user_id = access.user_id;
+    const user_role = access.role;
 
     const url = `http://localhost:8080/api/profiles`;
     const reqOptions = {

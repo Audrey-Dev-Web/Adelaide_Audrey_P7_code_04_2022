@@ -8,22 +8,30 @@ export default class UserLoggedIn extends Component {
         this.state = {
             userInfo: [],
             DataIsLoaded: false,
+            user: this.props.access,
         };
     }
 
     async componentDidMount() {
-        const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
-        const token = user.pass;
-        const userId = user.id;
+        // const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
+        // const token = user.pass;
+        // const userId = user.id;
+
+        const access = this.state.user.token;
+        const user_id = this.state.user.user_id;
+        const user_role = this.state.user.role;
+
+        // console.log("=====> access <=====");
+        // console.log(this.state.user.user_id);
 
         // console.log(userId);
 
-        const url = `http://localhost:8080/api/profiles/${userId}`;
+        const url = `http://localhost:8080/api/profiles/${user_id}`;
 
         const reqOptions = {
             method: "GET",
             headers: {
-                Authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${access}`,
                 Accept: "application/json",
                 "Content-Type": "application/json",
             },
@@ -40,7 +48,9 @@ export default class UserLoggedIn extends Component {
     }
 
     render() {
-        const { DataIsLoaded, userInfo } = this.state;
+        const { DataIsLoaded, userInfo, user } = this.state;
+        const user_role = user.role;
+        const user_id = user.user_id;
 
         if (!DataIsLoaded)
             return (
@@ -69,7 +79,12 @@ export default class UserLoggedIn extends Component {
                     <img className="userLoggedIn__pix" src={userInfo.profile.avatarUrl} alt="Photo de profile" />
                 )}
                 {/* <img className="userLoggedIn__pix" src={userInfo.profile.avatarUrl} alt="Photo de profile" /> */}
-                <span className="username">{userInfo.profile.firstName}</span>
+
+                {user_role === "admin" ? (
+                    <span className="user_admin">Administrateur</span>
+                ) : (
+                    <span className="username">{userInfo.profile.firstName}</span>
+                )}
                 {/* </Link> */}
             </div>
         );

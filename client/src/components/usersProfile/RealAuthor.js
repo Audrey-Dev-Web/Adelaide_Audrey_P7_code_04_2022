@@ -4,14 +4,18 @@ import { Link } from "react-router-dom";
 import DateTime from "../DateTime";
 
 export default function RealAuthor(props) {
-    const { realAuthor_id, dateTime } = props;
+    const { realAuthor_id, dateTime, access } = props;
     const [realAuthor, setRealAuthor] = useState({ userInfos: {} });
     const [dataOk, setDataOk] = useState(false);
 
-    console.log(realAuthor_id);
+    // console.log(realAuthor_id);
 
-    const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
-    const token = user.pass;
+    // const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
+    // const token = user.pass;
+
+    const token = access.token;
+    const user_id = access.user_id;
+    const user_role = access.role;
 
     const url = `http://localhost:8080/api/profiles/${realAuthor_id}`;
     const reqOptions = {
@@ -41,7 +45,7 @@ export default function RealAuthor(props) {
         if (realAuthor_id !== undefined) {
             fetchRealAuthor();
         } else {
-            console.log("bug");
+            console.log("message d'erreur a ajouter !");
         }
     }, []);
 

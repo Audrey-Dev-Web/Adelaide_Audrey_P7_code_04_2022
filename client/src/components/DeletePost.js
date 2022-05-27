@@ -7,6 +7,7 @@ import { BiTrash } from "react-icons/bi";
 function DeletePost(props) {
     let navigate = useNavigate();
     let { postSlug } = useParams();
+    const { access } = props;
 
     // On récupère l'id du post à supprimer
     const { post_id, author_id } = props;
@@ -14,11 +15,15 @@ function DeletePost(props) {
     const [isAuthorized, setIsAuthorized] = useState(false);
 
     // On récupère les données pour les authorisations
-    const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
-    const token = user.pass;
-    const user_id = user.id;
-    const user_role = user.role;
-    const role = "admin";
+    // const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
+    // const token = user.pass;
+    // const user_id = user.id;
+    // const user_role = user.role;
+    // const role = "admin";
+
+    const token = access.token;
+    const user_id = access.user_id;
+    const user_role = access.role;
 
     // On configure la requête
     const url = `http://localhost:8080/api/articles/${post_id}`;
@@ -33,7 +38,7 @@ function DeletePost(props) {
 
     // On vérifi si l'utilisateur est autorisé à supprimer le commentaire
     const authorization = async () => {
-        if (user_id === author_id || user_role === role) {
+        if (user_id === author_id || user_role === "admin") {
             setIsAuthorized(true);
         }
     };

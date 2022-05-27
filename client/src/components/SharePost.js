@@ -3,16 +3,20 @@ import React, { useState } from "react";
 import { BiShare, BiRepost } from "react-icons/bi";
 
 function SharePost(props) {
-    const { post_id, userId } = props;
+    const { post_id, userId, access } = props;
     const [shareNumber, setShareNumber] = useState(1);
 
     const [message, setMessage] = useState("");
 
     const [shared, setShared] = useState(false);
 
-    const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
-    const token = user.pass;
-    const user_id = user.id;
+    // const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
+    // const token = user.pass;
+    // const user_id = user.id;
+
+    const token = access.token;
+    const user_id = access.user_id;
+    const user_role = access.role;
 
     const shareObject = {
         share: shareNumber,

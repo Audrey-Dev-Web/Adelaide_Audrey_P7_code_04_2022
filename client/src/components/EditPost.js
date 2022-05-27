@@ -4,7 +4,7 @@ import { BiSend, BiImageAdd } from "react-icons/bi";
 
 function EditPost(props) {
     // On récupère les données utiles
-    const { post_id, author_id, post_title, post_content, post_img } = props;
+    const { post_id, author_id, post_title, post_content, post_img, access } = props;
 
     // On prépare le state local
     const [title, setTitle] = useState(post_title);
@@ -12,14 +12,18 @@ function EditPost(props) {
     const [image, setImage] = useState(post_img);
     const [fileDataURL, setFileDataURL] = useState(null);
 
-    // const [editMod, setEditMod] = useState(false);
+    const [editMod, setEditMod] = useState(false);
 
     // On récupère les données pour les authorisations
-    const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
-    const token = user.pass;
-    const user_id = user.id;
+    // const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
+    // const token = user.pass;
+    // const user_id = user.id;
 
-    // const [isAuthor, setIsAuthor] = useState(false);
+    const token = access.token;
+    const user_id = access.user_id;
+    const user_role = access.role;
+
+    const [isAuthor, setIsAuthor] = useState(false);
 
     // console.log(props);
 
@@ -40,15 +44,15 @@ function EditPost(props) {
     };
 
     // On vérifis si l'utilisateur est l'auteur du post
-    // const set_author = () => {
-    //     if (user_id === author_id) {
-    //         setIsAuthor(true);
-    //     }
-    // };
+    const set_author = () => {
+        if (user_id === author_id) {
+            setIsAuthor(true);
+        }
+    };
 
-    // useEffect(() => {
-    //     set_author();
-    // }, []);
+    useEffect(() => {
+        set_author();
+    }, []);
 
     // console.log("Est-ce que l'utilisateur est l'auteur du post ? ", isAuthor, author_id);
     // console.log(user_id);

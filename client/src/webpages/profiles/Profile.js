@@ -5,18 +5,30 @@ import { BiCalendarCheck, BiUserCheck, BiMailSend, BiTrash } from "react-icons/b
 
 import DateTime from "../../components/DateTime";
 import EditProfile from "../../components/Editprofile";
+import DeleteAccount from "../../components/DeleteAccount";
 
-function Profile() {
+import ErrorBoundary from "../../components/ErrorBoundary";
+
+function Profile(props) {
+    const { access } = props;
+
+    // console.log(access);
+
     let { userSlug } = useParams();
     const [userData, setUserData] = useState({ profile: {} });
     const [dataIsLoaded, setDataIsLoaded] = useState(false);
 
     const [isAuthorized, setIsAuthorized] = useState(false);
 
-    const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
-    const token = user.pass;
-    const user_id = user.id;
-    const user_role = user.role;
+    // const userObject = access;
+    const token = access.token;
+    const user_id = access.user_id;
+    const user_role = access.role;
+
+    // const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
+    // const token = user.pass;
+    // const user_id = user.id;
+    // const user_role = user.role;
 
     // Request options
     const url = `http://localhost:8080/api/profiles/${userSlug}`;
@@ -42,6 +54,8 @@ function Profile() {
             .then((data) => {
                 setUserData(data);
                 setDataIsLoaded(true);
+
+                console.log(data);
             })
             .catch((err) => {
                 console.log(err);
@@ -61,7 +75,7 @@ function Profile() {
         );
     }
 
-    console.log("", userData);
+    // console.log("", userData);
 
     return (
         <div className="profile">
@@ -91,12 +105,16 @@ function Profile() {
                             />
                         )}
                         <div>
-                            <h1 className="profile__title">
-                                {userData.profile.firstName + " " + userData.profile.lastName} <BiUserCheck />
-                            </h1>
-                            <p className="profile__signupDate">
+                            {userData.profile.role !== "admin" ? (
+                                <h1 className="profile__title">
+                                    {userData.profile.firstName + " " + userData.profile.lastName} <BiUserCheck />
+                                </h1>
+                            ) : (
+                                <h1 className="profile__title admin">Administrateur</h1>
+                            )}
+                            <div className="profile__signupDate">
                                 <BiCalendarCheck /> Inscrit <DateTime datetime={userData.profile.inscrit_le} />
-                            </p>
+                            </div>
                         </div>
                     </div>
 
@@ -107,17 +125,21 @@ function Profile() {
                             </p>
                         </div>
 
-                        <div className="profile__user--margin">
-                            <p>
-                                Role : <span>{userData.profile.role}</span>
-                            </p>
-                        </div>
+                        {userData.profile.role !== "admin" ? (
+                            <div className="profile__user--margin">
+                                <p>
+                                    Role : <span>{userData.profile.role}</span>
+                                </p>
+                            </div>
+                        ) : null}
 
-                        <div className="profile__user--margin">
-                            <p>
-                                <BiMailSend /> Adresse email : <span>{userData.profile.email}</span>
-                            </p>
-                        </div>
+                        {user_id !== userData.profile.user_id ? null : (
+                            <div className="profile__user--margin">
+                                <p>
+                                    <BiMailSend /> Adresse email : <span>{userData.profile.email}</span>
+                                </p>
+                            </div>
+                        )}
                     </div>
                     <div className="profile__btn">
                         <EditProfile
@@ -128,8 +150,19 @@ function Profile() {
                             emailValue={userData.profile.email}
                             password={userData.profile.password}
                             avatar={userData.profile.avatarUrl}
+                            access={access}
                         />
                     </div>
+
+                    {user_id === userData.profile.user_id ? null : (
+                        <div className="account_management">
+                            {user_role === "admin" ? (
+                                <ErrorBoundary>
+                                    <DeleteAccount userId={userData.profile.user_id} access={access} />
+                                </ErrorBoundary>
+                            ) : null}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

@@ -4,7 +4,7 @@ import { BiTrash } from "react-icons/bi";
 
 function DeleteComment(props) {
     // On récupère l'id de l'utilisateur avec props
-    const { post_id, author_id, comment_id } = props;
+    const { post_id, author_id, comment_id, access } = props;
 
     // On ajoute la double validation avant suppression
 
@@ -12,12 +12,16 @@ function DeleteComment(props) {
     const [isAuthorized, setIsAuthorized] = useState(false);
 
     // On récupère les données de connexion de l'utilisateur loggé
-    const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
-    const token = user.pass;
-    const user_id = user.id;
-    const user_role = user.role;
+    // const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
+    // const token = user.pass;
+    // const user_id = user.id;
+    // const user_role = user.role;
 
-    const role = "admin";
+    const token = access.token;
+    const user_id = access.user_id;
+    const user_role = access.role;
+
+    // const role = "admin";
 
     // On prépare la requête delete
     const url = `http://localhost:8080/api/articles/${post_id}/comments/${comment_id}`;
@@ -32,7 +36,7 @@ function DeleteComment(props) {
 
     // On vérifi si l'utilisateur est autorisé à supprimer le commentaire
     const authorization = async () => {
-        if (user_id === author_id || user_role === role) {
+        if (user_id === author_id || user_role === "admin") {
             setIsAuthorized(true);
         }
     };

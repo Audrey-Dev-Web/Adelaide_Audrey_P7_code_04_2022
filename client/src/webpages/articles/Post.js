@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Route } from "react-router-dom";
 
+import { useCookies } from "react-cookie";
+import jwt_decode from "jwt-decode";
+
 import { BiLike, BiDislike, BiShare, BiComment, BiCommentAdd } from "react-icons/bi";
 
 // Import pour la gestion de l'article
@@ -18,7 +21,8 @@ import ErrorBoundary from "../../components/ErrorBoundary";
 // Import Socials
 import SharePost from "../../components/SharePost";
 
-function Post() {
+function Post(props) {
+    const { access } = props;
     let { postSlug } = useParams();
     const [post, setPost] = useState({ post: {} });
     const [postIsLoaded, setPostIsLoaded] = useState(false);
@@ -28,9 +32,24 @@ function Post() {
     const [isAuthor, setIsAuthor] = useState(false);
 
     // Token de l'utilisateur
-    const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
-    const token = user.pass;
-    const user_id = user.id;
+    // const [cookies, setCookie, removeCookie] = useCookies(["access"]);
+
+    // On décode le token afin de récupérer le useId
+
+    // console.log(cookies.access);
+
+    // const decoded = jwt_decode(token);
+    const token = access.token;
+    const user_id = access.user_id;
+    const user_role = access.role;
+
+    // console.log(decoded);
+    // console.log(user_role);
+    // console.log(user_id);
+
+    // const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
+    // const token = user.pass;
+    // const user_id = user.id;
 
     // Request options
     const url = `http://localhost:8080/api/articles/${postSlug}`;
@@ -52,8 +71,7 @@ function Post() {
                 setComments(dataComments);
                 setPostIsLoaded(true);
 
-                // console.log(dataPost);
-                if (user_id === dataPost.articleFound.author_id) {
+                if (user_id === dataPost.articleFound.author_id || user_role === "admin") {
                     setIsAuthor(true);
                 }
             });
@@ -140,7 +158,7 @@ function Post() {
                                 <span className="social__icon">
                                     {/* <BiShare /> */}
                                     <ErrorBoundary>
-                                        <SharePost post_id={post.articleFound.id} />
+                                        <SharePost post_id={post.articleFound.id} access={access} />
                                     </ErrorBoundary>
                                 </span>
                                 <span className="social__count">{post.articleFound.shares}</span>
@@ -163,14 +181,19 @@ function Post() {
                             post_title={post.articleFound.title}
                             post_content={post.articleFound.content}
                             post_img={post.articleFound.img}
+                            access={access}
                         />
 
-                        <DeletePost post_id={post.articleFound.id} author_id={post.articleFound.author_id} />
+                        <DeletePost
+                            post_id={post.articleFound.id}
+                            author_id={post.articleFound.author_id}
+                            access={access}
+                        />
                     </div>
                     <div className="comments">
                         <h3 className="comments__title">Commentaires</h3>
 
-                        <CommentForm post_id={post.articleFound.id} />
+                        <CommentForm post_id={post.articleFound.id} access={access} />
 
                         {!comments.allComments
                             ? "Aucun commentaire, soyez le premier !"
@@ -211,12 +234,14 @@ function Post() {
                                               post_id={post.articleFound.id}
                                               comment_id={comment.id}
                                               comment_value={comment.comment}
+                                              access={access}
                                           />
 
                                           <DeleteComment
                                               author_id={comment.author_id}
                                               post_id={post.articleFound.id}
                                               comment_id={comment.id}
+                                              access={access}
                                           />
                                       </div>
                                   </div>
