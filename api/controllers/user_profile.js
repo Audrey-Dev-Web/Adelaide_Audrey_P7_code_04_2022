@@ -77,7 +77,7 @@ exports.getOneProfile = (req, res, next) => {
             console.log("-------> Résultat de la recherche");
             console.log(found.length);
 
-            if (found.length == 0) {
+            if (found.length <= 0) {
                 res.status(404).json({ ERROR: "Cet utilisateur n'existe pas !" });
             } else {
                 // Objet user, on uniquement

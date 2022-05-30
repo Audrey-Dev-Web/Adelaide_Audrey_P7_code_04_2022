@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import jwt_decode from "jwt-decode";
 
 import { BiTrash } from "react-icons/bi";
 
@@ -11,17 +12,10 @@ function DeleteComment(props) {
     // useState pour stocker le boolean si oui ou non l'utilisateur est autorisé à supprimer
     const [isAuthorized, setIsAuthorized] = useState(false);
 
-    // On récupère les données de connexion de l'utilisateur loggé
-    // const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
-    // const token = user.pass;
-    // const user_id = user.id;
-    // const user_role = user.role;
-
-    const token = access.token;
-    const user_id = access.user_id;
-    const user_role = access.role;
-
-    // const role = "admin";
+    const token = access;
+    const decoded = jwt_decode(token);
+    const user_id = decoded.userId;
+    const user_role = decoded.role;
 
     // On prépare la requête delete
     const url = `http://localhost:8080/api/articles/${post_id}/comments/${comment_id}`;
@@ -60,30 +54,9 @@ function DeleteComment(props) {
         }
     };
 
-    /*
-
-    onClick : 
-    <span> Voulez-vous vraiment supprimer ce commentaire ? </span>
-        if (!question) {
-            setQuestion(false)
-        } else {
-            setQuestion(true)
-        }
-    */
-
-    // doubleValidator = () => {
-    //     if (!isOk) {
-    //         setDelete(false)
-    //     } else {}
-    // }
-
-    // console.log("=====> Est-ce que l'utilisateur est autorisé à effectuer cette action ?");
-    // console.log(isAuthorized);
-
     return (
         <div>
             {!isAuthorized ? null : (
-                // <button className="comments__delete--btn btn" onClick={(e) => deleteComment(e)}>
                 <button
                     className="comments__delete--btn btn"
                     onClick={() => {
@@ -95,7 +68,6 @@ function DeleteComment(props) {
                     }}
                 >
                     <BiTrash />
-                    {/* <span className="infobubble">Supprimer</span> */}
                 </button>
             )}
         </div>

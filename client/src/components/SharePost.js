@@ -1,22 +1,20 @@
 import React, { useState } from "react";
+import jwt_decode from "jwt-decode";
 
 import { BiShare, BiRepost } from "react-icons/bi";
 
 function SharePost(props) {
     const { post_id, userId, access } = props;
+
+    // console.log(post_id);
+
     const [shareNumber, setShareNumber] = useState(1);
-
     const [message, setMessage] = useState("");
-
     const [shared, setShared] = useState(false);
 
-    // const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
-    // const token = user.pass;
-    // const user_id = user.id;
-
-    const token = access.token;
-    const user_id = access.user_id;
-    const user_role = access.role;
+    const token = access;
+    // const user_id = access.user_id;
+    // const user_role = access.role;
 
     const shareObject = {
         share: shareNumber,
@@ -35,7 +33,7 @@ function SharePost(props) {
 
     function shareButton(e) {
         // setShared(true)
-        setShareNumber(1);
+        // setShareNumber(1);
 
         fetch(url, reqOptions)
             .then((res) => {
@@ -44,7 +42,6 @@ function SharePost(props) {
                 }
             })
             .then((data) => {
-                console.log(data);
                 setMessage(data.MESSAGE);
                 setShared(true);
 

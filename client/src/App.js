@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Routes, Route, BrowserRouter, Router } from "react-router-dom";
 import { Navigation, Footer, Login, Signup, Home, Profile } from "./webpages";
 
@@ -8,37 +8,24 @@ import jwt_decode from "jwt-decode";
 import Posts from "./webpages/articles/Posts";
 import Post from "./webpages/articles/Post";
 
+import ErrorBoundary from "./components/ErrorBoundary";
+
 function App() {
     // On récupère le cookie qui a été créé au moment du login
-    const [cookies, setCookie, removeCookie] = useCookies(["access"]);
+    const [cookies, setCookie, removeCookie] = useCookies("access");
 
-    const token = cookies.access;
-    const decoded = jwt_decode(token);
-    const user_id = decoded.userId;
-    const user_role = decoded.role;
+    const [isAuthenticated, setIsAuthenticated] = useState(cookies.access ? true : false);
 
-    const access = {
-        token: token,
-        user_id: user_id,
-        role: user_role,
-    };
-
-    const user = sessionStorage.getItem("isAuthenticate");
-
-    // ce state autorise ou non l'accès aux pages privés
-    const [isAuthenticated, setIsAuthenticated] = useState(cookies ? true : false); // <==== remplacer user par cookies
-
-    console.log(cookies);
+    const access = cookies.access;
 
     if (!isAuthenticated) {
+        // Ici, si l'utilisateur n'est pas connecté, il n'aura accès qu'à la page login et signup
         return (
             <BrowserRouter>
                 <div className="App">
                     <div className="App__bgColor"></div>
-                    {/* <Login /> */}
                     <Routes>
                         <Route path="/" element={<Login />} />
-                        {/* <Route path="/" element={<Login />} /> */}
                         <Route path="/signup" element={<Signup />} />
                     </Routes>
                 </div>
@@ -47,6 +34,7 @@ function App() {
     }
 
     return (
+        // Si l'utilisateur est connecté, il aura accès a toutes les pages ci-dessou
         <BrowserRouter>
             <div className="App">
                 <div className="App__bgColor"></div>

@@ -84,7 +84,7 @@ exports.getAllArticles = (req, res, next) => {
                             original_author_id: real_author,
                             title: article.title,
                             is_shared: article.is_shared,
-                            // shared_id: shared_id,
+                            shared_id: article.shared_id ? article.shared_id.toString() : null,
                             content: article.content,
                             images: article.images,
                             comments: article.comments,
@@ -145,6 +145,7 @@ exports.getOneArticle = (req, res, next) => {
 
                     const articleFound = {
                         id: article[0].id.toString(),
+                        is_shared: article[0].is_shared,
                         shared_id: shared_id,
                         original_author_id: real_author,
                         author_firstName: article[0].first_name,

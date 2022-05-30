@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
+import jwt_decode from "jwt-decode";
 
 import { BiEditAlt } from "react-icons/bi";
 
 function EditComment(props) {
     // On récupère les données de l'utilisateur avec props
-    const { post_id, author_id, comment_id, comment_value } = props;
+    const { post_id, author_id, comment_id, comment_value, access } = props;
 
     // On prépare le state local pour stocker les données à modifier
     const [comment, setComment] = useState(comment_value);
@@ -14,9 +15,9 @@ function EditComment(props) {
     const [editMod, setEditMod] = useState(false);
 
     // On récupère les données de connexion de l'utilisateur loggé
-    const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
-    const token = user.pass;
-    const user_id = user.id;
+    const token = access;
+    const decoded = jwt_decode(token);
+    const user_id = decoded.userId;
 
     // On créer un objet a envoyer pour la modification
     const commentObject = {

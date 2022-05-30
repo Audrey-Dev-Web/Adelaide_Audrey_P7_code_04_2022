@@ -5,21 +5,22 @@ Cette page sert à chercher et afficher tous les utilisateurs inscrits
 import React, { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 
+import { useCookies } from "react-cookie";
+import jwt_decode from "jwt-decode";
+
 import DateTime from "../components/DateTime";
 
 function UsersProfile(props) {
-    const { access } = props;
-
+    const [cookies] = useCookies("access");
     const [users, setUsers] = useState([]);
     const [dataIsLoaded, setDataIsLoaded] = useState(false);
     const [showMore, setShowMore] = useState(false);
+    const [message, setMessage] = useState(null);
 
-    // const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
-    // const token = user.pass;
-
-    const token = access.token;
-    const user_id = access.user_id;
-    const user_role = access.role;
+    const decoded = jwt_decode(cookies.access);
+    const token = cookies.access;
+    const user_id = decoded.userId;
+    const User_role = decoded.role;
 
     const url = `http://localhost:8080/api/profiles`;
     const reqOptions = {
@@ -31,7 +32,7 @@ function UsersProfile(props) {
         },
     };
 
-    const fetchUsers = () => {
+    useEffect(() => {
         fetch(url, reqOptions)
             .then((res) => {
                 if (res.ok) {
@@ -39,18 +40,16 @@ function UsersProfile(props) {
                 }
             })
             .then((data) => {
-                // console.log(data);
-
                 setUsers(data);
                 setDataIsLoaded(true);
+            })
+            .catch((err) => {
+                if (err) {
+                    setMessage(err);
+                }
             });
-    };
-
-    useEffect(() => {
-        fetchUsers();
+        // }
     }, []);
-
-    // console.log(users);
 
     if (!dataIsLoaded) {
         return (
@@ -90,7 +89,6 @@ function UsersProfile(props) {
                         </div>
                     </div>
                 </NavLink>
-                {/* <div className="usersList__user--signupDate">{user.usersProfile.inscrit_le}</div> */}
             </li>
         );
     });
@@ -101,12 +99,6 @@ function UsersProfile(props) {
             {usersList}
         </ul>
     );
-    // return (
-    //     <div>
-    //         UsersProfile coding en cours
-    //         <div>{usersList}</div>
-    //     </div>
-    // );
 }
 
 export default UsersProfile;

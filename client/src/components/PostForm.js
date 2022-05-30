@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import jwt_decode from "jwt-decode";
 
 import UserAvatar from "./UserAvatar";
 
@@ -7,7 +8,6 @@ import { BiPlus, BiImageAdd } from "react-icons/bi";
 function PostForm(props) {
     const { access } = props;
     // ===========> CREATE NEW POST
-
     const [postTitle, setPostTitle] = useState(null);
     const [postContent, setPostContent] = useState(null);
     const [postImg, setPostImg] = useState(null);
@@ -19,9 +19,10 @@ function PostForm(props) {
     // const token = user.pass;
     // const user_id = user.id;
 
-    const token = access.token;
-    const user_id = access.user_id;
-    const user_role = access.role;
+    const token = access;
+    // const decoded = jwt_decode(token);
+    // const user_id = decoded.userId;
+    // const user_role = decoded.role;
 
     const postObject = {
         title: postTitle,

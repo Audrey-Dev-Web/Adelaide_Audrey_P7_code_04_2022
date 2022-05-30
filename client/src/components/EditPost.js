@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import jwt_decode from "jwt-decode";
 
 import { BiSend, BiImageAdd } from "react-icons/bi";
 
@@ -19,9 +20,10 @@ function EditPost(props) {
     // const token = user.pass;
     // const user_id = user.id;
 
-    const token = access.token;
-    const user_id = access.user_id;
-    const user_role = access.role;
+    const token = access;
+    const decoded = jwt_decode(token);
+    const user_id = decoded.userId;
+    // const user_role = access.role;
 
     const [isAuthor, setIsAuthor] = useState(false);
 

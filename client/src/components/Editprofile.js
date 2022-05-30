@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 
+import jwt_decode from "jwt-decode";
+
 import { BiEditAlt, BiTrash } from "react-icons/bi";
 
 import DeleteAccount from "../components/DeleteAccount";
@@ -43,9 +45,10 @@ function Editprofile(props) {
     // const user_id = user.id;
     // const user_role = user.role;
 
-    const token = access.token;
-    const user_id = access.user_id;
-    const user_role = access.role;
+    const token = access;
+    const decoded = jwt_decode(token);
+    const user_id = decoded.userId;
+    const user_role = decoded.role;
 
     // Création de l'object user
     const formData = new FormData();

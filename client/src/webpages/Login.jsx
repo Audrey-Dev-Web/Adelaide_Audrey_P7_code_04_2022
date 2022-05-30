@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import logo from "../images/icon.svg";
 
-import jwt_decode from "jwt-decode";
+// import jwt_decode from "jwt-decode";
 
 import { useCookies } from "react-cookie";
 
@@ -12,13 +12,7 @@ import { BiLogInCircle, BiLockOpenAlt, BiShow, BiHide } from "react-icons/bi";
 function Login() {
     let navigate = useNavigate();
 
-    const [cookies, setCookie] = useCookies(["user"]);
-
-    // function handleCookie() {
-    //     setCookie("user", "gowtham", {
-    //         path: "/",
-    //     });
-    // }
+    const [cookies, setCookie] = useCookies(["access"]);
 
     // connexion
     const [email, setEmail] = useState("");
@@ -66,25 +60,15 @@ function Login() {
 
                 setCookie("access", data.token, { path: "/" });
 
-                // let token = data.token;
-                // let decodedToken = jwt_decode(token);
+                if (res.ok) {
+                    window.location.reload();
+                }
             }
-
-            // if (res.ok) {
-            // }
         } catch (error) {
             setMsg(error);
         }
     };
 
-    if (user) {
-        sessionStorage.setItem("isAuthenticate", JSON.stringify(user));
-        window.location.reload(true);
-    }
-
-    // icon pour afficher le mot de pass
-
-    // Pour afficher ou cacher le mot de passe
     const [passwordShown, setPasswordShown] = useState(false);
     const [show, setShow] = useState(false);
 
@@ -169,19 +153,9 @@ function Login() {
                                 </label>
                             </div>
                         </div>
-                        {/* <div>
-                    <label className="login__rememberMe">
-                        <input className="login__rememberMe--checkbox" type="checkbox" id="scales" name="scales" />
-                        <p className="login__rememberMe--text">Se souvenir de moi</p>
-                    </label>
-                </div> */}
 
                         <p>{msg}</p>
                         <input className="login__btn btn" type="submit" value="Connexion" />
-                        {/* <p>
-                    <li>Mot de passe oublié ?</li>
-                </p> */}
-                        {/* {isAuthenticated ? <Navigate to="/" replace /> : "Vous devez vous connecter"} */}
                     </form>
                 </div>
             </div>

@@ -8,16 +8,6 @@ const MIME_TYPES = {
 };
 
 const storage = multer.diskStorage({
-    // fileFilter: (req, file, callback) => {
-    //     console.log(req.params.id);
-
-    //     if (req.params.id !== req.auth.userId) {
-    //         callback(null, false);
-    //     } else {
-    //         callback(null, true);
-    //     }
-    // },
-
     destination: (req, file, callback) => {
         callback(null, "images");
     },

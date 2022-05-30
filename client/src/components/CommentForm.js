@@ -13,7 +13,7 @@ function CommentForm(props) {
     // const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
     // const token = user.pass;
 
-    const token = access.token;
+    const token = access;
     const user_id = access.user_id;
     const user_role = access.role;
 

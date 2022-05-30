@@ -8,6 +8,9 @@ import EditComment from "../components/EditComment";
 import DeleteComment from "../components/DeleteComment";
 import ErrorBoundary from "../components/ErrorBoundary";
 
+// Permet d'afficher les informations de l'utilisateur qui a créé un post losque celui-ci est un post partagé
+import UserData from "../components/usersProfile/UserData";
+
 function Comments(props) {
     const { post_id, access } = props;
 
@@ -23,7 +26,7 @@ function Comments(props) {
     // const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
     // const token = user.pass;
 
-    const token = access.token;
+    const token = access;
     const user_id = access.user_id;
     const user_role = access.role;
 
@@ -117,7 +120,12 @@ function Comments(props) {
                         <div className="comments__post" key={comment.id}>
                             <div className="comments__header">
                                 <div className="comments__author">
-                                    {!comment.avatar ? (
+                                    <UserData
+                                        realAuthor_id={comment.author_id}
+                                        dateTime={comment.timestamp}
+                                        access={access}
+                                    />
+                                    {/* {!comment.avatar ? (
                                         <div className="comments__author--avatar initiales">
                                             <p>
                                                 {`${comment.firstName} ${comment.lastName}
@@ -141,7 +149,7 @@ function Comments(props) {
                                         <div className="comments__author--dateTime">
                                             <p>Posté</p> <DateTime datetime={comment.timestamp} acces={access} />
                                         </div>
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
                             <div className="comments__content">

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import jwt_decode from "jwt-decode";
 
 import { BiCalendarCheck, BiUserCheck, BiMailSend, BiTrash } from "react-icons/bi";
 
@@ -12,23 +13,17 @@ import ErrorBoundary from "../../components/ErrorBoundary";
 function Profile(props) {
     const { access } = props;
 
-    // console.log(access);
-
     let { userSlug } = useParams();
     const [userData, setUserData] = useState({ profile: {} });
     const [dataIsLoaded, setDataIsLoaded] = useState(false);
 
     const [isAuthorized, setIsAuthorized] = useState(false);
 
-    // const userObject = access;
-    const token = access.token;
-    const user_id = access.user_id;
-    const user_role = access.role;
-
-    // const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
-    // const token = user.pass;
-    // const user_id = user.id;
-    // const user_role = user.role;
+    const token = access;
+    const decoded = jwt_decode(token);
+    console.log(decoded);
+    const user_id = decoded.userId;
+    const user_role = decoded.role;
 
     // Request options
     const url = `http://localhost:8080/api/profiles/${userSlug}`;
@@ -46,7 +41,6 @@ function Profile(props) {
             .then((res) => {
                 if (res.ok) {
                     return res.json();
-                    // console.log(res);
                 } else {
                     console.log("Ce profile n'existe pas");
                 }

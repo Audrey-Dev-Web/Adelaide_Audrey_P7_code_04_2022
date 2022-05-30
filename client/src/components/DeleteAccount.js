@@ -2,39 +2,30 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useParams } from "react-router-dom";
 
+// Gestion des cookies
+import { useCookies } from "react-cookie";
+import jwt_decode from "jwt-decode";
+
 import { BiTrash } from "react-icons/bi";
 
 function DeleteAccount(props) {
     const { userId, access } = props;
     let navigate = useNavigate();
-    let { postSlug } = useParams();
+    let { userSlug } = useParams();
 
-    // console.log(userObject);
-    // const userObject = {
-    //     token: access.token,
-    //     user_id: access.user_id,
-    //     role: access.role,
-    // };
-
-    // console.log(userObject);
-    // On récupère l'id de l'utilisateur
-    // const { userId } = props;
+    const [cookies, setCookies, removeCookie] = useCookies(["access"]);
+    const [deleteMsg, setDeleteMsg] = useState("");
+    const [deleteOK, setDeleteOK] = useState(false);
 
     const [isAuthorized, setIsAuthorized] = useState(false);
 
-    // On récupère les données pour les authorisations
-    // const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
-    // const token2 = user.pass;
-    // const user_id = user.id;
-    // const user_role = user.role;
-    // const role = "admin";
-    // console.log(access.token);
-    const token = access.token;
-    const user_id = access.user_id;
-    const user_role = access.role;
+    const token = access;
+    const decoded = jwt_decode(token);
+    const user_id = decoded.userId;
+    const user_role = decoded.role;
 
     // On configure la requête
-    const url = `http://localhost:8080/api/profiles/${userId}`;
+    const url = `http://localhost:8080/api/profiles/${userSlug}`;
     const reqOptions = {
         method: "DELETE",
         headers: {
@@ -44,17 +35,6 @@ function DeleteAccount(props) {
         },
     };
 
-    // On vérifi si l'utilisateur est autorisé à supprimer ce compte
-    // const authorization = async () => {
-    //     if (user_id === userId) {
-    //         setIsAuthorized(true);
-    //     }
-    // };
-
-    // useEffect(() => {
-    //     authorization();
-    // }, []);
-
     // Requête pour supprimer le compte
     const delAccount = async (e) => {
         // e.preventDefault();
@@ -62,25 +42,36 @@ function DeleteAccount(props) {
         try {
             let res = await fetch(url, reqOptions);
             let deleteRes = await res.json();
-            // console.log("=====> Réponse commentaire envoyé : ");
-            // console.log(deleteRes);
 
             console.log(deleteRes);
 
             if (res.ok) {
-                // window.location.reload();
-                if (postSlug === undefined) {
-                    window.location.reload();
-                }
+                if (user_id === userSlug) {
+                    // afficher une page pendant 5 secondes afin de confirmer à l'utilisateur que son compte est
+                    // supprimé à vie
+                    setDeleteMsg("Votre compte a été supprimé avec succès!");
+                    setDeleteOK(true);
+                    removeCookie("access", "", { path: "/" });
+                    setTimeout(function () {
+                        navigate("/");
+                        window.location.reload();
+                    }, 3500);
+                } else if (user_role === "admin") {
+                    // Afficher une page pour l'admin lui confirmant que le compte a bien été supprimé
+                    setDeleteMsg("Le compte de cet utilisateur a bien été supprimé");
+                    setDeleteOK(true);
+                    // navigate("/");
+                    // window.location.reload();
 
-                navigate("/");
-                window.location.reload();
-                sessionStorage.removeItem("isAuthenticate");
+                    setTimeout(function () {
+                        navigate("/");
+                        window.location.reload();
+                    }, 3500);
+                }
             } else {
+                setDeleteOK(false);
                 throw new Error("Error");
             }
-
-            // window.location.reload();
         } catch (err) {
             console.log(err);
         }
@@ -90,18 +81,21 @@ function DeleteAccount(props) {
         <div>
             {user_id === userId || user_role === "admin" ? (
                 // <button className="account__delete btn btn__delete" onClick={(e) => delAccount(e)}>
-                <button
-                    className="account__delete btn btn__delete"
-                    onClick={() => {
-                        const confirmBox = window.confirm("Voulez vous vraiment supprimer votre compte ?");
+                <div>
+                    <div>{deleteMsg}</div>
+                    <button
+                        className="account__delete btn btn__delete"
+                        onClick={() => {
+                            const confirmBox = window.confirm("Voulez vous vraiment supprimer votre compte ?");
 
-                        if (confirmBox === true) {
-                            delAccount();
-                        }
-                    }}
-                >
-                    <BiTrash />
-                </button>
+                            if (confirmBox === true) {
+                                delAccount();
+                            }
+                        }}
+                    >
+                        <BiTrash />
+                    </button>
+                </div>
             ) : null}
         </div>
     );

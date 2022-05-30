@@ -3,11 +3,15 @@ import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import logo from "../images/icon.svg";
 
+import jwt_decode from "jwt-decode";
+import { useCookies } from "react-cookie";
+
 // Import des icons de la page login
 import { BiLogInCircle, BiLockOpenAlt, BiShow, BiHide } from "react-icons/bi";
 
 function Signup() {
     const navigate = useNavigate();
+    const [cookies, setCookie] = useCookies(["access"]);
     // connexion
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
@@ -51,10 +55,7 @@ function Signup() {
             } else {
                 const dataSignup = await res.json();
 
-                console.log(dataSignup);
-
                 const loginUrl = "http://localhost:8080/api/auth/login";
-
                 const postLogin = {
                     method: "POST",
                     body: JSON.stringify(userObject),
@@ -71,9 +72,19 @@ function Signup() {
                 } else {
                     const data = await resLogin.json();
                     setUser({ id: data.userId, pass: data.token, role: data.userRole });
+                    setCookie("access", data.token, { path: "/" });
 
-                    console.log(user);
-                    console.log(data);
+                    if (res.ok) {
+                        navigate("/", { replace: true });
+                        window.location.reload(true);
+                    }
+
+                    // setUser({ id: data.userId, pass: data.token, role: data.userRole });
+
+                    // setCookie("access", data.token, { path: "/" });
+
+                    // console.log(user);
+                    // console.log(data);
                 }
             }
 
@@ -84,11 +95,11 @@ function Signup() {
         }
     };
 
-    if (user) {
-        sessionStorage.setItem("isAuthenticate", JSON.stringify(user));
-        navigate("/", { replace: true });
-        window.location.reload(true);
-    }
+    // if (user) {
+    //     sessionStorage.setItem("isAuthenticate", JSON.stringify(user));
+    //     navigate("/", { replace: true });
+    //     window.location.reload(true);
+    // }
 
     // icon pour afficher le mot de pass
 

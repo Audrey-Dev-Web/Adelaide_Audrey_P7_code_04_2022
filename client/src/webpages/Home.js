@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Posts from "./articles/Posts";
 import PostForm from "../components/PostForm";
 import UsersProfile from "../components/UsersProfile";
-// import ErrorBoundary from "../components/ErrorBoundary";
+import ErrorBoundary from "../components/ErrorBoundary";
 
 import { BiPlus, BiX } from "react-icons/bi";
 
@@ -46,10 +46,14 @@ function Home(props) {
                     </div>
 
                     <div className="home__articles">
-                        <Posts access={access} />
+                        <ErrorBoundary>
+                            <Posts access={access} />
+                        </ErrorBoundary>
                     </div>
                 </div>
-                <UsersProfile access={access} />
+                <ErrorBoundary>
+                    <UsersProfile access={access} />
+                </ErrorBoundary>
             </div>
         </div>
     );

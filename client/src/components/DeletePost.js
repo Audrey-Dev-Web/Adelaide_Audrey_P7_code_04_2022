@@ -1,29 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useParams } from "react-router-dom";
+import jwt_decode from "jwt-decode";
 
 import { BiTrash } from "react-icons/bi";
 
 function DeletePost(props) {
     let navigate = useNavigate();
     let { postSlug } = useParams();
-    const { access } = props;
+    // const { access } = props;
 
     // On récupère l'id du post à supprimer
-    const { post_id, author_id } = props;
+    const { post_id, author_id, access } = props;
 
     const [isAuthorized, setIsAuthorized] = useState(false);
 
-    // On récupère les données pour les authorisations
-    // const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
-    // const token = user.pass;
-    // const user_id = user.id;
-    // const user_role = user.role;
-    // const role = "admin";
-
-    const token = access.token;
-    const user_id = access.user_id;
-    const user_role = access.role;
+    const token = access;
+    const decoded = jwt_decode(token);
+    const user_id = decoded.userId;
+    const user_role = decoded.role;
 
     // On configure la requête
     const url = `http://localhost:8080/api/articles/${post_id}`;
