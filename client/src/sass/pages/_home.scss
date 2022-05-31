@@ -12,6 +12,11 @@
     &__article {
         width: 70%;
 
+        @include tablet-only {
+            width: 100%;
+            margin: 2%;
+        }
+
         &--createPost {
             margin: 0 auto;
             width: 50px;

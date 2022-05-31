@@ -8,6 +8,16 @@
         margin: 0 auto;
         background: darken($principal_bg, 5%);
         box-shadow: 0 0 5px rgb(48, 40, 40);
+
+        @include tablet-only {
+            width: 600px;
+            margin: 2% auto;
+        }
+
+        @include mobile-only {
+            width: 100%;
+            margin: 2%;
+        }
     }
 
     &__user {
@@ -17,7 +27,7 @@
 
         padding: 2%;
 
-        background: $accent_color_3;
+        background: darken($principal_bg, 10%);
         border-radius: 20px 20px 0 0;
 
         &--margin {
@@ -148,5 +158,16 @@
 
     &__btn {
         margin: 2% auto;
+        font-size: 1.2rem;
+        font-weight: 700;
+    }
+
+    &__image {
+        display: none;
+    }
+
+    .setPwd {
+        font-size: 1.2rem;
+        font-weight: 700;
     }
 }

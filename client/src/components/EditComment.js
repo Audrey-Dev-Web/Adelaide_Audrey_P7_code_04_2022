@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import jwt_decode from "jwt-decode";
 
+import DeleteComment from "../components/DeleteComment";
+// Import pour la gestion des erreurs
+import ErrorBoundary from "../components/ErrorBoundary";
+
 import { BiEditAlt } from "react-icons/bi";
 
 function EditComment(props) {
@@ -79,20 +83,34 @@ function EditComment(props) {
     // console.log(user_id);
 
     return (
-        <div>
+        <div className="comment">
             {!isAuthor ? null : (
-                <button className="comments__edit--btn btn" onClick={toggleEdit}>
-                    <BiEditAlt />
-                    <span className="infobubble">Editer ce commentaire</span>
-                </button>
+                <div className="comment__buttons">
+                    <button className="comment__edit--btn btn" onClick={toggleEdit}>
+                        <p hidden>Afficher les commentaires</p>
+                        <BiEditAlt />
+                        <span className="infobubble">Editer ce commentaire</span>
+                    </button>
+                    <ErrorBoundary>
+                        <DeleteComment
+                            author_id={author_id}
+                            post_id={post_id}
+                            comment_id={comment_id}
+                            access={access}
+                        />
+                    </ErrorBoundary>
+                </div>
             )}
 
-            <div className="comments__editForm">
-                <span className="editMod" style={{ display: editMod ? "block" : "none" }}>
+            <div className="comment__editForm">
+                {/* <span className="editMod" style={{ display: editMod ? "block" : "none" }, }> */}
+                <span className={editMod ? "showForm editMod" : "hideForm editMod"}>
                     <h3>Modifier votre commentaire</h3>
-                    <form className="comment_editForm--form" onSubmit={modifyComment}>
-                        <label>
+                    <form className="comment__editForm--form" onSubmit={modifyComment}>
+                        <label htmlFor="comment-content" aria-label="Créer un commentaire">
                             <textarea
+                                id="comment-content"
+                                className="comment__editForm--content"
                                 type="text"
                                 name="content"
                                 placeholder="Ajouter un nouveau commentaire"
@@ -102,7 +120,12 @@ function EditComment(props) {
                         </label>
 
                         <div>
-                            <input className="comment__send--btn btn" type="submit" value="Envoyer" />
+                            <input
+                                className="comment__send--btn btn"
+                                type="submit"
+                                value="Envoyer"
+                                aria-label="envoyer"
+                            />
                         </div>
                     </form>
                 </span>

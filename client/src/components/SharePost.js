@@ -57,6 +57,7 @@ function SharePost(props) {
     return (
         <div>
             <button type="button" className="social__icon shareBtn" onClick={(e) => shareButton()}>
+                <p hidden>Partager cet article</p>
                 <BiRepost />
             </button>
 

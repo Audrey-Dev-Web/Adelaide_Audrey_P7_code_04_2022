@@ -71,6 +71,10 @@
         font-size: 2rem;
     }
 
+    &__send {
+        display: none;
+    }
+
     @include mobile-only {
         width: 100%;
         margin: 1%;

@@ -67,6 +67,7 @@ function DeleteComment(props) {
                         }
                     }}
                 >
+                    <p hidden>Supprimer le commentaire</p>
                     <BiTrash />
                 </button>
             )}

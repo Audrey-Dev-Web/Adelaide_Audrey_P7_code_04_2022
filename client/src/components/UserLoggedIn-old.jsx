@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 // import { useCookies, cookies, withCookies } from "react-cookie";
 import jwt_decode from "jwt-decode";
 
-import UserData from "../components/usersProfile/UserData";
+import UserData from "./usersProfile/UserData";
 
 // import { instanceOf } from 'prop-types';
 // import { withCookies, Cookies } from 'react-cookie';

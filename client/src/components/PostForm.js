@@ -3,7 +3,7 @@ import jwt_decode from "jwt-decode";
 
 import UserAvatar from "./UserAvatar";
 
-import { BiPlus, BiImageAdd } from "react-icons/bi";
+import { BiSend, BiPlus, BiImageAdd } from "react-icons/bi";
 
 function PostForm(props) {
     const { access } = props;
@@ -92,18 +92,23 @@ function PostForm(props) {
             {/* <h1>Créer un article</h1> */}
             <h2 className="newPost__title">Créer un nouvel article</h2>
             <form onSubmit={sendNewPost} className="newPost__add" method="POST" encType="multipart/form-data">
-                <label>
+                <label htmlFor="post-title" aria-label="titre">
+                    <p hidden>Titre</p>
                     <input
+                        id="post-title"
                         className="newPost__add--title"
                         type="text"
                         name="title"
                         placeholder="Titre"
                         onChange={(e) => setPostTitle(e.target.value)}
+                        required
                     />
                 </label>
 
-                <label>
+                <label htmlFor="post-content" aria-label="votre message">
+                    <p hidden>Text</p>
                     <textarea
+                        id="post-content"
                         className="newPost__add--content"
                         type="text"
                         name="content"
@@ -114,13 +119,25 @@ function PostForm(props) {
 
                 {!postImg ? null : <img width="300" src={fileDataURL} />}
                 <div className="newPost__btn">
-                    <label htmlFor="addImg" className="btn">
+                    <label htmlFor="addImg" className="btn" aria-label="Ajouter une image">
+                        <p hidden>Ajouter une image</p>
                         <BiImageAdd className="imgIcon" />
                     </label>
                     <input className="newPost__img btn" type="file" id="addImg" name="image" onChange={handleChange} />
 
                     {message}
-                    <input className="newPost__add--send btn" type="submit" value="Envoyer" />
+                    <label htmlFor="sendBtn" className="newPost__add--send btn" aria-label="Envoyer">
+                        <p hidden>Envoyer l'article</p>
+                        <BiSend />
+                    </label>
+                    <input
+                        id="sendBtn"
+                        aria-label="Envoyer"
+                        className="newPost__add--send btn"
+                        type="submit"
+                        value="Envoyer"
+                        style={{ display: "none" }}
+                    />
                 </div>
             </form>
         </div>

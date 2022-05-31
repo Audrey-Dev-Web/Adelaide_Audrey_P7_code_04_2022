@@ -38,6 +38,8 @@ exports.createArticle = (req, res, next) => {
             connection.query(addNewPost, newArticle, (err, result) => {
                 if (err) throw err;
 
+                connection.release();
+
                 res.status(201).json({ MESSAGE: "Nouvel article ajouté avec succès !" });
             });
         });
@@ -52,6 +54,9 @@ exports.getAllArticles = (req, res, next) => {
         connection.getConnection(async (err, connection) => {
             if (err) throw err;
 
+            console.log(connection);
+            console.log(err);
+
             // On cherche tous les articles
             const articles = `SELECT * FROM users_profiles JOIN articles ON users_profiles.user_id = articles.author_id ORDER by timestamp DESC`;
             await connection.query(articles, async (err, found) => {
@@ -65,7 +70,7 @@ exports.getAllArticles = (req, res, next) => {
 
                 let articlesFound = [];
 
-                console.log(found);
+                // console.log(found);
 
                 found.forEach((article, index) => {
                     let real_author;
@@ -120,14 +125,13 @@ exports.getOneArticle = (req, res, next) => {
 
             connection.query(searchOne, article_id, (err, article) => {
                 connection.release();
-
                 if (err) throw err;
 
                 if (article.length == 0) {
                     res.status(404).json({ ERROR: "Cet article n'existe pas" });
                 } else {
-                    console.log("=====> article");
-                    console.log(article);
+                    // console.log("=====> article");
+                    // console.log(article);
 
                     let real_author;
                     let shared_id;
@@ -165,7 +169,7 @@ exports.getOneArticle = (req, res, next) => {
 
                     res.status(200).json({ articleFound });
 
-                    console.log(articleFound);
+                    // console.log(articleFound);
                 }
             });
         });
@@ -207,6 +211,7 @@ exports.modifyArticle = (req, res, next) => {
                             const newTitleSQL = `UPDATE articles SET title = "${newTitle}" WHERE id = "${article_id}"`;
 
                             connection.query(newTitleSQL, (err, result) => {
+                                connection.release();
                                 if (err) throw err;
                             });
                         }
@@ -218,6 +223,7 @@ exports.modifyArticle = (req, res, next) => {
                             const newContentSQL = `UPDATE articles SET content = "${newContent}" WHERE id = "${article_id}"`;
 
                             connection.query(newContentSQL, (err, result) => {
+                                connection.release();
                                 if (err) throw err;
                             });
                         }
@@ -242,6 +248,7 @@ exports.modifyArticle = (req, res, next) => {
                             }
 
                             connection.query(newImgSQL, article_id, (err, result) => {
+                                connection.release();
                                 if (err) throw err;
 
                                 console.log("Nouvelle image d'article ajoutée");
@@ -269,12 +276,14 @@ exports.deleteArticle = (req, res, next) => {
 
     // Connection à la base de données MySQL
     connection.getConnection((err, connection) => {
+        if (err) throw err;
         // On recherche l'article
         const searchArticle = `SELECT * FROM articles WHERE id = ?`;
         const deleteArticle = `DELETE FROM articles WHERE id = ?`;
 
         // On récupère l'article a supprimer
         connection.query(searchArticle, article_id, (err, found) => {
+            connection.release();
             if (err) throw err;
 
             console.log(found);
@@ -296,6 +305,7 @@ exports.deleteArticle = (req, res, next) => {
 
                 fs.unlink(fileUrl, () => {
                     connection.query(deleteArticle, article_id, (err, results) => {
+                        connection.release();
                         if (err) throw err;
 
                         res.status(201).json({ MESSAGE: "Article supprimé" });
@@ -303,6 +313,7 @@ exports.deleteArticle = (req, res, next) => {
                 });
             } else {
                 connection.query(deleteArticle, article_id, (err, results) => {
+                    connection.release();
                     if (err) throw err;
 
                     res.status(201).json({ MESSAGE: "Article supprimé" });
@@ -324,6 +335,7 @@ exports.likeArticle = (req, res, next) => {
         const searchArticle = `SELECT * FROM articles WHERE id = ?`;
 
         connection.query(searchArticle, article_id, (err, article) => {
+            connection.release();
             if (err) throw err;
 
             if (article.length == 0) {
@@ -572,6 +584,7 @@ exports.shareArticle = (req, res, next) => {
 
         // connection à la base de Données
         connection.getConnection(async (err, connection) => {
+            connection.release();
             if (err) throw err;
 
             // On verifis que l'article existe
@@ -581,6 +594,7 @@ exports.shareArticle = (req, res, next) => {
             WHERE articles.id = ?`;
 
             await connection.query(searchPost, post_id, async (err, postFound) => {
+                connection.release();
                 if (err) throw err;
 
                 if (postFound.length <= 0) {
@@ -592,6 +606,7 @@ exports.shareArticle = (req, res, next) => {
                 switch (req.body.share) {
                     case 0:
                         await connection.query(searchUsersShared, post_id, async (err, userFound) => {
+                            connection.release();
                             if (err) throw err;
 
                             if (userFound.length <= 0) {
@@ -601,12 +616,14 @@ exports.shareArticle = (req, res, next) => {
                             const delete_post_shared = `DELETE FROM posts_shared WHERE user_id = '${user_id}' AND post_id = ?`;
 
                             await connection.query(delete_post_shared, post_id, async (err, deleted) => {
+                                connection.release();
                                 if (err) throw err;
 
                                 console.log("delete post shared a fonctionné avec succès");
 
                                 const delete_user_shared = `DELETE FROM users_shared WHERE user_id = '${user_id}' AND post_id = ?`;
                                 await connection.query(delete_user_shared, post_id, async (err, deleted) => {
+                                    connection.release();
                                     if (err) throw err;
 
                                     console.log("delete user shared a fonctionné avec succès");
@@ -614,6 +631,7 @@ exports.shareArticle = (req, res, next) => {
                                     const update_shares = `UPDATE articles SET shares = shares-1 WHERE id = ?`;
 
                                     await connection.query(update_shares, post_id, async (err, updated) => {
+                                        connection.release();
                                         if (err) throw err;
 
                                         res.status(200).json({ MESSAGE: "Partage annulé avec succès !" });
@@ -629,6 +647,7 @@ exports.shareArticle = (req, res, next) => {
                         // On cherche donc la présence de l'utilisateur dans users_shared
 
                         await connection.query(searchUsersShared, post_id, async (err, userFound) => {
+                            connection.release();
                             if (err) throw err;
 
                             if (userFound.length > 0) {
@@ -640,12 +659,15 @@ exports.shareArticle = (req, res, next) => {
                                 const updateShareCount = `UPDATE articles SET shares = shares-1 WHERE id = ?`;
 
                                 await connection.query(cancelShare, post_id, async (err, canceled) => {
+                                    connection.release();
                                     if (err) throw err;
 
                                     await connection.query(cancelPostSharing, post_id, async (err, postCanceled) => {
+                                        connection.release();
                                         if (err) throw err;
 
                                         await connection.query(updateShareCount, post_id, async (err, updated) => {
+                                            connection.release();
                                             if (err) throw err;
 
                                             return res.status(201).json({ MESSAGE: "Partage annulé avec succès!" });
@@ -699,7 +721,7 @@ exports.shareArticle = (req, res, next) => {
                                 console.log(post_shared_Data);
 
                                 await connection.query(sharePost, post_shared_Data, async (err, result) => {
-                                    // connection.release();
+                                    connection.release();
                                     if (err) throw err;
 
                                     const userObject = {
@@ -709,16 +731,18 @@ exports.shareArticle = (req, res, next) => {
                                     // On ajoute l'id utilisateur dans usersshared
                                     const addUsersShared = `INSERT INTO users_shared SET ?`;
                                     await connection.query(addUsersShared, userObject, async (err, userAdded) => {
+                                        connection.release();
                                         if (err) throw err;
 
                                         // const update = `UPDATE articles SET comments = comments-1 WHERE id = ? AND comments > 0`;
                                         // On mets à jour le nombre de partage de l'article
                                         const update_shares = `UPDATE articles SET shares = shares+1 WHERE id = ?`;
                                         await connection.query(update_shares, post_id, async (err, updated) => {
+                                            connection.release();
                                             if (err) throw err;
 
-                                            console.log("=====> Update Réussi !");
-                                            console.log(updated);
+                                            // console.log("=====> Update Réussi !");
+                                            // console.log(updated);
 
                                             res.status(201).json({ MESSAGE: "Post partagé avec succès" });
                                         });

@@ -5,6 +5,15 @@
     border-radius: 20px;
     margin: 5% 0;
 
+    &__shareAuthor {
+        background: darken($principal_bg, 5%);
+        border-radius: 15px;
+
+        &--margin {
+            margin: 0 0 5%;
+        }
+    }
+
     &__info {
         &--wrapper {
             display: flex;
@@ -14,21 +23,42 @@
 
     & .sharedFlex {
         display: flex;
+        justify-content: center;
         align-items: center;
-        background: $principal_bg;
+        // background: $principal_bg;
         border-radius: 10px;
-        margin-top: 2%;
-        width: 200px;
+        // margin-top: 2%;
+        width: 120px;
+        padding: 1%;
+        // margin: 0 2%;
+
+        & p {
+            // display: flex;
+            // justify-content: center;
+            // align-items: center;
+
+            font-size: 1.1rem;
+        }
     }
 
     &__header {
         background: darken($principal_bg, 5%);
         border-radius: 20px 20px 0 0;
-        padding: 2%;
+        position: relative;
+        // padding: 2%;
 
+        &--share {
+            height: auto;
+            position: absolute;
+            right: 3%;
+            top: 30%;
+        }
         &--shared {
             color: $accent_color_3;
-            font-size: 2rem;
+            font-size: 1.7rem;
+            margin: 2%;
+            width: 30px;
+            height: 30px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -44,8 +74,8 @@
         }
 
         &--author {
-            display: flex;
-            align-items: center;
+            // display: flex;
+            // align-items: center;
 
             .author {
                 &__img {
@@ -101,6 +131,13 @@
             display: flex;
             justify-content: space-between;
             padding: 2%;
+
+            & .social__count {
+                color: #fff;
+                font-weight: 700;
+                margin: 0 2px;
+                font-size: 1.2rem;
+            }
         }
     }
 }

@@ -81,6 +81,7 @@ function DeletePost(props) {
                         }
                     }}
                 >
+                    <p hidden>Supprimer cet article</p>
                     <BiTrash />
                 </button>
             )}

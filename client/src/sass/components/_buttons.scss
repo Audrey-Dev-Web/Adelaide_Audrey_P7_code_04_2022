@@ -1,6 +1,6 @@
 .btn {
     background: $accent_color_3;
-    color: $accent_color_2;
+    color: #fff;
     font-size: 1.1rem;
     outline: none;
     border: none;
@@ -28,6 +28,21 @@
 
     &:hover {
         background: $accent_color_2;
+        color: $accent_color_3;
+    }
+}
+
+.logoutBtn {
+    font-size: 2rem;
+    outline: none;
+    border: none;
+    background: transparent;
+    color: #fff;
+
+    display: flex;
+    align-items: center;
+
+    &:hover {
         color: $accent_color_3;
     }
 }

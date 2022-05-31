@@ -126,7 +126,7 @@ function Post(props) {
                                         <div className="article__header--shared">
                                             <BiRepost />
                                         </div>
-                                        <p>a partagé cet article</p>
+                                        <p>a partagé</p>
                                     </div>
                                 )}
                             </div>
@@ -206,11 +206,13 @@ function Post(props) {
                                                     // Si l'utilisateur est le propriétaire
                                                     <div className="social__icon shareBtn">
                                                         {/* Cancel Sharing */}
-                                                        <SharePost
-                                                            // id="cancelShare"
-                                                            post_id={post.articleFound.shared_id}
-                                                            access={access}
-                                                        />
+                                                        <ErrorBoundary>
+                                                            <SharePost
+                                                                // id="cancelShare"
+                                                                post_id={post.articleFound.shared_id}
+                                                                access={access}
+                                                            />
+                                                        </ErrorBoundary>
                                                         cancel
                                                     </div>
                                                 ) : null}
@@ -218,11 +220,13 @@ function Post(props) {
                                             <div className="social__icon deletePost">
                                                 {user_id !== post.articleFound.author && user_role === "admin" ? (
                                                     // Si l'utilisateur n'est pas le propriétaire et qu'il est admin
-                                                    <DeletePost
-                                                        post_id={post.articleFound.id}
-                                                        author_id={post.articleFound.author}
-                                                        access={access}
-                                                    />
+                                                    <ErrorBoundary>
+                                                        <DeletePost
+                                                            post_id={post.articleFound.id}
+                                                            author_id={post.articleFound.author}
+                                                            access={access}
+                                                        />
+                                                    </ErrorBoundary>
                                                 ) : null}
                                             </div>
                                         </div>
@@ -243,11 +247,13 @@ function Post(props) {
                                             </div>
                                             <div className="social__icon deletePost">
                                                 {user_id === post.articleFound.author || user_role === "admin" ? (
-                                                    <DeletePost
-                                                        post_id={post.articleFound.id}
-                                                        author_id={post.articleFound.author}
-                                                        access={access}
-                                                    />
+                                                    <ErrorBoundary>
+                                                        <DeletePost
+                                                            post_id={post.articleFound.id}
+                                                            author_id={post.articleFound.author}
+                                                            access={access}
+                                                        />
+                                                    </ErrorBoundary>
                                                 ) : null}
                                             </div>
                                         </div>

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 // import { Routes, Route, Link, Navigate, Outlet } from "react-router-dom";
 
 import Posts from "./articles/Posts";
+// import Posts2 from "./articles/Posts2";
 import PostForm from "../components/PostForm";
 import UsersProfile from "../components/UsersProfile";
 import ErrorBoundary from "../components/ErrorBoundary";
@@ -12,12 +13,13 @@ function Home(props) {
     const { access } = props;
     return (
         <div className="home">
-            <div className="home__container container">
-                <div className="home__article">
-                    <h1 hidden>Home</h1>
+            <React.StrictMode>
+                <div className="home__container container">
+                    <div className="home__article">
+                        <h1 hidden>Home</h1>
 
-                    <div className="createNewPost">
-                        {/* <button
+                        <div className="createNewPost">
+                            {/* <button
                             type="button"
                             className="createMod createMod__button createMod__closed btn"
                             onClick={toggleCreateMod}
@@ -30,8 +32,8 @@ function Home(props) {
 
                         </button> */}
 
-                        {/* <div className={createMod ? "createMod createPost__show" : "createMod createPost__hide"}> */}
-                        {/* <button
+                            {/* <div className={createMod ? "createMod createPost__show" : "createMod createPost__hide"}> */}
+                            {/* <button
                                 type="button"
                                 className="createMod createMod__button createMod__opened btn"
                                 onClick={toggleCreateMod}
@@ -41,20 +43,24 @@ function Home(props) {
                                     <BiX />
                                 </span>
                             </button> */}
-                        <PostForm access={access} />
-                        {/* </div> */}
-                    </div>
+                            <PostForm access={access} />
+                            {/* </div> */}
+                        </div>
 
-                    <div className="home__articles">
-                        <ErrorBoundary>
-                            <Posts access={access} />
-                        </ErrorBoundary>
+                        <div className="home__articles">
+                            <ErrorBoundary>
+                                <Posts access={access} />
+                            </ErrorBoundary>
+                            {/* <ErrorBoundary>
+                                <Posts2 access={access} />
+                            </ErrorBoundary> */}
+                        </div>
                     </div>
+                    <ErrorBoundary>
+                        <UsersProfile access={access} />
+                    </ErrorBoundary>
                 </div>
-                <ErrorBoundary>
-                    <UsersProfile access={access} />
-                </ErrorBoundary>
-            </div>
+            </React.StrictMode>
         </div>
     );
 }

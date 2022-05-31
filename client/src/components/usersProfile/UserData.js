@@ -14,6 +14,7 @@ function UserData(props) {
     const [message, setMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
     const [userFound, setUserFound] = useState(false);
+    const [notFound, setNotFound] = useState(true);
 
     const token = access;
     const decoded = jwt_decode(token);
@@ -36,19 +37,29 @@ function UserData(props) {
         } else {
             fetch(url, reqOptions)
                 .then((res) => {
+                    if (res.status === 201) {
+                        setErrorMessage("Utilisateur inconnu");
+                        // throw new Error("Utilisateur inexistant");
+                    }
                     if (res.ok) {
                         return res.json();
                     } else {
                         // if (res.status == 404) {
                         //     console.log("404");
                         // }
-                        setErrorMessage("Utilisateur inconnu");
+                        // setErrorMessage("Utilisateur inconnu");
                         throw new Error("Utilisateur inexistant");
                     }
                 })
                 .then((data) => {
-                    setRealAuthor(data.profile);
-                    setDataOk(true);
+                    // console.log(data);
+                    if (data.profile) {
+                        setRealAuthor(data.profile);
+                        setDataOk(true);
+                        setNotFound(false);
+                    } else {
+                        setNotFound(true);
+                    }
                 })
                 .catch((err) => {
                     if (err) {
@@ -58,9 +69,11 @@ function UserData(props) {
         }
     }, []);
 
-    // if (!dataOk) {
-    //     return null;
-    // }
+    if (!dataOk) {
+        return null;
+    }
+
+    // console.log(realAuthor);
 
     const first_Name = realAuthor.firstName;
     const last_Name = realAuthor.lastName;
@@ -70,50 +83,51 @@ function UserData(props) {
     // console.log(dateTime);
 
     return (
-        <div>
-            <div className="realAuthor">
-                {/* <Link to={"/profile/" + realAuthor_id}> */}
-                {realAuthor.role === "admin" ? (
-                    <div className="realAuthor__wrapper">
-                        <div className="adminAvatar initiales">
-                            <BiCheckShield />
-                        </div>
+        // <div>
+        <div className="realAuthor">
+            {/* <Link to={"/profile/" + realAuthor_id}> */}
+            {realAuthor.role === "admin" ? (
+                <div className="realAuthor__wrapper">
+                    <div className="adminIcon">
+                        <BiCheckShield className="icon" />
+                    </div>
 
-                        <div className="realAuthor__infos">
-                            <p>Administrateur</p>
-                            {!dateTime ? null : (
-                                <div className="realAuthor__infos--dateTime">
-                                    <DateTime datetime={dateTime} />
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                ) : (
-                    <div className="realAuthor__wrapper">
-                        {!realAuthor.avatarUrl ? (
-                            <div className="realAuthor__avatar initiales">
-                                <p>{initiales}</p>
+                    <div className="realAuthor__infos">
+                        <p className="adminName">Administrateur</p>
+                        {!dateTime ? null : (
+                            <div className="realAuthor__infos--dateTime">
+                                <DateTime datetime={dateTime} />
                             </div>
-                        ) : (
-                            <img className="realAuthor__avatar" src={realAuthor.avatarUrl} alt="Photo de profile" />
                         )}
-                        <div className="realAuthor__infos">
-                            <p className="realAuthor__infos--fullName">
-                                {realAuthor.firstName && realAuthor.lastName
-                                    ? first_Name + " " + last_Name
-                                    : "Utilisateur inconnu"}
-                            </p>
-                            {!dateTime ? null : (
-                                <div className="realAuthor__infos--dateTime">
-                                    <DateTime datetime={dateTime} />
-                                </div>
-                            )}
-                        </div>
                     </div>
-                )}
-                {/* </Link> */}
-            </div>
+                </div>
+            ) : (
+                <div className="realAuthor__wrapper">
+                    {!realAuthor.avatarUrl ? (
+                        <div className="realAuthor__avatar initiales">
+                            <p>{initiales}</p>
+                        </div>
+                    ) : (
+                        <img className="realAuthor__avatar" src={realAuthor.avatarUrl} alt="Photo de profile" />
+                    )}
+                    <div className="realAuthor__infos">
+                        <p className="realAuthor__infos--fullName">
+                            {!notFound ? first_Name + " " + last_Name : "Utilisateur inconnu"}
+                            {/* {realAuthor.firstName && realAuthor.lastName
+                                ? first_Name + " " + last_Name
+                                : "Utilisateur inconnu"} */}
+                        </p>
+                        {!dateTime ? null : (
+                            <div className="realAuthor__infos--dateTime">
+                                <DateTime datetime={dateTime} />
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+            {/* </Link> */}
         </div>
+        // </div>
     );
 }
 

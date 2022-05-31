@@ -16,12 +16,12 @@ function Profile(props) {
     let { userSlug } = useParams();
     const [userData, setUserData] = useState({ profile: {} });
     const [dataIsLoaded, setDataIsLoaded] = useState(false);
+    const [errorMsg, setErrorMsg] = useState("");
 
     const [isAuthorized, setIsAuthorized] = useState(false);
 
     const token = access;
     const decoded = jwt_decode(token);
-    console.log(decoded);
     const user_id = decoded.userId;
     const user_role = decoded.role;
 
@@ -49,10 +49,12 @@ function Profile(props) {
                 setUserData(data);
                 setDataIsLoaded(true);
 
-                console.log(data);
+                // console.log(data);
             })
             .catch((err) => {
-                console.log(err);
+                if (err) {
+                    setErrorMsg(err);
+                }
             });
     };
 

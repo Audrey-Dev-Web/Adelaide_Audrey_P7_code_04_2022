@@ -67,13 +67,28 @@
 
         &--item {
             display: inline-block;
-            padding: 5px 1%;
+            padding: 2%;
+            transition: all 170ms ease-in-out;
+            border-radius: 15px;
+
+            & .icon {
+                &:hover {
+                    color: $accent_color_3;
+                }
+            }
+
+            & .active {
+                border-bottom: 3px solid $accent_color_3;
+            }
 
             @include mobile-only {
                 display: block;
             }
             &:hover {
-                background: $accent_color_3;
+                background: $principal_bg;
+                transform: translateY(-10%);
+                box-shadow: 0 0 5px rgb(48, 40, 40);
+                color: $accent_color_3;
             }
         }
     }
@@ -104,11 +119,11 @@
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    &__pix {
-        border-radius: 100%;
-        border: 3px solid $accent_color_3;
-        width: 50px;
-        height: 50px;
-        margin: 3%;
-    }
+    // &__pix {
+    //     border-radius: 100%;
+    //     border: 3px solid $accent_color_3;
+    //     width: 50px;
+    //     height: 50px;
+    //     margin: 3%;
+    // }
 }

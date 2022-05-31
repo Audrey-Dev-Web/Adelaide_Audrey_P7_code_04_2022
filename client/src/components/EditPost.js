@@ -94,25 +94,30 @@ function EditPost(props) {
             <span className="postForm__editMod editMod">
                 <form onSubmit={editPost} className="postForm__edit--form" method="PUT" encType="multipart/form-data">
                     <h2>Modifier cet article</h2>
-                    <label>
+                    <label htmlFor="edit-title" aria-label="modifier le titre">
+                        <p hidden>Modifier le titre</p>
                         <input
+                            id="edit-title"
                             className="postForm__input--title"
                             type="text"
                             name="title"
                             value={title}
                             placeholder="Titre"
                             onChange={(e) => setTitle(e.target.value)}
+                            required
                         />
                     </label>
 
-                    <label>
+                    <label htmlFor="edit-content" aria-label="Modifier le contenu">
                         <textarea
+                            id="edit-content"
                             className="postForm__input--content"
                             type="text"
                             name="content"
                             value={content}
                             placeholder="Teste (Optionnal)"
                             onChange={(e) => setContent(e.target.value)}
+                            required
                         />
                     </label>
 
@@ -131,7 +136,8 @@ function EditPost(props) {
                     )}
 
                     <div className="postForm__inputBtn">
-                        <label htmlFor="changeImg" className="btn">
+                        <label htmlFor="changeImg" className="btn" aria-label="Ajouter une image">
+                            <p hidden>Ajouter une image</p>
                             <BiImageAdd className="imgIcon" />
                         </label>
 
@@ -142,8 +148,20 @@ function EditPost(props) {
                             name="image"
                             // src={image}
                             onChange={handleImgChange}
+                            aria-label="Modifier ou ajouter une image"
                         />
-                        <input className="postForm__send btn" type="submit" value="Envoyer" />
+
+                        <label htmlFor="sendEdit" className="btn" aria-label="Ajouter une image">
+                            <p hidden>Ajouter une image</p>
+                            <BiSend className="sendPost" />
+                        </label>
+                        <input
+                            id="sendEdit"
+                            className="postForm__send btn"
+                            type="submit"
+                            value="Envoyer"
+                            aria-label="envoyer les modifications"
+                        />
                     </div>
                 </form>
             </span>

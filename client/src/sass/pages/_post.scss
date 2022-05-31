@@ -18,6 +18,16 @@
         // display: flex;
         // justify-content: space-between;
         // width: 100%;
+
+        @include tablet-only {
+            width: 600px;
+            margin: 2% auto;
+        }
+
+        @include mobile-only {
+            width: 100%;
+            margin: 2%;
+        }
     }
 
     &__details {

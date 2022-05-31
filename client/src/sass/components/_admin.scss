@@ -1,0 +1,29 @@
+.adminIcon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 1.2rem;
+    font-weight: 700;
+    background: $accent_color_3;
+    color: $accent_color_2;
+
+    // border: 3px solid $accent_color_2;
+    width: 50px;
+    height: 50px;
+    border-radius: 100%;
+    margin-right: 2%;
+}
+
+.adminName {
+    color: $accent_color_3;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.icon {
+    width: 50px;
+    height: 50px;
+    padding: 15%;
+    border-radius: 100%;
+}

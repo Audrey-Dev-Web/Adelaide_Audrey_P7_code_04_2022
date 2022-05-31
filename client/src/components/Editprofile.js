@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 
 import jwt_decode from "jwt-decode";
 
-import { BiEditAlt, BiTrash } from "react-icons/bi";
+import { BiEditAlt, BiImageAdd, BiTrash } from "react-icons/bi";
 
 import DeleteAccount from "../components/DeleteAccount";
 import ErrorBoundary from "../components/ErrorBoundary";
@@ -20,13 +20,6 @@ function Editprofile(props) {
     const get_year = new Date(birthDate).getFullYear();
 
     const birth = `${get_year}-${get_month}-${get_date}`;
-    // console.log(birth);
-    console.log(access);
-    // const userObject = {
-    //     token: access.token,
-    //     user_id: access.user_id,
-    //     role: access.role,
-    // };
 
     // On prépare le state local pour stocker les données à modifier
     const [firstName, setFirstName] = useState(first_name);
@@ -156,6 +149,7 @@ function Editprofile(props) {
         <div className="profileForm">
             {!isAuthorized ? null : (
                 <button className="comments__edit--btn btn" onClick={toggleEdit}>
+                    <p hidden>Afficher le formulaire de modification</p>
                     <BiEditAlt />
                     {/* <span className="infobubble">Editer votre profile</span> */}
                 </button>
@@ -165,16 +159,38 @@ function Editprofile(props) {
 
             <div style={{ display: editMod ? "block" : "none" }}>
                 <form onSubmit={modifyProfile} className="profileForm__form" method="PUT" encType="multipart/form-data">
-                    <label>
-                        <h3>Modifiez / Ajoutez une photo de profil</h3>
-                        <input className="btn" type="file" name="image" src={image} onChange={handleChange} />
-                        <img className="postForm__edit--imgPreview" src={image} />
+                    <h3>Modifiez / Ajoutez une photo de profil</h3>
+
+                    <label htmlFor="img-profile" className="btn" aria-label="Ajouter une image">
+                        <p hidden>Ajouter ou modifier votre photo de profile</p>
+                        <BiImageAdd className="imgIcon" />
                     </label>
+                    {/* <label htmlFor="img-profile"> */}
+                    <input
+                        id="img-profile"
+                        className="profileForm__image btn"
+                        type="file"
+                        name="image"
+                        src={image}
+                        alt="photo de profile"
+                        onChange={handleChange}
+                    />
+
+                    {!image ? null : (
+                        <img
+                            className="profileForm__edit--imgPreview"
+                            src={image}
+                            alt={"Photo de profile de " + firstName}
+                        />
+                    )}
+                    {/* </label> */}
                     <div className="profileForm__personnal">
                         <h3>Modifiez vos informations personnels</h3>
                         <div className="profileForm__personnal--inputs">
-                            <label>
+                            <label htmlFor="first_name" aria-label="Prénom">
+                                <p hidden>Modifier ou ajouter votre prénom</p>
                                 <input
+                                    id="first_name"
                                     className="profileForm__firstName"
                                     type="text"
                                     name="first_name"
@@ -183,8 +199,10 @@ function Editprofile(props) {
                                     onChange={(e) => setFirstName(e.target.value)}
                                 />
                             </label>
-                            <label>
+                            <label htmlFor="last_name" aria-label="Nom">
+                                <p hidden>Modifier ou ajoutez votre Nom</p>
                                 <input
+                                    id="last_name"
                                     className="profileForm__lastName"
                                     type="text"
                                     name="last_name"
@@ -194,21 +212,26 @@ function Editprofile(props) {
                             </label>
                         </div>
 
-                        <label>
+                        <label htmlFor="birthDate" aria-label="Date de naissance">
+                            <p hidden>Modifier ou ajoutez votre date de naissance</p>
                             {!birthDate ? (
                                 <input
+                                    id="birthDate"
                                     className="profileForm__birthdate"
                                     type="date"
                                     name="birthdate"
                                     onChange={(e) => setBirthdate(e.target.value)}
+                                    aria-label="Ajouter votre date de naissance"
                                 />
                             ) : (
                                 <input
+                                    id="birthDate"
                                     className="profileForm__birthdate"
                                     type="date"
                                     name="birthdate"
                                     value={birthdate}
                                     onChange={(e) => setBirthdate(e.target.value)}
+                                    aria-label="Modifier votre date de naissance"
                                 />
                             )}
                         </label>
@@ -217,13 +240,16 @@ function Editprofile(props) {
                     <div className="profileForm__login">
                         <h3>Modifiez vos informations de connexion</h3>
                         <div className="profileForm__login--inputs">
-                            <label>
+                            <label htmlFor="emailInput" aria-label="Modifier votre adress email">
+                                <p hidden>Modifier votre adresse email</p>
                                 <input
+                                    id="emailInput"
                                     className="profileForm__email"
                                     type="text"
                                     name="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
+                                    aria-label="champ modifier votre adresse email"
                                 />
                             </label>
                         </div>
@@ -236,20 +262,25 @@ function Editprofile(props) {
                         Changez votre mot de passe
                     </button>
                     <div style={{ display: changePwd ? "block" : "none" }}>
-                        <label>
+                        <label htmlFor="passwordInput" aria-label="Modifier votre mot de passe">
+                            <p hidden>Modifier votre mot de passe</p>
                             <input
+                                id="passwordInput"
                                 className="profileForm__password"
                                 type="password"
                                 name="password"
                                 placeholder="******"
                                 onChange={(e) => setpwd(e.target.value)}
+                                aria-label="champ modifier votre mot de passe"
                             />
                         </label>
                         <input
                             className="profileForm__btn btn"
                             type="submit"
                             value="Envoyer votre nouveau mot de passe"
+                            autoComplete="new-password"
                             onClick={changePwdReq}
+                            aria-label="Envoyer le nouveau mot de passe"
                         />
                     </div>
                 </form>

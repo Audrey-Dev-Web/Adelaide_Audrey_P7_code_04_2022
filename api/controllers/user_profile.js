@@ -52,12 +52,13 @@ exports.getAllProfile = (req, res, next) => {
 // Afficher un profile
 exports.getOneProfile = (req, res, next) => {
     connection.getConnection((err, connection) => {
+        // console.log(connection.length);
         if (err) throw err;
 
         const profile_id = req.params.id;
 
-        console.log("----> FoundProfile");
-        console.log(profile_id);
+        // console.log("----> FoundProfile");
+        // console.log(profile_id);
 
         // const foundProfileSQL = `SELECT * FROM users INNER JOIN users_profiles ON users.id = ?`;
         // const foundProfileSQL = `SELECT * FROM users INNER JOIN users_profiles WHERE users.id = ?`;
@@ -74,11 +75,11 @@ exports.getOneProfile = (req, res, next) => {
         connection.query(foundUserSQL, profile_id, (err, found) => {
             if (err) throw err;
 
-            console.log("-------> Résultat de la recherche");
-            console.log(found.length);
+            // console.log("-------> Résultat de la recherche");
+            // console.log(found.length);
 
             if (found.length <= 0) {
-                res.status(404).json({ ERROR: "Cet utilisateur n'existe pas !" });
+                res.status(201).json({ MESSAGE: "Cet utilisateur n'existe pas ou a été supprimé." });
             } else {
                 // Objet user, on uniquement
                 const user = {
@@ -89,10 +90,11 @@ exports.getOneProfile = (req, res, next) => {
 
                 // On cherche le profile de cet utilisateur
                 connection.query(foundProfileSQL, user.id, (err, foundProfile) => {
+                    connection.release();
                     if (err) throw err;
 
                     if (foundProfile.length == 0) {
-                        res.status(404).json({ ERROR: "Ce profile n'existe pas !" });
+                        res.status(201).json({ MESSAGE: "Ce profile n'existe pas !" });
                     } else {
                         // On vérifis que la req vient du propriétaire
                         if (profile_id === req.auth.userId) {

@@ -55,8 +55,10 @@ function CommentForm(props) {
         <div className="commentForm">
             {/* <h2 className="commentForm__title">Ajouter un commentaire</h2> */}
             <form onSubmit={sendComment} className="commentForm__form">
-                <label>
+                <label htmlFor="comment">
+                    <h3>Ajouter un commentaire</h3>
                     <textarea
+                        id="comment"
                         className="commentForm__form--textarea"
                         type="text"
                         name="content"
@@ -69,6 +71,7 @@ function CommentForm(props) {
                     {/* <BiCommentAdd />
                     <input className="commentForm__form--btn btn" type="submit" value="Envoyer" /> */}
                     <button className="commentForm__form--btn btn" type="submit">
+                        <p hidden>Envoyer votre commentaire</p>
                         <BiCommentAdd />
                     </button>
                 </div>

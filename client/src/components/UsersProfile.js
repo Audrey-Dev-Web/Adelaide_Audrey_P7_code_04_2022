@@ -74,7 +74,11 @@ function UsersProfile(props) {
                             </p>
                         </div>
                     ) : (
-                        <img className="usersList__user--avatar" src={user.usersProfile.avatar} />
+                        <img
+                            className="usersList__user--avatar"
+                            src={user.usersProfile.avatar}
+                            alt={"photo de profile de " + user.usersProfile.first_name}
+                        />
                     )}
                     <div>
                         <div className="usersList__user--name">

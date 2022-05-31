@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-import { BiPlus, BiX } from "react-icons/bi";
+import { BiPlus, BiX, BiCommentAdd } from "react-icons/bi";
 
 import DateTime from "../components/DateTime";
 import CommentForm from "../components/CommentForm";
@@ -57,8 +57,8 @@ function Comments(props) {
 
                 const result = await res.json();
 
-                console.log("result is: ", result);
-                console.log("result de data.allComments: ", data.allComments);
+                // console.log("result is: ", result);
+                // console.log("result de data.allComments: ", data.allComments);
                 // console.log("Résultat de data.allComments[0].id: ", data.allComments[0].id);
                 // console.log("result is: ", JSON.stringify(result, null, 4));
 
@@ -87,9 +87,9 @@ function Comments(props) {
     };
 
     // Affiche le formulaire de commentaire au click
-    function toggleCreateMod(e) {
-        setCreateMod(!createMod);
-    }
+    // function toggleCreateMod(e) {
+    //     setCreateMod(!createMod);
+    // }
 
     return (
         <div>
@@ -103,53 +103,32 @@ function Comments(props) {
             <div className="showComments">
                 {/* AFFICHAGE DU FORMULAIRE DE COMMENTAIRE */}
                 <div className="showCommentForm">
-                    <button type="button" className="btn" onClick={toggleCreateMod}>
-                        Ajouter un commentaire
-                    </button>
-                    <div className="showCommentForm" style={{ display: createMod ? "block" : "none" }}>
+                    {/* <h3>Ajouter un commentaire</h3> */}
+                    {/* <button type="button" className="btn" onClick={toggleCreateMod}>
+                        <p hidden>Ajouter un commentaire</p>
+                        <BiCommentAdd />
+                    </button> */}
+                    <div className="showCommentForm">
                         <ErrorBoundary>
                             <CommentForm post_id={post_id} access={access} />
                         </ErrorBoundary>
                     </div>
                 </div>
 
-                {err ? <h2>{err}</h2> : <h2 className="comments__title">Commentaires :</h2>}
+                {err ? <h2>{err}</h2> : <h3 className="comments__title">Commentaires :</h3>}
 
                 {data.allComments?.map((comment) => {
                     return (
                         <div className="comments__post" key={comment.id}>
                             <div className="comments__header">
                                 <div className="comments__author">
-                                    <UserData
-                                        realAuthor_id={comment.author_id}
-                                        dateTime={comment.timestamp}
-                                        access={access}
-                                    />
-                                    {/* {!comment.avatar ? (
-                                        <div className="comments__author--avatar initiales">
-                                            <p>
-                                                {`${comment.firstName} ${comment.lastName}
-                                            `
-                                                    .match(/\b\w/g)
-                                                    .join("")
-                                                    .toUpperCase()}
-                                            </p>
-                                        </div>
-                                    ) : (
-                                        <img
-                                            width="100"
-                                            className="comments__author--avatar"
-                                            src={comment.avatar}
-                                            alt={comment.firstName + " " + comment.lastName}
+                                    <ErrorBoundary>
+                                        <UserData
+                                            realAuthor_id={comment.author_id}
+                                            dateTime={comment.timestamp}
+                                            access={access}
                                         />
-                                    )}
-
-                                    <div className="comments__author--infos">
-                                        <p>{comment.firstName + " " + comment.lastName}</p>
-                                        <div className="comments__author--dateTime">
-                                            <p>Posté</p> <DateTime datetime={comment.timestamp} acces={access} />
-                                        </div>
-                                    </div> */}
+                                    </ErrorBoundary>
                                 </div>
                             </div>
                             <div className="comments__content">
@@ -157,20 +136,22 @@ function Comments(props) {
                             </div>
 
                             <div className="comments__buttons">
-                                <EditComment
-                                    author_id={comment.author_id}
-                                    post_id={comment.article_id}
-                                    comment_id={comment.id}
-                                    comment_value={comment.comment}
-                                    access={access}
-                                />
+                                <ErrorBoundary>
+                                    <EditComment
+                                        author_id={comment.author_id}
+                                        post_id={comment.article_id}
+                                        comment_id={comment.id}
+                                        comment_value={comment.comment}
+                                        access={access}
+                                    />
+                                </ErrorBoundary>
 
-                                <DeleteComment
+                                {/* <DeleteComment
                                     author_id={comment.author_id}
                                     post_id={comment.article_id}
                                     comment_id={comment.id}
                                     access={access}
-                                />
+                                /> */}
                             </div>
                         </div>
                     );

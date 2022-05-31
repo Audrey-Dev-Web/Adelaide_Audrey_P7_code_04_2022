@@ -13,12 +13,13 @@ root.render(
     //         <App />
     //     </ErrorBoundary>
     // </React.StrictMode>
-
-    <CookiesProvider>
-        <ErrorBoundary>
-            <App />
-        </ErrorBoundary>
-    </CookiesProvider>
+    <React.StrictMode>
+        <CookiesProvider>
+            <ErrorBoundary>
+                <App />
+            </ErrorBoundary>
+        </CookiesProvider>
+    </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

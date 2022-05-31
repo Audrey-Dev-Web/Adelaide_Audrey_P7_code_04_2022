@@ -2,9 +2,14 @@
     width: 27%;
     height: 100%;
     padding: 0 2% 2%;
-    margin: 2% 0;
+    margin: 1% 0;
     background: darken($principal_bg, 5%);
     border-radius: 20px;
+    box-shadow: 0 0 5px rgb(48, 40, 40);
+
+    @include tablet-only {
+        display: none;
+    }
 
     &__title {
         margin: 10% 0;
@@ -30,7 +35,7 @@
 
         &--name {
             font-weight: bold;
-            color: $accent_color_3;
+            color: #fff;
             text-transform: uppercase;
         }
 

@@ -93,6 +93,7 @@ function DeleteAccount(props) {
                             }
                         }}
                     >
+                        <p hidden>Supprimer ce compte</p>
                         <BiTrash />
                     </button>
                 </div>

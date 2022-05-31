@@ -6,10 +6,10 @@ import { useCookies } from "react-cookie";
 // import jwt_decode from "jwt-decode";
 
 import { NavLink, useNavigate } from "react-router-dom";
-import { BiMenuAltRight } from "react-icons/bi";
+import { BiMenuAltRight, BiLogOutCircle, BiHome } from "react-icons/bi";
 import jwt_decode from "jwt-decode";
 
-import UserLoggedIn from "./UserLoggedIn";
+import UserLoggedIn from "./UserLoggedIn-old";
 
 function Navigation(props) {
     const { access } = props;
@@ -45,7 +45,7 @@ function Navigation(props) {
     return (
         <div className="navigation">
             <div className="container navigation__container">
-                <NavLink to="/" className="navigation__branding">
+                <NavLink to="/" className="navigation__branding" aria-label="Page d'accueil">
                     <img className="navigation__branding--logo" src={logo} alt="Logo Groupomania" />
                     <h1 className="navigation__branding--title">Groupomania</h1>
                 </NavLink>
@@ -63,10 +63,12 @@ function Navigation(props) {
                     {/* {user} */}
                     <ul className="navigation__nav--items">
                         <li className="navigation__nav--item">
-                            <NavLink to="/">Home</NavLink>
+                            <NavLink to="/" aria-label="Page d'accueil">
+                                <BiHome className="icon" />
+                            </NavLink>
                         </li>
                         <li className="navigation__nav--item">
-                            <NavLink to={"/profile/" + user_id}>
+                            <NavLink to={"/profile/" + user_id} aria-label="profile utilisateur">
                                 {/* Afficher la photo de profile et le prénom de l'utilisateur connecté */}
                                 <UserLoggedIn user_id={user_id} access={access} />
                             </NavLink>
@@ -76,8 +78,8 @@ function Navigation(props) {
                                 Déconnection
                             </NavLink> */}
 
-                            <button className="btn" onClick={loggout}>
-                                Deconnection
+                            <button className="logoutBtn" onClick={loggout} aria-label="Déconnexion">
+                                <BiLogOutCircle />
                             </button>
                         </li>
                     </ul>
