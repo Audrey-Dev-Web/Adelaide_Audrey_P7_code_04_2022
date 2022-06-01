@@ -3,8 +3,8 @@ import React, { useState } from "react";
 
 import Posts from "./articles/Posts";
 // import Posts2 from "./articles/Posts2";
-import PostForm from "../components/PostForm";
-import UsersProfile from "../components/UsersProfile";
+import PostForm from "../components/articles/PostForm";
+import UsersProfile from "../components/usersProfile/UsersProfile";
 import ErrorBoundary from "../components/ErrorBoundary";
 
 import { BiPlus, BiX } from "react-icons/bi";

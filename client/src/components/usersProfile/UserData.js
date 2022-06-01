@@ -11,10 +11,10 @@ function UserData(props) {
     const { realAuthor_id, dateTime, access } = props;
     const [realAuthor, setRealAuthor] = useState([]);
     const [dataOk, setDataOk] = useState(false);
-    const [message, setMessage] = useState("");
+    // const [msg, setMsg] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
     const [userFound, setUserFound] = useState(false);
-    const [notFound, setNotFound] = useState(true);
+    // const [notFound, setNotFound] = useState(true);
 
     const token = access;
     const decoded = jwt_decode(token);
@@ -35,37 +35,29 @@ function UserData(props) {
         if (realAuthor_id === undefined || realAuthor_id === null) {
             setErrorMessage("Utilisateur inexistant");
         } else {
-            fetch(url, reqOptions)
-                .then((res) => {
+            const fetchUserData = async () => {
+                try {
+                    const res = await fetch(url, reqOptions);
+                    const data = await res.json();
+
                     if (res.status === 201) {
-                        setErrorMessage("Utilisateur inconnu");
-                        // throw new Error("Utilisateur inexistant");
+                        setUserFound(false);
+                        setDataOk(true);
                     }
-                    if (res.ok) {
-                        return res.json();
-                    } else {
-                        // if (res.status == 404) {
-                        //     console.log("404");
-                        // }
-                        // setErrorMessage("Utilisateur inconnu");
-                        throw new Error("Utilisateur inexistant");
-                    }
-                })
-                .then((data) => {
-                    // console.log(data);
+
                     if (data.profile) {
                         setRealAuthor(data.profile);
                         setDataOk(true);
-                        setNotFound(false);
-                    } else {
-                        setNotFound(true);
+                        setUserFound(true);
                     }
-                })
-                .catch((err) => {
+                } catch (err) {
                     if (err) {
-                        setMessage(err);
+                        setErrorMessage(err);
                     }
-                });
+                }
+            };
+
+            fetchUserData();
         }
     }, []);
 
@@ -73,19 +65,13 @@ function UserData(props) {
         return null;
     }
 
-    // console.log(realAuthor);
-
     const first_Name = realAuthor.firstName;
     const last_Name = realAuthor.lastName;
     const fullName = `${first_Name} ${last_Name}`;
     const initiales = fullName.match(/\b\w/g).join("").toUpperCase();
 
-    // console.log(dateTime);
-
     return (
-        // <div>
         <div className="realAuthor">
-            {/* <Link to={"/profile/" + realAuthor_id}> */}
             {realAuthor.role === "admin" ? (
                 <div className="realAuthor__wrapper">
                     <div className="adminIcon">
@@ -111,12 +97,13 @@ function UserData(props) {
                         <img className="realAuthor__avatar" src={realAuthor.avatarUrl} alt="Photo de profile" />
                     )}
                     <div className="realAuthor__infos">
-                        <p className="realAuthor__infos--fullName">
-                            {!notFound ? first_Name + " " + last_Name : "Utilisateur inconnu"}
-                            {/* {realAuthor.firstName && realAuthor.lastName
-                                ? first_Name + " " + last_Name
-                                : "Utilisateur inconnu"} */}
-                        </p>
+                        {userFound == false ? (
+                            <div>
+                                <p className="realAuthor__infos--fullName">Compte supprimé</p>
+                            </div>
+                        ) : (
+                            <p className="realAuthor__infos--fullName">{fullName}</p>
+                        )}
                         {!dateTime ? null : (
                             <div className="realAuthor__infos--dateTime">
                                 <DateTime datetime={dateTime} />
@@ -125,9 +112,7 @@ function UserData(props) {
                     </div>
                 </div>
             )}
-            {/* </Link> */}
         </div>
-        // </div>
     );
 }
 

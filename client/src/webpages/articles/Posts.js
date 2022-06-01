@@ -8,12 +8,12 @@ import { BiComment, BiEditAlt, BiRepost } from "react-icons/bi";
 import DateTime from "../../components/DateTime";
 
 // Import pour la gestion des commentaires
-import Comments from "../../components/Comments";
+import Comments from "../../components/comments/Comments";
 // import CommentForm from "../../components/CommentForm";
 
 // Import pour la gestion des posts
-import EditPost from "../../components/EditPost";
-import DeletePost from "../../components/DeletePost";
+import EditPost from "../../components/articles/EditPost";
+import DeletePost from "../../components/articles/DeletePost";
 
 // Permet d'afficher les informations de l'utilisateur qui a créé un post losque celui-ci est un post partagé
 import UserData from "../../components/usersProfile/UserData";
@@ -22,7 +22,7 @@ import UserData from "../../components/usersProfile/UserData";
 import ErrorBoundary from "../../components/ErrorBoundary";
 
 // Import Socials
-import SharePost from "../../components/SharePost";
+import SharePost from "../../components/articles/SharePost";
 
 function Posts(props) {
     const { access } = props;
@@ -204,10 +204,11 @@ function Posts(props) {
                                             {/* Cancel Sharing */}
                                             <SharePost
                                                 // id="cancelShare"
+                                                is_shared={post.article.is_shared}
                                                 post_id={post.article.shared_id}
                                                 access={access}
                                             />
-                                            cancel
+                                            {/* cancel */}
                                         </div>
                                     ) : null}
                                 </div>

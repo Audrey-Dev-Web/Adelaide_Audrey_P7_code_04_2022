@@ -9,22 +9,22 @@ import jwt_decode from "jwt-decode";
 import { BiRepost, BiEditAlt, BiComment } from "react-icons/bi";
 
 // Import pour la gestion de l'article
-import EditPost from "../../components/EditPost";
-import DeletePost from "../../components/DeletePost";
+import EditPost from "../../components/articles/EditPost";
+import DeletePost from "../../components/articles/DeletePost";
 
 // Import pour la gestion des commentaires
-import CommentForm from "../../components/CommentForm";
+import CommentForm from "../../components/comments/CommentForm";
 // Import pour la gestion des commentaires
-import Comments from "../../components/Comments";
-import EditComment from "../../components/EditComment";
-import DeleteComment from "../../components/DeleteComment";
+import Comments from "../../components/comments/Comments";
+import EditComment from "../../components/comments/EditComment";
+import DeleteComment from "../../components/comments/DeleteComment";
 
 import UserData from "../../components/usersProfile/UserData";
 
 import ErrorBoundary from "../../components/ErrorBoundary";
 
 // Import Socials
-import SharePost from "../../components/SharePost";
+import SharePost from "../../components/articles/SharePost";
 
 function Post(props) {
     const { access } = props;

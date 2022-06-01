@@ -28,13 +28,14 @@ exports.addComment = (req, res, next) => {
 
         // On envoi le commentaire dans la base de données
         await connection.query(addNewcomment, newComment, async (err, commentAdded) => {
-            if (err) throw err;
+            // if (err) throw err;
 
             console.log(commentAdded);
 
             // On mets à jour le nombre de commentaires de l'article
             const update = `UPDATE articles SET comments = comments+1 WHERE id = ?`;
             await connection.query(update, article_id, async (err, updated) => {
+                connection.release();
                 if (err) throw err;
 
                 res.status(200).json({ message: "Commentaire ajouté" });
@@ -49,7 +50,7 @@ exports.addComment = (req, res, next) => {
 exports.getAllcomments = (req, res, next) => {
     // Afficher les commentaires de l'article
     const article_id = req.params.id;
-    console.log(article_id);
+    // console.log(article_id);
 
     connection.getConnection(async (err, connection) => {
         if (err) throw err;
@@ -63,12 +64,13 @@ exports.getAllcomments = (req, res, next) => {
         //                     JOIN users_profiles ON (comments.author_comment_id = users_profiles.user_id)`;
 
         await connection.query(showComments, article_id, async (err, found) => {
+            connection.release();
             if (err) throw err;
 
             if (found.length <= 0) {
                 return res.status(404).json({ error: "Il n'y a aucun commentaire à afficher" });
             }
-            console.log(found);
+            // console.log(found);
 
             let allComments = [];
 
@@ -101,8 +103,8 @@ exports.getAllcomments = (req, res, next) => {
 exports.getOneComment = (req, res, next) => {
     try {
         // Afficher un commentaire en particulier
-        console.log(req.params.id);
-        console.log(req.params.comment_id);
+        // console.log(req.params.id);
+        // console.log(req.params.comment_id);
 
         const article_id = req.params.id;
         const comment_id = req.params.comment_id;
@@ -126,6 +128,7 @@ exports.getOneComment = (req, res, next) => {
                 const author_comment = found[0].author_comment_id.toString();
                 const searchAuthor = `SELECT first_name, last_name FROM users_profiles WHERE user_id = ?`;
                 connection.query(searchAuthor, author_comment, (err, authorFound) => {
+                    connection.release();
                     if (err) throw err;
 
                     if (authorFound.length <= 0) {
@@ -190,6 +193,7 @@ exports.modifyComment = (req, res, next) => {
                 // `UPDATE users_profiles SET first_name = '${req.body.first_name}', last_name = '${req.body.last_name}', birthdate = '${req.body.birthdate}' WHERE user_id = ?`;
                 const update_comment = `UPDATE comments SET comment= "${req.body.comment}" WHERE comment_id = ?`;
                 await connection.query(update_comment, comment_id, async (err, comment_updated) => {
+                    connection.release();
                     if (err) throw err;
 
                     res.status(201).json({ MESSAGE: "Commentaire modifié avec succès !" });
@@ -248,6 +252,7 @@ exports.deleteComment = (req, res, next) => {
                     // On mets à jour le nombre de commentaires de l'article
                     const update = `UPDATE articles SET comments = comments-1 WHERE id = ? AND comments > 0`;
                     await connection.query(update, article_id, async (err, updated) => {
+                        connection.release();
                         if (err) throw err;
 
                         // On vérifis que le nombre de commentaire ne soit pas en dessou de 0

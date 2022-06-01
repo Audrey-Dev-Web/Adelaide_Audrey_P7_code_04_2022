@@ -5,8 +5,8 @@ import jwt_decode from "jwt-decode";
 import { BiCalendarCheck, BiUserCheck, BiMailSend, BiTrash } from "react-icons/bi";
 
 import DateTime from "../../components/DateTime";
-import EditProfile from "../../components/Editprofile";
-import DeleteAccount from "../../components/DeleteAccount";
+import EditProfile from "../../components/usersProfile/Editprofile";
+import DeleteAccount from "../../components/usersProfile/DeleteAccount";
 
 import ErrorBoundary from "../../components/ErrorBoundary";
 

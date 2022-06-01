@@ -188,8 +188,6 @@ exports.modifyArticle = (req, res, next) => {
             if (err) throw err;
 
             connection.query(searchOne, article_id, (err, article) => {
-                connection.release();
-
                 if (err) throw err;
 
                 if (article.length == 0) {
@@ -211,7 +209,6 @@ exports.modifyArticle = (req, res, next) => {
                             const newTitleSQL = `UPDATE articles SET title = "${newTitle}" WHERE id = "${article_id}"`;
 
                             connection.query(newTitleSQL, (err, result) => {
-                                connection.release();
                                 if (err) throw err;
                             });
                         }
@@ -223,7 +220,6 @@ exports.modifyArticle = (req, res, next) => {
                             const newContentSQL = `UPDATE articles SET content = "${newContent}" WHERE id = "${article_id}"`;
 
                             connection.query(newContentSQL, (err, result) => {
-                                connection.release();
                                 if (err) throw err;
                             });
                         }
@@ -250,11 +246,7 @@ exports.modifyArticle = (req, res, next) => {
                             connection.query(newImgSQL, article_id, (err, result) => {
                                 connection.release();
                                 if (err) throw err;
-
-                                console.log("Nouvelle image d'article ajoutée");
                             });
-                            console.log("======> Nouvelle image article");
-                            console.log(newImgUrl);
                         }
 
                         res.status(200).json({ MESSAGE: "Article modifié avec succès!" });
@@ -584,7 +576,6 @@ exports.shareArticle = (req, res, next) => {
 
         // connection à la base de Données
         connection.getConnection(async (err, connection) => {
-            connection.release();
             if (err) throw err;
 
             // On verifis que l'article existe
@@ -594,7 +585,6 @@ exports.shareArticle = (req, res, next) => {
             WHERE articles.id = ?`;
 
             await connection.query(searchPost, post_id, async (err, postFound) => {
-                connection.release();
                 if (err) throw err;
 
                 if (postFound.length <= 0) {
@@ -606,7 +596,6 @@ exports.shareArticle = (req, res, next) => {
                 switch (req.body.share) {
                     case 0:
                         await connection.query(searchUsersShared, post_id, async (err, userFound) => {
-                            connection.release();
                             if (err) throw err;
 
                             if (userFound.length <= 0) {
@@ -616,17 +605,15 @@ exports.shareArticle = (req, res, next) => {
                             const delete_post_shared = `DELETE FROM posts_shared WHERE user_id = '${user_id}' AND post_id = ?`;
 
                             await connection.query(delete_post_shared, post_id, async (err, deleted) => {
-                                connection.release();
                                 if (err) throw err;
 
-                                console.log("delete post shared a fonctionné avec succès");
+                                // console.log("delete post shared a fonctionné avec succès");
 
                                 const delete_user_shared = `DELETE FROM users_shared WHERE user_id = '${user_id}' AND post_id = ?`;
                                 await connection.query(delete_user_shared, post_id, async (err, deleted) => {
-                                    connection.release();
                                     if (err) throw err;
 
-                                    console.log("delete user shared a fonctionné avec succès");
+                                    // console.log("delete user shared a fonctionné avec succès");
 
                                     const update_shares = `UPDATE articles SET shares = shares-1 WHERE id = ?`;
 
@@ -647,7 +634,6 @@ exports.shareArticle = (req, res, next) => {
                         // On cherche donc la présence de l'utilisateur dans users_shared
 
                         await connection.query(searchUsersShared, post_id, async (err, userFound) => {
-                            connection.release();
                             if (err) throw err;
 
                             if (userFound.length > 0) {
@@ -659,11 +645,9 @@ exports.shareArticle = (req, res, next) => {
                                 const updateShareCount = `UPDATE articles SET shares = shares-1 WHERE id = ?`;
 
                                 await connection.query(cancelShare, post_id, async (err, canceled) => {
-                                    connection.release();
                                     if (err) throw err;
 
                                     await connection.query(cancelPostSharing, post_id, async (err, postCanceled) => {
-                                        connection.release();
                                         if (err) throw err;
 
                                         await connection.query(updateShareCount, post_id, async (err, updated) => {
@@ -721,7 +705,6 @@ exports.shareArticle = (req, res, next) => {
                                 console.log(post_shared_Data);
 
                                 await connection.query(sharePost, post_shared_Data, async (err, result) => {
-                                    connection.release();
                                     if (err) throw err;
 
                                     const userObject = {
@@ -731,7 +714,6 @@ exports.shareArticle = (req, res, next) => {
                                     // On ajoute l'id utilisateur dans usersshared
                                     const addUsersShared = `INSERT INTO users_shared SET ?`;
                                     await connection.query(addUsersShared, userObject, async (err, userAdded) => {
-                                        connection.release();
                                         if (err) throw err;
 
                                         // const update = `UPDATE articles SET comments = comments-1 WHERE id = ? AND comments > 0`;
