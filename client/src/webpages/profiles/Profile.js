@@ -144,32 +144,43 @@ function Profile(props) {
                             </div>
                         )}
                     </div>
-                    <div className="profile__btn">
-                        <EditProfile
-                            userId={userSlug}
-                            first_name={userData.profile.firstName}
-                            last_name={userData.profile.lastName}
-                            birthDate={userData.profile.birthdate}
-                            emailValue={userData.profile.email}
-                            password={userData.profile.password}
-                            avatar={userData.profile.avatarUrl}
-                            access={access}
-                        />
-                    </div>
-
-                    {user_id === userData.profile.user_id ? null : (
-                        <div className="account_management">
-                            {user_role === "admin" ? (
-                                <ErrorBoundary>
-                                    <DeleteAccount userId={userData.profile.user_id} access={access} />
-                                </ErrorBoundary>
-                            ) : null}
+                    {user_id !== userData.profile.user_id ? null : (
+                        <div className="profile__btn">
+                            <EditProfile
+                                userId={userSlug}
+                                first_name={userData.profile.firstName}
+                                last_name={userData.profile.lastName}
+                                birthDate={userData.profile.birthdate}
+                                emailValue={userData.profile.email}
+                                password={userData.profile.password}
+                                avatar={userData.profile.avatarUrl}
+                                access={access}
+                            />
                         </div>
                     )}
+
+                    {user_id === userData.profile.user_id ? null : user_role === "admin" ? (
+                        <div className="profile__delete">
+                            <p>
+                                <strong>Supprimez définitivement le compte de cet utilisateur</strong>
+                            </p>
+                            <DeleteAccount userId={userData.profile.user_id} access={access} />
+                        </div>
+                    ) : null}
                 </div>
             </div>
         </div>
     );
+}
+
+{
+    /* <div className="profile__delete">
+    <p>
+        <strong>Supprimez votre compte *</strong>
+    </p>
+    <p>* Attention! Cette action est définitive. </p>
+    <DeleteAccount userId={userId} access={access} />
+</div>; */
 }
 
 export default Profile;

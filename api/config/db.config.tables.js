@@ -1,7 +1,6 @@
-const connection = require('./config/db.config');
+const connection = require("./config/db.config");
 
 connection.connect((err) => {
-
     // =========== SQL ===========
 
     // DB USER ACCOUNT SQL
@@ -34,30 +33,14 @@ connection.connect((err) => {
         role VARCHAR(10) NOT NULL,
         )`;
 
-    // articles TABLE SQL
-    // comments TABLE SQL
-
-    // Création des roles
-    // const addRole = `INSERT INTO roles SET ?`
-    // // Création du compte admin de l'application
-    // const createAdmin = `INSERT INTO users VALUE(email: 'admin@groupomania.fr', password: '@dminP@ssW0Rd123!!', role: admin.id)` // email, password, role
-
-    // connection.query(addRole, 'admin', (err, results) => {
-        
-    // });
-    // connection.query(addRole, 'user', (err, results) => {
-
-    // });
-
     // CREATION DES TABLES
     connection.query(createUsersTable, (err, results) => {
         if (err) throw err;
     });
     connection.query(createUsersProfile, (err, results) => {
         if (err) throw err;
-    })
+    });
     connection.query(createRoleTable, (err, results) => {
         if (err) throw err;
-    })
-
+    });
 });

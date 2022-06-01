@@ -1,4 +1,4 @@
-const connection = require('../db.config');
+const connection = require("../db.config");
 
 const CreateTableUsers = () => {
     const createUsersTable = `CREATE TABLE IF NOT EXISTS users(
@@ -9,10 +9,9 @@ const CreateTableUsers = () => {
         timestamp DATETIME NOT NULL DEFAULT NOW() 
         )`;
 
-        connection.query(createUsersTable, (err, results) => {
-            if (err) throw err;
-        });
-}
-
+    connection.query(createUsersTable, (err, results) => {
+        if (err) throw err;
+    });
+};
 
 module.exports = CreateTableUsers;

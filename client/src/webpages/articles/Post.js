@@ -17,8 +17,6 @@ import Comments from "../../components/comments/Comments";
 
 import UserData from "../../components/usersProfile/UserData";
 
-import ErrorBoundary from "../../components/ErrorBoundary";
-
 // Import Socials
 import SharePost from "../../components/articles/SharePost";
 
@@ -128,13 +126,11 @@ function Post(props) {
                                 <div className="social__wrapper">
                                     {/* PARTAGER - SHARE */}
                                     <div className="social">
-                                        <ErrorBoundary>
-                                            <SharePost
-                                                post_id={post.articleFound.id}
-                                                access={access}
-                                                commentsCount={post.articleFound.shares}
-                                            />
-                                        </ErrorBoundary>
+                                        <SharePost
+                                            post_id={post.articleFound.id}
+                                            access={access}
+                                            commentsCount={post.articleFound.shares}
+                                        />
                                     </div>
 
                                     {/* COMMENTAIRES BUTTON */}
@@ -171,13 +167,11 @@ function Post(props) {
                                     </div>
                                     <div className="social__icon deletePost">
                                         {user_id === post.articleFound.author_id || user_role === "admin" ? (
-                                            <ErrorBoundary>
-                                                <DeletePost
-                                                    post_id={post.articleFound.id}
-                                                    author_id={post.articleFound.author_id}
-                                                    access={access}
-                                                />
-                                            </ErrorBoundary>
+                                            <DeletePost
+                                                post_id={post.articleFound.id}
+                                                author_id={post.articleFound.author_id}
+                                                access={access}
+                                            />
                                         ) : null}
                                     </div>
                                 </div>
@@ -191,16 +185,14 @@ function Post(props) {
                                         display: editMod ? "block" : "none",
                                     }}
                                 >
-                                    <ErrorBoundary>
-                                        <EditPost
-                                            post_id={post.articleFound.id}
-                                            author_id={post.articleFound.author}
-                                            post_title={post.articleFound.title}
-                                            post_content={post.articleFound.content}
-                                            post_img={post.articleFound.images}
-                                            access={access}
-                                        />
-                                    </ErrorBoundary>
+                                    <EditPost
+                                        post_id={post.articleFound.id}
+                                        author_id={post.articleFound.author}
+                                        post_title={post.articleFound.title}
+                                        post_content={post.articleFound.content}
+                                        post_img={post.articleFound.images}
+                                        access={access}
+                                    />
                                 </div>
 
                                 {/* AFFICHAGE DES COMPOSANTS COMMENTAIRE */}
@@ -210,9 +202,7 @@ function Post(props) {
                                         className="comments showAllComments"
                                         style={{ display: showComments ? "block" : "none" }}
                                     >
-                                        <ErrorBoundary>
-                                            <Comments post_id={post.articleFound.id} access={access} />
-                                        </ErrorBoundary>
+                                        <Comments post_id={post.articleFound.id} access={access} />
                                     </div>
                                 </div>
                             </div>

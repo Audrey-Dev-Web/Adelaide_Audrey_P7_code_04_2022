@@ -114,7 +114,6 @@ exports.getOneProfile = (req, res, next) => {
                                 password: found[0].password,
                                 firstName: foundProfile[0].first_name,
                                 lastName: foundProfile[0].last_name,
-                                birthdate: foundProfile[0].birthdate.toString(),
                                 avatarUrl: foundProfile[0].avatar,
                             };
 
