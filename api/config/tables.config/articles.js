@@ -12,8 +12,6 @@ const articlesTable = () => {
         content VARCHAR(5000), 
         images VARCHAR(100),
         comments INT,
-        likes INT,
-        dislikes INT,
         shares INT,
         timestamp DATETIME NOT NULL DEFAULT NOW()
         )`;

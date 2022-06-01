@@ -116,7 +116,6 @@ exports.login = async (req, res, next) => {
                 res.status(404).send({ message: "Cette utilisateur n'existe pas." });
             } else {
                 // Réécrire cette partie du login
-
                 const hashedPassword = found[0].password;
                 const secret = process.env.SECRET_TOKEN;
 

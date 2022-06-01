@@ -6,9 +6,9 @@ const profileCtrl = require("../controllers/user_profile");
 const auth = require("../middleware/auth");
 const multer = require("../middleware/multer-config");
 
-router.get('/', auth, profileCtrl.getAllProfile);
-router.get('/:id', auth, profileCtrl.getOneProfile);
-router.put('/:id', auth, multer, profileCtrl.modifyProfile);
-router.delete('/:id', auth, profileCtrl.deleteAccount);
+router.get("/", auth, profileCtrl.getAllProfile);
+router.get("/:id", auth, profileCtrl.getOneProfile);
+router.put("/:id", auth, multer, profileCtrl.modifyProfile);
+router.delete("/:id", auth, profileCtrl.deleteAccount);
 
 module.exports = router;

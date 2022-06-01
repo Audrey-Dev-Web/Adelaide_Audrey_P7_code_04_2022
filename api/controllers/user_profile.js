@@ -35,7 +35,6 @@ exports.getAllProfile = (req, res, next) => {
                             role: profile.role,
                             first_name: profile.first_name,
                             last_name: profile.last_name,
-                            birthdate: profile.birthdate,
                             avatar: profile.avatar,
                         },
                     };
@@ -52,21 +51,9 @@ exports.getAllProfile = (req, res, next) => {
 // Afficher un profile
 exports.getOneProfile = (req, res, next) => {
     connection.getConnection((err, connection) => {
-        // console.log(connection.length);
         if (err) throw err;
 
         const profile_id = req.params.id;
-
-        // console.log("----> FoundProfile");
-        // console.log(profile_id);
-
-        // const foundProfileSQL = `SELECT * FROM users INNER JOIN users_profiles ON users.id = ?`;
-        // const foundProfileSQL = `SELECT * FROM users INNER JOIN users_profiles WHERE users.id = ?`;
-
-        // ================ Tester le code ci-dessus ===================== //
-
-        // const foundProfileSQL = `SELECT * FROM users_profiles JOIN users WHERE user_id = ?`;
-        // const foundProfileSQL = `SELECT * FROM users JOIN users_profiles ON users.id = ?`;
 
         const foundUserSQL = `SELECT * FROM users WHERE id = ?`;
         const foundProfileSQL = `SELECT * FROM users_profiles WHERE user_id = ?`;
@@ -74,9 +61,6 @@ exports.getOneProfile = (req, res, next) => {
         // On cherche l'utilisateur
         connection.query(foundUserSQL, profile_id, (err, found) => {
             if (err) throw err;
-
-            // console.log("-------> Résultat de la recherche");
-            // console.log(found.length);
 
             if (found.length <= 0) {
                 res.status(201).json({ MESSAGE: "Cet utilisateur n'existe pas ou a été supprimé." });
@@ -128,7 +112,6 @@ exports.getOneProfile = (req, res, next) => {
                                 role: user.role,
                                 firstName: foundProfile[0].first_name,
                                 lastName: foundProfile[0].last_name,
-                                birthdate: foundProfile[0].birthdate,
                                 avatarUrl: foundProfile[0].avatar,
                             };
 
@@ -180,13 +163,6 @@ exports.modifyProfile = (req, res, next) => {
 
                         const updateProfile = `UPDATE users_profiles SET first_name = '${req.body.first_name}', last_name = '${req.body.last_name}', birthdate = '${req.body.birthdate}' WHERE user_id = ?`;
 
-                        // const avatarUrl = `${req.protocol}://${req.get("host")}/images/${req.file.filename}`;
-
-                        // const toUpdate = {
-                        //     ...req.body,
-                        //     avatar: avatarUrl
-                        // }
-
                         var emailAES = foundProfile[0].email;
                         var decryptedEmail = cryptojs.AES.decrypt(emailAES, secretEmail).toString(cryptojs.enc.Utf8);
 
@@ -208,7 +184,6 @@ exports.modifyProfile = (req, res, next) => {
                                 if (err) throw err;
 
                                 if (emailFound.length === 0) {
-                                    console.error("Cette adresse email existe déjà");
                                     connection.query(updateTest, profile_id, (err, result) => {
                                         if (err) throw err;
 
@@ -216,7 +191,6 @@ exports.modifyProfile = (req, res, next) => {
                                             if (err) throw err;
 
                                             console.log("La modification de l'email fonctionne");
-                                            // console.log(result)
                                         });
                                     });
                                 }
@@ -239,9 +213,6 @@ exports.modifyProfile = (req, res, next) => {
                                     });
                                 })
                                 .catch((err) => res.status(500).json({ err }));
-
-                            console.log("modifier le mot de pass");
-                            // Changer le password en utilisant bcrypt
                         }
 
                         if (req.body.first_name) {
@@ -275,8 +246,6 @@ exports.modifyProfile = (req, res, next) => {
 
                             connection.query(update, profile_id, (err, result) => {
                                 if (err) throw err;
-
-                                console.log("Date de naissance modifiée !");
                             });
                         }
 
@@ -291,33 +260,14 @@ exports.modifyProfile = (req, res, next) => {
 
                                 // On supprime l'ancienne
                                 fs.unlink(fileUrl, () => {
-                                    console.log("IMAGE DELETED !");
+                                    console.log("IMAGE supprimée !");
                                 });
                             }
 
                             connection.query(update, profile_id, (err, result) => {
                                 if (err) throw err;
-
-                                console.log("Nouvelle image de profile ajoutée");
                             });
-                            console.log("======> Nouvelle photo de profile");
-                            console.log(newAvatarUrl);
                         }
-
-                        // const profileToUpdate = {
-                        //     id: foundProfile[0].id.toString(),
-                        //     user_id: foundProfile[0].user_id.toString(),
-                        //     email: decryptedEmail,
-                        //     password: foundUser[0].password,
-                        //     first_name: req.body.first_name,
-                        //     last_name: req.body.last_name,
-                        //     birthdate: req.body.birthdate,
-                        //     avatar: newAvatarUrl,
-                        // };
-
-                        // console.log("=====> profileToUpdate");
-                        // console.log(profileToUpdate);
-
                         res.status(200).json({ MESSAGE: `Profile modifié avec succès !` });
                     });
                 });
@@ -339,8 +289,6 @@ exports.deleteAccount = (req, res, next) => {
     } else {
         connection.getConnection((err, connection) => {
             if (err) throw err;
-
-            // const profileId = req.params.id;
 
             const searchUser = `SELECT * FROM users_profiles WHERE user_id = ?`;
             const deleteAccount = `DELETE FROM users_profiles WHERE user_id = ?`;
@@ -369,14 +317,9 @@ exports.deleteAccount = (req, res, next) => {
                 connection.query(deleteAccount, profile_id, (err, found) => {
                     if (err) throw err;
 
-                    console.log("Profile supprimé avec succès");
-
                     // On supprime le compte de connexion
                     connection.query(deleteLoginAcc, profile_id, (err, profile) => {
                         if (err) throw err;
-
-                        console.log("compte utilisateur supprimé avec succès !");
-                        // connection.release();
 
                         res.status(200).json({ MESSAGE: "Compte supprimé avec succès !" });
                     });

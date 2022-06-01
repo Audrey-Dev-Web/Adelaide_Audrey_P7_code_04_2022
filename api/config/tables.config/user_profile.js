@@ -7,7 +7,6 @@ const CreateTableProfile = () => {
         email VARCHAR(100) NOT NULL UNIQUE,
         first_name VARCHAR(25),
         last_name VARCHAR(25),
-        birthdate DATE,
         avatar VARCHAR(100)
         )`;
 

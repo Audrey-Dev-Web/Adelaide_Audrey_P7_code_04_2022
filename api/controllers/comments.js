@@ -5,12 +5,9 @@ const Comment = require("../models/Comments");
 // Ajouter un commentaire
 exports.addComment = (req, res, next) => {
     // Récupérer l'id de l'article
-
     const article_id = req.params.id;
     const author_id = req.auth.userId;
     const comment_content = req.body.comment;
-
-    console.log(article_id);
 
     connection.getConnection(async (err, connection) => {
         if (err) throw err;
@@ -28,9 +25,7 @@ exports.addComment = (req, res, next) => {
 
         // On envoi le commentaire dans la base de données
         await connection.query(addNewcomment, newComment, async (err, commentAdded) => {
-            // if (err) throw err;
-
-            console.log(commentAdded);
+            if (err) throw err;
 
             // On mets à jour le nombre de commentaires de l'article
             const update = `UPDATE articles SET comments = comments+1 WHERE id = ?`;
@@ -40,8 +35,6 @@ exports.addComment = (req, res, next) => {
 
                 res.status(200).json({ message: "Commentaire ajouté" });
             });
-
-            // console.log(founds)
         });
     });
 };
@@ -50,7 +43,6 @@ exports.addComment = (req, res, next) => {
 exports.getAllcomments = (req, res, next) => {
     // Afficher les commentaires de l'article
     const article_id = req.params.id;
-    // console.log(article_id);
 
     connection.getConnection(async (err, connection) => {
         if (err) throw err;
@@ -81,20 +73,14 @@ exports.getAllcomments = (req, res, next) => {
 
                 allComments.push(commentInfo);
             });
-            // console.log(allComments);
-
             res.status(200).json({ allComments });
         });
     });
 };
 
-// Afficher un commentaire
+// récupérer un commentaire
 exports.getOneComment = (req, res, next) => {
     try {
-        // Afficher un commentaire en particulier
-        // console.log(req.params.id);
-        // console.log(req.params.comment_id);
-
         const article_id = req.params.id;
         const comment_id = req.params.comment_id;
 
@@ -105,9 +91,6 @@ exports.getOneComment = (req, res, next) => {
             const searchComment = `SELECT * FROM comments WHERE comment_id = '${comment_id}' AND article_id = ?`;
             connection.query(searchComment, article_id, (err, found) => {
                 if (err) throw err;
-
-                // console.log("=====> Author comment id")
-                // console.log(found[0].author_comment_id.toString());
 
                 if (found.length <= 0) {
                     return res.status(404).json({ ERROR: "Le commentaire que vous recherchez n'existe pas" });
@@ -133,8 +116,6 @@ exports.getOneComment = (req, res, next) => {
                         comment: found[0].comment,
                         timestamp: found[0].timestamp.toString(),
                     };
-
-                    console.log(found);
                     res.status(200).json({ commentObject });
                 });
             });
@@ -179,7 +160,7 @@ exports.modifyComment = (req, res, next) => {
                 if (!req.body.comment) {
                     return res.status(402).json({ ERROR: "Aucune modification effectuée!" });
                 }
-                // `UPDATE users_profiles SET first_name = '${req.body.first_name}', last_name = '${req.body.last_name}', birthdate = '${req.body.birthdate}' WHERE user_id = ?`;
+
                 const update_comment = `UPDATE comments SET comment= "${req.body.comment}" WHERE comment_id = ?`;
                 await connection.query(update_comment, comment_id, async (err, comment_updated) => {
                     connection.release();
@@ -217,8 +198,6 @@ exports.deleteComment = (req, res, next) => {
             await connection.query(searchAuthor, comment_id, async (err, found) => {
                 if (err) throw err;
 
-                console.log(found);
-
                 if (found <= 0) {
                     return res.status(404).json({ ERROR: "Commentaire inexistant" });
                 }
@@ -245,8 +224,6 @@ exports.deleteComment = (req, res, next) => {
                         if (err) throw err;
 
                         // On vérifis que le nombre de commentaire ne soit pas en dessou de 0
-                        // const searchArticle = `SELECT `
-
                         res.status(200).json({ MESSAGE: "Commentaire supprimé" });
                     });
                 });
