@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import logo from "../images/icon.svg";
 
-import jwt_decode from "jwt-decode";
-
 import { useCookies } from "react-cookie";
 
 // Import des icons de la page login
@@ -17,9 +15,6 @@ function Login() {
     // connexion
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-
-    // Creation du user connecté
-    const [user, setUser] = useState("");
 
     // Message d'erreur
     const [msg, setMsg] = useState("");
@@ -60,15 +55,12 @@ function Login() {
 
                 const data = await res.json();
 
-                setUser({ id: data.userId, pass: data.token, role: data.userRole });
-
-                console.log("", user);
                 // Création du cookie de connexion qui expire au bout de 24h
                 setCookie("access", data.token, { path: "/", maxAge: expiresIn });
 
-                // if (res.ok) {
-                //     window.location.reload();
-                // }
+                if (res.ok) {
+                    window.location.reload();
+                }
             }
         } catch (error) {
             setMsg(error);
@@ -111,6 +103,7 @@ function Login() {
                         <div className="login__input-edit">
                             <div>
                                 <label className="login__label">
+                                    <p hidden>login email</p>
                                     <div className="login__icon">
                                         <BiLogInCircle />
                                     </div>
@@ -127,6 +120,7 @@ function Login() {
 
                             <div>
                                 <label className="login__label">
+                                    <p hidden>login password</p>
                                     <div className="login__icon">
                                         <BiLockOpenAlt />
                                     </div>
@@ -149,7 +143,6 @@ function Login() {
                                     </div>
                                     <input
                                         className="login__input-text"
-                                        // type="password"
                                         type={passwordShown ? "text" : "password"}
                                         name="password"
                                         placeholder="******"

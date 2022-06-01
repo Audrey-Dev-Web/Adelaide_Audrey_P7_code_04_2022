@@ -1,9 +1,5 @@
-import React, { useEffect, useState } from "react";
-import jwt_decode from "jwt-decode";
-
-import UserAvatar from "../UserAvatar";
-
-import { BiSend, BiPlus, BiImageAdd } from "react-icons/bi";
+import React, { useState } from "react";
+import { BiSend, BiImageAdd } from "react-icons/bi";
 
 function PostForm(props) {
     const { access } = props;
@@ -12,42 +8,58 @@ function PostForm(props) {
     const [postContent, setPostContent] = useState(null);
     const [postImg, setPostImg] = useState(null);
     const [fileDataURL, setFileDataURL] = useState(null);
-    const [message, setMessage] = useState(null);
-    const [createMod, setCreateMod] = useState(false);
 
-    // const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
-    // const token = user.pass;
-    // const user_id = user.id;
+    const [message, setMessage] = useState(null);
+    const [errorMsg, setErrorMsg] = useState(null);
+    const [error, setError] = useState(false);
+    const [success, setSuccess] = useState(false);
 
     const token = access;
-    // const decoded = jwt_decode(token);
-    // const user_id = decoded.userId;
-    // const user_role = decoded.role;
-
-    const postObject = {
-        title: postTitle,
-        content: postContent,
-        image: postImg,
-    };
 
     const formData = new FormData();
     formData.append("title", postTitle);
     formData.append("content", postContent);
     formData.append("image", postImg);
-    // console.log(postImg);
 
     // requêtes pour créer un nouvel article
     const sendNewPost = async (e) => {
         e.preventDefault();
 
         if (!postTitle && !postContent && !postImg) {
-            setMessage("Vous avez ajouter au moins un titre avec du texte ou une image");
+            setErrorMsg("Vous avez ajouter au moins un titre avec du texte ou une image");
+            setError(true);
+            setTimeout(function () {
+                setErrorMsg(null);
+                setError(false);
+            }, 3000);
         } else if (!postTitle && postContent && !postImg) {
-            setMessage("Vous avez ajouter au moins un titre");
+            setErrorMsg("Vous avez ajouter au moins un titre");
+            setError(true);
+            setTimeout(function () {
+                setErrorMsg(null);
+                setError(false);
+            }, 3000);
         } else if (!postTitle && !postContent && postImg) {
-            setMessage("Vous avez ajouter au moins un titre");
+            setErrorMsg("Vous avez ajouter au moins un titre");
+            setError(true);
+            setTimeout(function () {
+                setErrorMsg(null);
+                setError(false);
+            }, 3000);
         } else if (!postTitle && postContent && postImg) {
-            setMessage("Vous avez ajouter un titre a votre article");
+            setErrorMsg("Vous avez ajouter un titre a votre article");
+            setError(true);
+            setTimeout(function () {
+                setErrorMsg(null);
+                setError(false);
+            }, 3000);
+        } else if (postTitle && !postContent && !postImg) {
+            setErrorMsg("Vous devez ajouter un contenu d'article ou une image");
+            setError(true);
+            setTimeout(function () {
+                setErrorMsg(null);
+                setError(false);
+            }, 3000);
         } else {
             try {
                 let res = await fetch("http://localhost:8080/api/articles/", {
@@ -59,37 +71,47 @@ function PostForm(props) {
                 });
 
                 const data = await res.json();
-                console.log("======> Verifier l'envoi du post");
-                console.log(data);
 
-                window.location.reload();
+                if (res.ok) {
+                    setMessage("Nouveau post ajouté avec succès !");
+                    setSuccess(true);
+                    setError(false);
+
+                    setTimeout(function () {
+                        setMessage(null);
+                        setSuccess(false);
+                        setError(false);
+                        window.location.reload();
+                    }, 3000);
+                } else {
+                    throw new Error("Error");
+                }
             } catch (err) {
-                console.log(err);
+                setErrorMsg(err);
+                setError(true);
+                setTimeout(function () {
+                    setErrorMsg(null);
+                    setError(false);
+                }, 3000);
             }
         }
     };
 
+    // Permet de récupérer l'image qui a été upload
     function handleChange(event) {
         setPostImg(event.target.files[0]);
 
         var file = event.target.files[0];
         var reader = new FileReader();
         reader.onload = function (event) {
-            // The file's text will be printed here
             const { result } = event.target;
-            console.log(event.target.result);
             setFileDataURL(result);
         };
         reader.readAsDataURL(file);
     }
 
-    function toggleCreateMod(e) {
-        setCreateMod(!createMod);
-    }
-
     return (
         <div className="newPost">
-            {/* <h1>Créer un article</h1> */}
             <h2 className="newPost__title">Créer un nouvel article</h2>
             <form onSubmit={sendNewPost} className="newPost__add" method="POST" encType="multipart/form-data">
                 <label htmlFor="post-title" aria-label="titre">
@@ -124,8 +146,6 @@ function PostForm(props) {
                         <BiImageAdd className="imgIcon" />
                     </label>
                     <input className="newPost__img btn" type="file" id="addImg" name="image" onChange={handleChange} />
-
-                    {message}
                     <label htmlFor="sendBtn" className="newPost__add--send btn" aria-label="Envoyer">
                         <p hidden>Envoyer l'article</p>
                         <BiSend />
@@ -139,6 +159,8 @@ function PostForm(props) {
                         style={{ display: "none" }}
                     />
                 </div>
+                {!error ? null : <div className="errorMsg">{errorMsg}</div>}
+                {!success ? null : <div className="validateMsg">{message}</div>}
             </form>
         </div>
     );

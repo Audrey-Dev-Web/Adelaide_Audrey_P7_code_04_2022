@@ -1,20 +1,15 @@
 import React, { useState } from "react";
-import jwt_decode from "jwt-decode";
 
-import { BiShare, BiRepost } from "react-icons/bi";
+import { BiRepost } from "react-icons/bi";
 
 function SharePost(props) {
-    const { post_id, is_shared, userId, access } = props;
-
-    // console.log(post_id);
+    const { post_id, is_shared, userId, commentsCount, access } = props;
 
     const [shareNumber, setShareNumber] = useState(1);
     const [message, setMessage] = useState("");
     const [shared, setShared] = useState(false);
 
     const token = access;
-    // const user_id = access.user_id;
-    // const user_role = access.role;
 
     const shareObject = {
         share: shareNumber,
@@ -32,9 +27,6 @@ function SharePost(props) {
     };
 
     function shareButton(e) {
-        // setShared(true)
-        // setShareNumber(1);
-
         fetch(url, reqOptions)
             .then((res) => {
                 if (res.ok) {
@@ -57,17 +49,16 @@ function SharePost(props) {
     return (
         <div>
             {is_shared ? (
-                <div className="social__icon shareBtn">
-                    <button type="button" className="social__icon shareBtn btn" onClick={(e) => shareButton()}>
-                        <p hidden>Annulé le partage</p>
-                        <BiRepost />
-                        cancel
-                    </button>
-                </div>
+                <button type="button" className="social__icon btn btn__share" onClick={(e) => shareButton()}>
+                    <p hidden>Annulé le partage</p>
+                    <BiRepost />
+                    cancel
+                </button>
             ) : (
-                <button type="button" className="social__icon shareBtn" onClick={(e) => shareButton()}>
+                <button type="button" className="social__icon btn btn__share" onClick={(e) => shareButton()}>
                     <p hidden>Partager cet article</p>
                     <BiRepost />
+                    <span className="social__count btn__share--count">{commentsCount}</span>
                 </button>
             )}
 

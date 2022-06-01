@@ -1,9 +1,7 @@
 import React, { useState } from "react";
-// import { Routes, Route, Link, Navigate } from "react-router-dom";
 import { NavLink, useNavigate } from "react-router-dom";
 import logo from "../images/icon.svg";
 
-import jwt_decode from "jwt-decode";
 import { useCookies } from "react-cookie";
 
 // Import des icons de la page login
@@ -12,7 +10,6 @@ import { BiLogInCircle, BiLockOpenAlt, BiShow, BiHide } from "react-icons/bi";
 function Signup() {
     const navigate = useNavigate();
     const [cookies, setCookie] = useCookies(["access"]);
-    // connexion
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
@@ -20,9 +17,6 @@ function Signup() {
 
     // Expiration du token sous 24h soit 86400 secondes
     const expiresIn = 86400;
-
-    // Creation du user connecté
-    // const [user, setUser] = useState("");
 
     // Message d'erreur
     const [msg, setMsg] = useState("");
@@ -74,21 +68,12 @@ function Signup() {
                     setMsg("Cet utilisateur n'existe pas !");
                 } else {
                     const data = await resLogin.json();
-                    // setUser({ id: data.userId, pass: data.token, role: data.userRole });
-                    // setCookie("access", data.token, { path: "/" });
                     setCookie("access", data.token, { path: "/", maxAge: expiresIn });
 
                     if (res.ok) {
                         navigate("/", { replace: true });
                         window.location.reload(true);
                     }
-
-                    // setUser({ id: data.userId, pass: data.token, role: data.userRole });
-
-                    // setCookie("access", data.token, { path: "/" });
-
-                    // console.log(user);
-                    // console.log(data);
                 }
             }
 
@@ -98,14 +83,6 @@ function Signup() {
             setMsg(error);
         }
     };
-
-    // if (user) {
-    //     sessionStorage.setItem("isAuthenticate", JSON.stringify(user));
-    //     navigate("/", { replace: true });
-    //     window.location.reload(true);
-    // }
-
-    // icon pour afficher le mot de pass
 
     // Pour afficher ou cacher le mot de passe
     const [passwordShown, setPasswordShown] = useState(false);
@@ -211,7 +188,6 @@ function Signup() {
                                 </div>
                                 <input
                                     className="login__input-text"
-                                    // type="password"
                                     type={passwordShown ? "text" : "password"}
                                     name="password"
                                     placeholder="******"
@@ -221,19 +197,8 @@ function Signup() {
                             </label>
                         </div>
                     </div>
-                    {/* <div>
-                    <label className="login__rememberMe">
-                        <input className="login__rememberMe--checkbox" type="checkbox" id="scales" name="scales" />
-                        <p className="login__rememberMe--text">Se souvenir de moi</p>
-                    </label>
-                </div> */}
-
                     <p>{msg}</p>
                     <input className="login__btn btn" type="submit" value="Connexion" />
-                    {/* <p>
-                    <li>Mot de passe oublié ?</li>
-                </p> */}
-                    {/* {isAuthenticated ? <Navigate to="/" replace /> : "Vous devez vous connecter"} */}
                 </form>
             </div>
         </div>

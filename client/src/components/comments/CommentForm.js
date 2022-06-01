@@ -5,13 +5,11 @@ import { BiCommentAdd } from "react-icons/bi";
 function CommentForm(props) {
     const [comment, setComment] = useState(null);
     const [message, setMessage] = useState(null);
+    const [errorMsg, setErrorMsg] = useState(null);
+    const [error, setError] = useState(false);
+    const [success, setSuccess] = useState(false);
 
     const { post_id, access } = props;
-
-    // console.log(post_id);
-
-    // const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
-    // const token = user.pass;
 
     const token = access;
     const user_id = access.user_id;
@@ -35,25 +33,43 @@ function CommentForm(props) {
     // Fonction pour ajouter un commentaire
     const sendComment = async (e) => {
         e.preventDefault();
-        try {
-            let res = await fetch(url, reqOptions);
-            let commentRes = await res.json();
 
-            if (res.ok) {
-                setMessage("Commentaire ajouté avec succès");
+        if (!comment) {
+            setErrorMsg("Aucun texte a envoyer");
+            setError(true);
+            setTimeout(function () {
+                setErrorMsg(null);
+                setError(false);
+            }, 3000);
+        } else {
+            try {
+                let res = await fetch(url, reqOptions);
+                let commentRes = await res.json();
+
+                if (res.ok) {
+                    setMessage("Commentaire ajouté avec succès");
+                    setSuccess(true);
+                    setTimeout(function () {
+                        setMessage(null);
+                        setSuccess(false);
+                        window.location.reload();
+                    }, 3000);
+                } else {
+                    throw new Error("Error");
+                }
+            } catch (err) {
+                setErrorMsg(err);
+                setError(true);
+                setTimeout(function () {
+                    setErrorMsg(null);
+                    setError(false);
+                }, 3000);
             }
-            console.log("=====> Réponse commentaire envoyé : ");
-            console.log(commentRes);
-
-            window.location.reload();
-        } catch (err) {
-            console.log(err);
         }
     };
 
     return (
         <div className="commentForm">
-            {/* <h2 className="commentForm__title">Ajouter un commentaire</h2> */}
             <form onSubmit={sendComment} className="commentForm__form">
                 <label htmlFor="comment">
                     <h3>Ajouter un commentaire</h3>
@@ -67,16 +83,16 @@ function CommentForm(props) {
                     />
                 </label>
 
+                {!error ? null : <div className="errorMsg">{errorMsg}</div>}
+                {!success ? null : <div className="validateMsg">{message}</div>}
+
                 <div>
-                    {/* <BiCommentAdd />
-                    <input className="commentForm__form--btn btn" type="submit" value="Envoyer" /> */}
                     <button className="commentForm__form--btn btn" type="submit">
                         <p hidden>Envoyer votre commentaire</p>
                         <BiCommentAdd />
                     </button>
                 </div>
             </form>
-            {message}
         </div>
     );
 }

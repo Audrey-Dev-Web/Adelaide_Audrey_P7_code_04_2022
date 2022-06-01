@@ -54,7 +54,7 @@
                 padding: 2%;
                 width: 100%;
                 background: $principal_bg;
-                border-radius: 20px;
+                border-radius: 0;
 
                 font-size: 1.5rem;
 
@@ -81,15 +81,20 @@
                 border-bottom: 3px solid $accent_color_3;
             }
 
-            @include mobile-only {
-                display: block;
-            }
             &:hover {
                 background: $principal_bg;
                 transform: translateY(-10%);
                 box-shadow: 0 0 5px rgb(48, 40, 40);
                 color: $accent_color_3;
+
+                @include mobile-only {
+                    box-shadow: none;
+                }
             }
+
+            // @include mobile-only {
+            //     display: block;
+            // }
         }
     }
 
@@ -115,15 +120,8 @@
     }
 }
 
-.userLoggedIn {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    // &__pix {
-    //     border-radius: 100%;
-    //     border: 3px solid $accent_color_3;
-    //     width: 50px;
-    //     height: 50px;
-    //     margin: 3%;
-    // }
-}
+// .userLoggedIn {
+//     display: flex;
+//     justify-content: flex-end;
+//     align-items: center;
+// }

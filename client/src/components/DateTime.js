@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 
+// Ce fichier permet de calculer le temps entre la création et l'instant présent
+
 function DateTime(props) {
     const { datetime } = props;
     const [timeAfter, setTimeAfter] = useState(" ");

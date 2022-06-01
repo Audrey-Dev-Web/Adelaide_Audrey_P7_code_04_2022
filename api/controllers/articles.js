@@ -54,8 +54,8 @@ exports.getAllArticles = (req, res, next) => {
         connection.getConnection(async (err, connection) => {
             if (err) throw err;
 
-            console.log(connection);
-            console.log(err);
+            // console.log(connection);
+            // console.log(err);
 
             // On cherche tous les articles
             const articles = `SELECT * FROM users_profiles JOIN articles ON users_profiles.user_id = articles.author_id ORDER by timestamp DESC`;
@@ -103,8 +103,6 @@ exports.getAllArticles = (req, res, next) => {
 
                     articlesFound.push(articleFound);
                 });
-
-                // console.log(found)
 
                 res.status(200).json({ articlesFound });
             });
@@ -168,8 +166,6 @@ exports.getOneArticle = (req, res, next) => {
                     };
 
                     res.status(200).json({ articleFound });
-
-                    // console.log(articleFound);
                 }
             });
         });
@@ -275,10 +271,9 @@ exports.deleteArticle = (req, res, next) => {
 
         // On récupère l'article a supprimer
         connection.query(searchArticle, article_id, (err, found) => {
-            connection.release();
             if (err) throw err;
 
-            console.log(found);
+            // console.log(found);
 
             if (found.length === 0) {
                 return res.status(404).json({ ERROR: "Cet article n'existe pas !" });
@@ -297,7 +292,6 @@ exports.deleteArticle = (req, res, next) => {
 
                 fs.unlink(fileUrl, () => {
                     connection.query(deleteArticle, article_id, (err, results) => {
-                        connection.release();
                         if (err) throw err;
 
                         res.status(201).json({ MESSAGE: "Article supprimé" });
@@ -613,8 +607,6 @@ exports.shareArticle = (req, res, next) => {
                                 await connection.query(delete_user_shared, post_id, async (err, deleted) => {
                                     if (err) throw err;
 
-                                    // console.log("delete user shared a fonctionné avec succès");
-
                                     const update_shares = `UPDATE articles SET shares = shares-1 WHERE id = ?`;
 
                                     await connection.query(update_shares, post_id, async (err, updated) => {
@@ -660,10 +652,6 @@ exports.shareArticle = (req, res, next) => {
                                 });
                             } else {
                                 // On récupère la data du post
-                                console.log("=====> Post Found");
-                                console.log(postFound);
-
-                                // const title = "Shared";
                                 const content = {
                                     id: postFound[0].id.toString(),
                                     is_shared: 1,
@@ -701,9 +689,6 @@ exports.shareArticle = (req, res, next) => {
                                     shares: 0,
                                 };
 
-                                console.log("=====> POST DATA");
-                                console.log(post_shared_Data);
-
                                 await connection.query(sharePost, post_shared_Data, async (err, result) => {
                                     if (err) throw err;
 
@@ -716,15 +701,11 @@ exports.shareArticle = (req, res, next) => {
                                     await connection.query(addUsersShared, userObject, async (err, userAdded) => {
                                         if (err) throw err;
 
-                                        // const update = `UPDATE articles SET comments = comments-1 WHERE id = ? AND comments > 0`;
                                         // On mets à jour le nombre de partage de l'article
                                         const update_shares = `UPDATE articles SET shares = shares+1 WHERE id = ?`;
                                         await connection.query(update_shares, post_id, async (err, updated) => {
                                             connection.release();
                                             if (err) throw err;
-
-                                            // console.log("=====> Update Réussi !");
-                                            // console.log(updated);
 
                                             res.status(201).json({ MESSAGE: "Post partagé avec succès" });
                                         });

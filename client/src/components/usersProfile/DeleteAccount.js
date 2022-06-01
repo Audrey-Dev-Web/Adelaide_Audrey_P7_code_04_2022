@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router";
 import { useParams } from "react-router-dom";
 
@@ -16,8 +16,7 @@ function DeleteAccount(props) {
     const [cookies, setCookies, removeCookie] = useCookies(["access"]);
     const [deleteMsg, setDeleteMsg] = useState("");
     const [deleteOK, setDeleteOK] = useState(false);
-
-    const [isAuthorized, setIsAuthorized] = useState(false);
+    const [errorMgs, setErrorMsg] = useState(null);
 
     const token = access;
     const decoded = jwt_decode(token);
@@ -37,8 +36,6 @@ function DeleteAccount(props) {
 
     // Requête pour supprimer le compte
     const delAccount = async (e) => {
-        // e.preventDefault();
-        console.log("click");
         try {
             let res = await fetch(url, reqOptions);
             let deleteRes = await res.json();
@@ -47,21 +44,17 @@ function DeleteAccount(props) {
 
             if (res.ok) {
                 if (user_id === userSlug) {
-                    // afficher une page pendant 5 secondes afin de confirmer à l'utilisateur que son compte est
-                    // supprimé à vie
                     setDeleteMsg("Votre compte a été supprimé avec succès!");
                     setDeleteOK(true);
                     removeCookie("access", "", { path: "/" });
                     setTimeout(function () {
                         navigate("/");
                         window.location.reload();
-                    }, 3500);
+                    }, 3000);
                 } else if (user_role === "admin") {
                     // Afficher une page pour l'admin lui confirmant que le compte a bien été supprimé
                     setDeleteMsg("Le compte de cet utilisateur a bien été supprimé");
                     setDeleteOK(true);
-                    // navigate("/");
-                    // window.location.reload();
 
                     setTimeout(function () {
                         navigate("/");
@@ -73,16 +66,15 @@ function DeleteAccount(props) {
                 throw new Error("Error");
             }
         } catch (err) {
-            console.log(err);
+            setErrorMsg(err);
         }
     };
 
     return (
         <div>
+            <p>{deleteOK ? deleteMsg : errorMgs}</p>
             {user_id === userId || user_role === "admin" ? (
-                // <button className="account__delete btn btn__delete" onClick={(e) => delAccount(e)}>
                 <div>
-                    <div>{deleteMsg}</div>
                     <button
                         className="account__delete btn btn__delete"
                         onClick={() => {

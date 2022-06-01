@@ -2,18 +2,23 @@ import React, { useState, useEffect } from "react";
 
 import jwt_decode from "jwt-decode";
 
-import { BiEditAlt, BiImageAdd, BiTrash } from "react-icons/bi";
+import { BiEditAlt, BiImageAdd } from "react-icons/bi";
 
 import DeleteAccount from "./DeleteAccount";
-import ErrorBoundary from "../ErrorBoundary";
 
+// Permet de modifier le profile de l'utilisateur
 function Editprofile(props) {
-    // On récupère l'id de l'utilisateur avec props
+    // On récupère les de l'utilisateur dont on a besoin avec props
     const { userId, first_name, last_name, birthDate, emailValue, password, avatar, access } = props;
 
-    // State pour vérifier que c'est le bon utilisateur qui est connecté
+    // State pour vérifier si c'est le bon utilisateur qui est connecté
     const [isAuthorized, setIsAuthorized] = useState(false);
     const [changePwd, setChangePwd] = useState(false);
+
+    const [message, setMessage] = useState(null);
+    const [errorMsg, setErrorMsg] = useState(null);
+    const [error, setError] = useState(false);
+    const [success, setSuccess] = useState(false);
 
     const get_date = new Date(birthDate).getDate();
     const get_month = new Date(birthDate).getMonth() + 1; // On ajoute +1 afin de compenser la perte de 1 moi durant la convertion
@@ -29,7 +34,6 @@ function Editprofile(props) {
     const [pwd, setpwd] = useState();
     const [image, setImage] = useState(avatar);
     const [fileDataURL, setFileDataURL] = useState(null);
-    // const [formPwdData, setFormPwdData] = useState(null);
 
     const [editMod, setEditMod] = useState(false);
 
@@ -53,8 +57,6 @@ function Editprofile(props) {
         e.preventDefault();
         setChangePwd(!changePwd);
     };
-
-    // console.log(pwd);
 
     // Request options
     const url = `http://localhost:8080/api/profiles/${userId}`;
@@ -91,12 +93,24 @@ function Editprofile(props) {
             let res = await fetch(url, reqOptions);
             let profileRes = await res.json();
 
-            console.log("=====> Reponse modification de profile");
-            console.log(profileRes);
-
-            window.location.reload();
+            if (res.ok) {
+                setMessage("Profile modifié avec succès");
+                setSuccess(true);
+                setTimeout(function () {
+                    setMessage(null);
+                    setSuccess(false);
+                    window.location.reload();
+                }, 3000);
+            } else {
+                throw new Error("Error");
+            }
         } catch (err) {
-            console.log(err);
+            setErrorMsg(err);
+            setError(true);
+            setTimeout(function () {
+                setErrorMsg(null);
+                setError(false);
+            }, 3000);
         }
     };
 
@@ -107,12 +121,24 @@ function Editprofile(props) {
             let res = await fetch(url, reqOptionsPwd);
             let profileRes = await res.json();
 
-            console.log("=====> Reponse modification de profile");
-            console.log(profileRes);
-
-            // window.location.reload();
+            if (res.ok) {
+                setMessage("Password modifié avec succès");
+                setSuccess(true);
+                setTimeout(function () {
+                    setMessage(null);
+                    setSuccess(false);
+                    window.location.reload();
+                }, 3000);
+            } else {
+                throw new Error("Error");
+            }
         } catch (err) {
-            console.log(err);
+            setErrorMsg(err);
+            setError(true);
+            setTimeout(function () {
+                setErrorMsg(null);
+                setError(false);
+            }, 3000);
         }
     };
 
@@ -120,22 +146,19 @@ function Editprofile(props) {
     const toggleEdit = () => {
         if (!editMod) {
             setEditMod(true);
-            console.log("mode edition activée !");
         } else {
             setEditMod(false);
-            console.log("mode edition désactivée !");
         }
     };
 
+    // Fonction qui permet d'afficher une image preview
     function handleChange(e) {
         setImage(e.target.files[0]);
 
         var file = e.target.files[0];
         var reader = new FileReader();
         reader.onload = function (e) {
-            // The file's text will be printed here
             const { result } = e.target;
-            // console.log(e.target.result);
             setFileDataURL(result);
         };
         reader.readAsDataURL(file);
@@ -148,30 +171,12 @@ function Editprofile(props) {
                 <button className="comments__edit--btn btn" onClick={toggleEdit}>
                     <p hidden>Afficher le formulaire de modification</p>
                     <BiEditAlt />
-                    {/* <span className="infobubble">Editer votre profile</span> */}
                 </button>
             )}
-
-            {/* <button className="profile__btn--edit btn">Edit</button> */}
 
             <div style={{ display: editMod ? "block" : "none" }}>
                 <form onSubmit={modifyProfile} className="profileForm__form" method="PUT" encType="multipart/form-data">
                     <h3>Modifiez / Ajoutez une photo de profil</h3>
-
-                    <label htmlFor="img-profile" className="btn" aria-label="Ajouter une image">
-                        <p hidden>Ajouter ou modifier votre photo de profile</p>
-                        <BiImageAdd className="imgIcon" />
-                    </label>
-                    {/* <label htmlFor="img-profile"> */}
-                    <input
-                        id="img-profile"
-                        className="profileForm__image btn"
-                        type="file"
-                        name="image"
-                        // src={image}
-                        alt="photo de profile"
-                        onChange={handleChange}
-                    />
 
                     {!fileDataURL ? (
                         <div>
@@ -185,14 +190,19 @@ function Editprofile(props) {
                         </div>
                     )}
 
-                    {/* {!image ? null : (
-                        <img
-                            className="profileForm__edit--imgPreview"
-                            src={image}
-                            alt={"Photo de profile de " + firstName}
-                        />
-                    )} */}
-                    {/* </label> */}
+                    <label htmlFor="img-profile" className="btn btn__img" aria-label="Ajouter une image">
+                        <p hidden>Ajouter ou modifier votre photo de profile</p>
+                        <BiImageAdd className="imgIcon" />
+                    </label>
+                    <input
+                        id="img-profile"
+                        className="profileForm__image btn"
+                        type="file"
+                        name="image"
+                        alt="photo de profile"
+                        onChange={handleChange}
+                    />
+
                     <div className="profileForm__personnal">
                         <h3>Modifiez vos informations personnels</h3>
                         <div className="profileForm__personnal--inputs">
@@ -244,53 +254,54 @@ function Editprofile(props) {
                                 />
                             )}
                         </label>
+
+                        <label htmlFor="emailInput" aria-label="Modifier votre adress email">
+                            <p hidden>Modifier votre adresse email</p>
+                            <input
+                                id="emailInput"
+                                className="profileForm__email"
+                                type="text"
+                                name="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                aria-label="champ modifier votre adresse email"
+                            />
+                        </label>
                     </div>
 
-                    <div className="profileForm__login">
-                        <h3>Modifiez vos informations de connexion</h3>
-                        <div className="profileForm__login--inputs">
-                            <label htmlFor="emailInput" aria-label="Modifier votre adress email">
-                                <p hidden>Modifier votre adresse email</p>
-                                <input
-                                    id="emailInput"
-                                    className="profileForm__email"
-                                    type="text"
-                                    name="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    aria-label="champ modifier votre adresse email"
-                                />
-                            </label>
-                        </div>
-                    </div>
                     <input className="profileForm__btn btn" type="submit" value="Envoyer" />
                 </form>
 
                 <form>
-                    <button className="setPwd btn" onClick={handleClick}>
-                        Changez votre mot de passe
-                    </button>
-                    <div style={{ display: changePwd ? "block" : "none" }}>
-                        <label htmlFor="passwordInput" aria-label="Modifier votre mot de passe">
-                            <p hidden>Modifier votre mot de passe</p>
+                    <div className="profileForm__login">
+                        <h3>Modifiez votre mot de passe</h3>
+                        {!error ? null : <div className="errorMsg">{errorMsg}</div>}
+                        {!success ? null : <div className="validateMsg">{message}</div>}
+                        <button className="setPwd btn" onClick={handleClick}>
+                            Changez votre mot de passe
+                        </button>
+                        <div style={{ display: changePwd ? "block" : "none" }}>
+                            <label htmlFor="passwordInput" aria-label="Modifier votre mot de passe">
+                                <p hidden>Modifier votre mot de passe</p>
+                                <input
+                                    id="passwordInput"
+                                    className="profileForm__password"
+                                    type="password"
+                                    name="password"
+                                    placeholder="******"
+                                    onChange={(e) => setpwd(e.target.value)}
+                                    aria-label="champ modifier votre mot de passe"
+                                />
+                            </label>
                             <input
-                                id="passwordInput"
-                                className="profileForm__password"
-                                type="password"
-                                name="password"
-                                placeholder="******"
-                                onChange={(e) => setpwd(e.target.value)}
-                                aria-label="champ modifier votre mot de passe"
+                                className="profileForm__btn btn"
+                                type="submit"
+                                value="Envoyer votre nouveau mot de passe"
+                                autoComplete="new-password"
+                                onClick={changePwdReq}
+                                aria-label="Envoyer le nouveau mot de passe"
                             />
-                        </label>
-                        <input
-                            className="profileForm__btn btn"
-                            type="submit"
-                            value="Envoyer votre nouveau mot de passe"
-                            autoComplete="new-password"
-                            onClick={changePwdReq}
-                            aria-label="Envoyer le nouveau mot de passe"
-                        />
+                        </div>
                     </div>
                 </form>
 
@@ -298,13 +309,8 @@ function Editprofile(props) {
                     <p>
                         <strong>Supprimez votre compte *</strong>
                     </p>
-                    <p>* Attention ! cette action est définitive. </p>
-                    {/* <button className="btn">
-                        <BiTrash />
-                    </button> */}
-                    <ErrorBoundary>
-                        <DeleteAccount userId={userId} access={access} />
-                    </ErrorBoundary>
+                    <p>* Attention! Cette action est définitive. </p>
+                    <DeleteAccount userId={userId} access={access} />
                 </div>
             </div>
         </div>

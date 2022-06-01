@@ -57,26 +57,15 @@ exports.getAllcomments = (req, res, next) => {
 
         const showComments = `SELECT * FROM comments INNER JOIN users_profiles ON comments.author_comment_id = users_profiles.user_id WHERE article_id = ? ORDER by timestamp ASC`;
 
-        // const showComments = `SELECT * FROM comments WHERE article_id = ?`;
-
-        // const showComments = `SELECT * FROM comments
-        //                     JOIN articles ON (comments.article_id = article_id)
-        //                     JOIN users_profiles ON (comments.author_comment_id = users_profiles.user_id)`;
-
         await connection.query(showComments, article_id, async (err, found) => {
             connection.release();
             if (err) throw err;
 
             if (found.length <= 0) {
-                return res.status(404).json({ error: "Il n'y a aucun commentaire à afficher" });
+                return res.status(201).json({ MESSAGE: "Il n'y a aucun commentaire à afficher" });
             }
-            // console.log(found);
 
             let allComments = [];
-
-            // author_firstName: author.first_name,
-            // author_lastName: author.last_name,
-            // author_avatarUrl: author.avatar,
 
             found.forEach((comment) => {
                 let commentInfo = {

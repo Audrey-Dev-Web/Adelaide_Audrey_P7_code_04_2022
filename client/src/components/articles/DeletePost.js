@@ -8,12 +8,13 @@ import { BiTrash } from "react-icons/bi";
 function DeletePost(props) {
     let navigate = useNavigate();
     let { postSlug } = useParams();
-    // const { access } = props;
-
     // On récupère l'id du post à supprimer
     const { post_id, author_id, access } = props;
 
     const [isAuthorized, setIsAuthorized] = useState(false);
+
+    const [errorMsg, setErrorMsg] = useState(null);
+    const [error, setError] = useState(false);
 
     const token = access;
     const decoded = jwt_decode(token);
@@ -43,34 +44,43 @@ function DeletePost(props) {
     }, []);
 
     const del = async (e) => {
-        // e.preventDefault();
-
         console.log("click");
         try {
             let res = await fetch(url, reqOptions);
             let deleteRes = await res.json();
 
             if (res.ok) {
-                // window.location.reload();
                 if (postSlug === undefined) {
                     window.location.reload();
+                    navigate("/");
                 }
 
+                if (postSlug) {
+                    window.location.reload();
+                    navigate("/");
+                }
+
+                window.location.reload();
                 navigate("/");
             } else {
                 throw new Error("Error");
             }
 
-            // window.location.reload();
+            window.location.reload();
         } catch (err) {
-            console.log(err);
+            setErrorMsg("Aucun texte a envoyer");
+            setError(true);
+            setTimeout(function () {
+                setErrorMsg(null);
+                setError(false);
+            }, 3000);
         }
     };
 
     return (
         <div>
+            {!error ? null : <div className="errorMsg">{errorMsg}</div>}
             {!isAuthorized ? null : (
-                // <button className="post__delete btn btn__delete" onClick={(e) => del(e)}>
                 <button
                     className="post__delete btn btn__delete"
                     onClick={() => {

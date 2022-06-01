@@ -16,9 +16,14 @@ function Comments(props) {
 
     const [data, setData] = useState({ data: [] });
     const [showComments, setShowComments] = useState(false);
-    // const [dataIsLoaded, setDataIsLoaded] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [err, setErr] = useState("");
+
+    const [message, setMessage] = useState(null);
+    const [errorMsg, setErrorMsg] = useState(null);
+    const [error, setError] = useState(false);
+    const [success, setSuccess] = useState(false);
+    const [noComments, setNoComments] = useState(false);
 
     // State pour afficher ou non le formulaire de commentaire
     const [createMod, setCreateMod] = useState(false);
@@ -51,22 +56,29 @@ function Comments(props) {
             try {
                 const res = await fetch(url, reqOptions);
 
-                if (!res.ok) {
-                    throw new Error(`Error! status: ${res.status}`);
+                if (res.status === 201) {
+                    setMessage("Soyez le premier à commenter cet article !");
+                    setNoComments(true);
                 }
 
-                const result = await res.json();
-
-                // console.log("result is: ", result);
-                // console.log("result de data.allComments: ", data.allComments);
-                // console.log("Résultat de data.allComments[0].id: ", data.allComments[0].id);
-                // console.log("result is: ", JSON.stringify(result, null, 4));
-
-                setData(result);
+                if (res.ok) {
+                    const result = await res.json();
+                    setData(result);
+                } else {
+                    setErrorMsg(err);
+                    setError(true);
+                    setTimeout(function () {
+                        setErrorMsg(null);
+                        setError(false);
+                    }, 3000);
+                }
             } catch (err) {
-                setErr("Aucun commentaire à afficher");
-            } finally {
-                setIsLoading(false);
+                setErrorMsg(err);
+                setError(true);
+                setTimeout(function () {
+                    setErrorMsg(null);
+                    setError(false);
+                }, 3000);
             }
         }
     };
@@ -86,28 +98,11 @@ function Comments(props) {
         }
     };
 
-    // Affiche le formulaire de commentaire au click
-    // function toggleCreateMod(e) {
-    //     setCreateMod(!createMod);
-    // }
-
     return (
         <div>
-            {/* <button className="btn" onClick={handleClick}>
-                Afficher les commentaires
-            </button> */}
-            {/* <ErrorBoundary>
-                <CommentForm post_id={post.article.id} />
-            </ErrorBoundary> */}
-            {/* <div className="showComments" style={{ display: showComments ? "block" : "none" }}> */}
             <div className="showComments">
                 {/* AFFICHAGE DU FORMULAIRE DE COMMENTAIRE */}
                 <div className="showCommentForm">
-                    {/* <h3>Ajouter un commentaire</h3> */}
-                    {/* <button type="button" className="btn" onClick={toggleCreateMod}>
-                        <p hidden>Ajouter un commentaire</p>
-                        <BiCommentAdd />
-                    </button> */}
                     <div className="showCommentForm">
                         <ErrorBoundary>
                             <CommentForm post_id={post_id} access={access} />
@@ -115,8 +110,9 @@ function Comments(props) {
                     </div>
                 </div>
 
-                {err ? <h2>{err}</h2> : <h3 className="comments__title">Commentaires :</h3>}
-
+                {!error ? null : <div className="errorMsg">{errorMsg}</div>}
+                <h3 className="comments__title">{!noComments ? "Commentaires" : message}</h3>
+                {!success ? null : <div className="validateMsg">{message}</div>}
                 {data.allComments?.map((comment) => {
                     return (
                         <div className="comments__post" key={comment.id}>
@@ -145,13 +141,6 @@ function Comments(props) {
                                         access={access}
                                     />
                                 </ErrorBoundary>
-
-                                {/* <DeleteComment
-                                    author_id={comment.author_id}
-                                    post_id={comment.article_id}
-                                    comment_id={comment.id}
-                                    access={access}
-                                /> */}
                             </div>
                         </div>
                     );

@@ -8,11 +8,15 @@
     background: $accent_color_3;
     color: $accent_color_2;
 
-    // border: 3px solid $accent_color_2;
     width: 50px;
     height: 50px;
     border-radius: 100%;
-    margin-right: 2%;
+    margin-right: 15px;
+
+    &:hover {
+        color: $accent_color_3;
+        background: $accent_color_2;
+    }
 }
 
 .adminName {

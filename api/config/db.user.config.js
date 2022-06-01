@@ -10,12 +10,13 @@ const db_port = process.env.DB_PORT;
 
 // On utilise CreatePool pour permettre plusieurs connexion simultanées
 const connection = mysql.createPool({
-    connectionLimit: 200,
+    connectionLimit: 100,
     host: db_host,
     user: db_user,
     password: db_password,
     database: db,
     port: db_port,
+    // multipleStatements: true,
 });
 
 module.exports = connection;

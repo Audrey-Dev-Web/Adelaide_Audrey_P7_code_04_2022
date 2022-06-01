@@ -3,7 +3,6 @@
     margin: 2% 0;
     &__data {
         width: 55%;
-        // padding: 2%;
         border-radius: 15px;
         margin: 0 auto;
         background: darken($principal_bg, 5%);
@@ -16,7 +15,7 @@
 
         @include mobile-only {
             width: 100%;
-            margin: 2%;
+            // margin: 2%;
         }
     }
 
@@ -67,12 +66,27 @@
         border: 3px #fff;
         border-style: solid;
     }
+
+    &__delete {
+        margin: 5% auto;
+        text-align: center;
+        border-top: 3px solid $accent_color_3;
+        padding-top: 5%;
+
+        & .btn__delete {
+            margin: 5% auto;
+        }
+    }
 }
 
 .profileForm {
     width: 100%;
     padding: 2%;
     margin: 0 0 2%;
+
+    & .btn__img {
+        width: 100px;
+    }
 
     &__form {
         margin: 2% 0 0;
@@ -125,7 +139,7 @@
     }
 
     &__login {
-        margin: 5% 0;
+        margin: 5% auto;
 
         & h3 {
             text-align: center;
@@ -169,5 +183,6 @@
     .setPwd {
         font-size: 1.2rem;
         font-weight: 700;
+        margin: 5% auto;
     }
 }

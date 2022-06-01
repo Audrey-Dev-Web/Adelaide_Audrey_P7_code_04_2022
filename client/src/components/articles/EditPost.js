@@ -7,27 +7,19 @@ function EditPost(props) {
     // On récupère les données utiles
     const { post_id, author_id, post_title, post_content, post_img, access } = props;
 
-    // On prépare le state local
     const [title, setTitle] = useState(post_title);
     const [content, setContent] = useState(post_content);
     const [image, setImage] = useState(post_img);
     const [fileDataURL, setFileDataURL] = useState(null);
 
-    const [editMod, setEditMod] = useState(false);
-
-    // On récupère les données pour les authorisations
-    // const user = JSON.parse(sessionStorage.getItem("isAuthenticate"));
-    // const token = user.pass;
-    // const user_id = user.id;
+    const [message, setMessage] = useState(null);
+    const [errorMsg, setErrorMsg] = useState(null);
+    const [error, setError] = useState(false);
+    const [success, setSuccess] = useState(false);
 
     const token = access;
     const decoded = jwt_decode(token);
     const user_id = decoded.userId;
-    // const user_role = access.role;
-
-    const [isAuthor, setIsAuthor] = useState(false);
-
-    // console.log(props);
 
     // On créer le formData
     const formData = new FormData();
@@ -45,20 +37,6 @@ function EditPost(props) {
         },
     };
 
-    // On vérifis si l'utilisateur est l'auteur du post
-    const set_author = () => {
-        if (user_id === author_id) {
-            setIsAuthor(true);
-        }
-    };
-
-    useEffect(() => {
-        set_author();
-    }, []);
-
-    // console.log("Est-ce que l'utilisateur est l'auteur du post ? ", isAuthor, author_id);
-    // console.log(user_id);
-
     // Fonction pour modifier un commentaire
     const editPost = async (e) => {
         e.preventDefault();
@@ -66,24 +44,35 @@ function EditPost(props) {
             let res = await fetch(url, reqOptions);
             let editRes = await res.json();
 
-            console.log("=====> Réponse commentaire envoyé : ");
-            console.log(editRes);
-
-            window.location.reload();
+            if (res.ok) {
+                setMessage("Article modifié avec succès");
+                setSuccess(true);
+                setTimeout(function () {
+                    setMessage(null);
+                    setSuccess(false);
+                    window.location.reload();
+                }, 3000);
+            } else {
+                throw new Error("Error");
+            }
         } catch (err) {
-            console.log(err);
+            setErrorMsg(err);
+            setError(true);
+            setTimeout(function () {
+                setErrorMsg(null);
+                setError(false);
+            }, 3000);
         }
     };
 
+    // Fonction pour récupérer l'image qui vient d'être ajouté
     function handleImgChange(e) {
         setImage(e.target.files[0]);
 
         var file = e.target.files[0];
         var reader = new FileReader();
         reader.onload = function (e) {
-            // The file's text will be printed here
             const { result } = e.target;
-            // console.log(e.target.result);
             setFileDataURL(result);
         };
         reader.readAsDataURL(file);
@@ -121,8 +110,6 @@ function EditPost(props) {
                         />
                     </label>
 
-                    {/* Ici, si le post n'a pas d'image on affiche rien, s'il en a une on l'affiche, si une image 
-                    a été uploadé on l'affiche à la place de l'image actuelle de l'article */}
                     {!fileDataURL ? (
                         <div>
                             <p className="previewTxt">Image preview</p>
@@ -146,10 +133,11 @@ function EditPost(props) {
                             type="file"
                             id="changeImg"
                             name="image"
-                            // src={image}
                             onChange={handleImgChange}
                             aria-label="Modifier ou ajouter une image"
                         />
+                        {!error ? null : <div className="errorMsg">{errorMsg}</div>}
+                        {!success ? null : <div className="validateMsg">{message}</div>}
 
                         <label htmlFor="sendEdit" className="btn" aria-label="Ajouter une image">
                             <p hidden>Ajouter une image</p>

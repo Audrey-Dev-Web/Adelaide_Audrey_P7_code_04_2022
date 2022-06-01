@@ -1,22 +1,27 @@
 .btn {
     background: $accent_color_3;
     color: #fff;
-    font-size: 1.1rem;
+    font-size: 1.5rem;
     outline: none;
     border: none;
     border-radius: 15px;
 
-    padding: 15px 30px;
-    // height: 40px;
-
-    // text-align: center;
-    // display: flex;
-    // align-items: center;
-    // justify-content: center;
+    padding: 10px 20px;
+    margin: 1%;
 
     @include flex-center;
 
     transition: all 100ms ease-in-out;
+    &__share {
+        background: $principal_bg;
+    }
+
+    &__comments {
+        background: $principal_bg;
+        &--count {
+            color: green;
+        }
+    }
 
     &__edit {
         background: $principal_bg;
@@ -24,6 +29,11 @@
 
     &__delete {
         background: grey;
+        margin: 0 20%;
+    }
+
+    &__img {
+        width: 10%;
     }
 
     &:hover {
@@ -45,4 +55,11 @@
     &:hover {
         color: $accent_color_3;
     }
+}
+
+.resetBtn {
+    outline: none;
+    border: none;
+    background: none;
+    color: #fff;
 }

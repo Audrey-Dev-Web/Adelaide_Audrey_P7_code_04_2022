@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import jwt_decode from "jwt-decode";
 
-import { BiCalendarCheck, BiUserCheck, BiMailSend, BiTrash } from "react-icons/bi";
+import { BiCalendarCheck, BiUserCheck, BiMailSend } from "react-icons/bi";
 
 import DateTime from "../../components/DateTime";
 import EditProfile from "../../components/usersProfile/Editprofile";
@@ -16,9 +16,8 @@ function Profile(props) {
     let { userSlug } = useParams();
     const [userData, setUserData] = useState({ profile: {} });
     const [dataIsLoaded, setDataIsLoaded] = useState(false);
-    const [errorMsg, setErrorMsg] = useState("");
-
-    const [isAuthorized, setIsAuthorized] = useState(false);
+    const [errorMsg, setErrorMsg] = useState(null);
+    const [error, setError] = useState(false);
 
     const token = access;
     const decoded = jwt_decode(token);
@@ -36,29 +35,39 @@ function Profile(props) {
         },
     };
 
-    const fetchProfile = () => {
-        fetch(url, reqOptions)
-            .then((res) => {
-                if (res.ok) {
-                    return res.json();
-                } else {
-                    console.log("Ce profile n'existe pas");
-                }
-            })
-            .then((data) => {
-                setUserData(data);
-                setDataIsLoaded(true);
+    useEffect(() => {
+        // Requête pour récupérer les informations du profile de l'utilisateur
+        const fetchProfile = async () => {
+            try {
+                const res = await fetch(url, reqOptions);
+                const data = await res.json();
 
-                // console.log(data);
-            })
-            .catch((err) => {
+                if (res.ok) {
+                    setUserData(data);
+                    setDataIsLoaded(true);
+                    setError(false);
+                } else {
+                    setErrorMsg("Ce compte utilisateur n'existe pas");
+                    setError(true);
+
+                    setTimeout(function () {
+                        setErrorMsg(null);
+                        setError(false);
+                    }, 3000);
+                }
+            } catch (err) {
                 if (err) {
                     setErrorMsg(err);
-                }
-            });
-    };
+                    setError(true);
 
-    useEffect(() => {
+                    setTimeout(function () {
+                        setErrorMsg(null);
+                        setError(false);
+                    }, 3000);
+                }
+            }
+        };
+
         fetchProfile();
     }, []);
 
@@ -66,12 +75,10 @@ function Profile(props) {
     if (!dataIsLoaded) {
         return (
             <div>
-                <h1> Pleases wait some time.... </h1>
+                <h1> En chargement... </h1>
             </div>
         );
     }
-
-    // console.log("", userData);
 
     return (
         <div className="profile">
@@ -115,17 +122,17 @@ function Profile(props) {
                     </div>
 
                     <div className="profile__infos">
-                        <div className="profile__user--margin">
-                            <p>
-                                <BiCalendarCheck /> Date de naissance : <span>{userData.profile.birthdate}</span>
-                            </p>
-                        </div>
-
                         {userData.profile.role !== "admin" ? (
                             <div className="profile__user--margin">
                                 <p>
                                     Role : <span>{userData.profile.role}</span>
                                 </p>
+                            </div>
+                        ) : null}
+
+                        {error ? (
+                            <div className="errorMsg">
+                                <p>{errorMsg}</p>
                             </div>
                         ) : null}
 

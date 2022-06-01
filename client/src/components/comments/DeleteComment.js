@@ -7,10 +7,11 @@ function DeleteComment(props) {
     // On récupère l'id de l'utilisateur avec props
     const { post_id, author_id, comment_id, access } = props;
 
-    // On ajoute la double validation avant suppression
-
     // useState pour stocker le boolean si oui ou non l'utilisateur est autorisé à supprimer
     const [isAuthorized, setIsAuthorized] = useState(false);
+
+    const [errorMsg, setErrorMsg] = useState(null);
+    const [error, setError] = useState(false);
 
     const token = access;
     const decoded = jwt_decode(token);
@@ -40,22 +41,28 @@ function DeleteComment(props) {
     }, []);
 
     const deleteComment = async (e) => {
-        // e.preventDefault();
         try {
             let res = await fetch(url, reqOptions);
             let commentRes = await res.json();
 
-            console.log("=====> Réponse commentaire envoyé : ");
-            console.log(commentRes);
-
-            window.location.reload();
+            if (res.ok) {
+                window.location.reload();
+            } else {
+                throw new Error("Error");
+            }
         } catch (err) {
-            console.log(err);
+            setErrorMsg(err);
+            setError(true);
+            setTimeout(function () {
+                setErrorMsg(null);
+                setError(false);
+            }, 3000);
         }
     };
 
     return (
         <div>
+            {!error ? null : <div className="errorMsg">{errorMsg}</div>}
             {!isAuthorized ? null : (
                 <button
                     className="comments__delete--btn btn"

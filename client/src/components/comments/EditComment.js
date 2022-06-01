@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import jwt_decode from "jwt-decode";
 
 import DeleteComment from "./DeleteComment";
-// Import pour la gestion des erreurs
-import ErrorBoundary from "../ErrorBoundary";
 
 import { BiEditAlt } from "react-icons/bi";
 
@@ -14,6 +12,10 @@ function EditComment(props) {
     // On prépare le state local pour stocker les données à modifier
     const [comment, setComment] = useState(comment_value);
     const [isAuthor, setIsAuthor] = useState(false);
+    const [message, setMessage] = useState(null);
+    const [success, setSuccess] = useState(false);
+    const [errorMsg, setErrorMsg] = useState(null);
+    const [error, setError] = useState(false);
 
     // Hide and show form
     const [editMod, setEditMod] = useState(false);
@@ -52,10 +54,8 @@ function EditComment(props) {
     const toggleEdit = () => {
         if (!editMod) {
             setEditMod(true);
-            console.log("mode edition activée !");
         } else {
             setEditMod(false);
-            console.log("mode edition désactivée !");
         }
     };
 
@@ -66,21 +66,26 @@ function EditComment(props) {
             let res = await fetch(url, reqOptions);
             let commentRes = await res.json();
 
-            console.log("=====> Réponse commentaire envoyé : ");
-            console.log(commentRes);
-
-            window.location.reload();
+            if (res.ok) {
+                setMessage("Commentaire modifié avec succès");
+                setSuccess(true);
+                setTimeout(function () {
+                    setMessage(null);
+                    setSuccess(false);
+                    window.location.reload();
+                }, 3000);
+            } else {
+                throw new Error("Error");
+            }
         } catch (err) {
-            console.log(err);
+            setErrorMsg(err);
+            setError(true);
+            setTimeout(function () {
+                setErrorMsg(null);
+                setError(false);
+            }, 3000);
         }
     };
-
-    // console.log("=====> Test sur le propriétaire du commentaire");
-    // console.log(isAuthor);
-    // console.log("=====> Author id");
-    // console.log(author_id);
-    // console.log("=====> User id");
-    // console.log(user_id);
 
     return (
         <div className="comment">
@@ -91,23 +96,16 @@ function EditComment(props) {
                         <BiEditAlt />
                         <span className="infobubble">Editer ce commentaire</span>
                     </button>
-                    <ErrorBoundary>
-                        <DeleteComment
-                            author_id={author_id}
-                            post_id={post_id}
-                            comment_id={comment_id}
-                            access={access}
-                        />
-                    </ErrorBoundary>
+                    <DeleteComment author_id={author_id} post_id={post_id} comment_id={comment_id} access={access} />
                 </div>
             )}
 
             <div className="comment__editForm">
-                {/* <span className="editMod" style={{ display: editMod ? "block" : "none" }, }> */}
                 <span className={editMod ? "showForm editMod" : "hideForm editMod"}>
                     <h3>Modifier votre commentaire</h3>
                     <form className="comment__editForm--form" onSubmit={modifyComment}>
                         <label htmlFor="comment-content" aria-label="Créer un commentaire">
+                            <p hidden>Modifier votre commentaire</p>
                             <textarea
                                 id="comment-content"
                                 className="comment__editForm--content"
@@ -118,6 +116,9 @@ function EditComment(props) {
                                 onChange={(e) => setComment(e.target.value)}
                             />
                         </label>
+
+                        {!error ? null : <div className="errorMsg">{errorMsg}</div>}
+                        {!success ? null : <div className="validateMsg">{message}</div>}
 
                         <div>
                             <input

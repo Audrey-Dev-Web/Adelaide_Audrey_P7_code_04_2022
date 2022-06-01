@@ -1,26 +1,21 @@
-/*
-Cette page sert à chercher et afficher tous les utilisateurs inscrits
-*/
-
 import React, { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 
 import { useCookies } from "react-cookie";
 import jwt_decode from "jwt-decode";
 
+import { BiCheckShield } from "react-icons/bi";
+
 import DateTime from "../DateTime";
 
-function UsersProfile(props) {
+// Permet de chercher et d'afficher les 5 derniers utilisateurs inscrits
+function UsersProfile() {
     const [cookies] = useCookies("access");
     const [users, setUsers] = useState([]);
     const [dataIsLoaded, setDataIsLoaded] = useState(false);
-    const [showMore, setShowMore] = useState(false);
     const [message, setMessage] = useState(null);
 
-    const decoded = jwt_decode(cookies.access);
     const token = cookies.access;
-    const user_id = decoded.userId;
-    const User_role = decoded.role;
 
     const url = `http://localhost:8080/api/profiles`;
     const reqOptions = {
@@ -48,13 +43,12 @@ function UsersProfile(props) {
                     setMessage(err);
                 }
             });
-        // }
     }, []);
 
     if (!dataIsLoaded) {
         return (
             <div>
-                <h1> Pleases wait some time.... </h1>
+                <h1>En chargement...</h1>
             </div>
         );
     }
@@ -63,7 +57,11 @@ function UsersProfile(props) {
         return (
             <li className="usersList__user" key={user.usersProfile.user_Id}>
                 <NavLink className="usersList__user--link" to={"/profile/" + user.usersProfile.user_Id}>
-                    {!user.usersProfile.avatar ? (
+                    {user.usersProfile.role === "admin" ? (
+                        <div className="adminIcon">
+                            <BiCheckShield className="icon" />
+                        </div>
+                    ) : !user.usersProfile.avatar ? (
                         <div className="usersList__user--avatar initiales">
                             <p>
                                 {`${user.usersProfile.first_name} ${user.usersProfile.last_name}
@@ -80,12 +78,17 @@ function UsersProfile(props) {
                             alt={"photo de profile de " + user.usersProfile.first_name}
                         />
                     )}
+
                     <div>
                         <div className="usersList__user--name">
-                            <p>
-                                <span className="user__firstName">{user.usersProfile.first_name} </span>
-                                <span className="user__lastName">{user.usersProfile.last_name}</span>
-                            </p>
+                            {user.usersProfile.role === "admin" ? (
+                                <p>Administrateur</p>
+                            ) : (
+                                <p>
+                                    <span className="user__firstName">{user.usersProfile.first_name} </span>
+                                    <span className="user__lastName">{user.usersProfile.last_name}</span>
+                                </p>
+                            )}
                         </div>
 
                         <div className="usersList__user--signupDate">

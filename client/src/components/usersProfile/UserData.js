@@ -1,24 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-
 import jwt_decode from "jwt-decode";
-
 import DateTime from "../DateTime";
 
 import { BiCheckShield } from "react-icons/bi";
 
+// Permet de récupérer et d'afficher les informations de l'utilisateur dont on communique l'id en props
 function UserData(props) {
     const { realAuthor_id, dateTime, access } = props;
     const [realAuthor, setRealAuthor] = useState([]);
     const [dataOk, setDataOk] = useState(false);
-    // const [msg, setMsg] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
     const [userFound, setUserFound] = useState(false);
-    // const [notFound, setNotFound] = useState(true);
 
     const token = access;
     const decoded = jwt_decode(token);
-    // const user_id = decoded.user_id;
     const user_role = decoded.role;
 
     const url = `http://localhost:8080/api/profiles/${realAuthor_id}`;
@@ -62,7 +57,12 @@ function UserData(props) {
     }, []);
 
     if (!dataOk) {
-        return null;
+        return (
+            <div>
+                <h1>En cours de chargement</h1>
+                <p>{errorMessage}</p>
+            </div>
+        );
     }
 
     const first_Name = realAuthor.firstName;

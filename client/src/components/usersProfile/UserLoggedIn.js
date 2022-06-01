@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from "react";
-// import { useCookies, cookies, withCookies } from "react-cookie";
 import jwt_decode from "jwt-decode";
 
 import UserData from "../usersProfile/UserData";
 
+// Permet de récupérer et d'afficher la photo de profile et le nom de l'utilisateur dans la bar de navigation
 function UserLoggedIn(props) {
     const { access } = props;
-
     const [user, setUser] = useState([]);
-
     const decoded = jwt_decode(access);
     const user_id = decoded.userId;
 
@@ -37,7 +35,7 @@ function UserLoggedIn(props) {
     if (!user.DataIsLoaded)
         return (
             <div>
-                <h1> Pleses wait some time.... </h1>{" "}
+                <h1> En cours de chargement... </h1>
             </div>
         );
 

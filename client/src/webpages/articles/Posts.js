@@ -4,9 +4,6 @@ import jwt_decode from "jwt-decode";
 
 import { BiComment, BiEditAlt, BiRepost } from "react-icons/bi";
 
-// Import pour afficher le format de la date
-import DateTime from "../../components/DateTime";
-
 // Import pour la gestion des commentaires
 import Comments from "../../components/comments/Comments";
 // import CommentForm from "../../components/CommentForm";
@@ -31,15 +28,15 @@ function Posts(props) {
         is_open: false,
         id: null,
     });
-    // const [postEdit_id, setPostEdit_id] = useState(0);
+
     const [toggleComments, setToggleComments] = useState({
         comments_is_open: false,
         id: null,
     });
-    // const [toggleComments_id, setToggleComments_id] = useState(0);
 
     const [posts, setPosts] = useState({ posts: [] });
 
+    // on récupère l'id et le role de l'utilisateur
     const decoded = jwt_decode(access);
     const user_id = decoded.userId;
     const role = decoded.role;
@@ -54,6 +51,7 @@ function Posts(props) {
         },
     };
 
+    // permet d'afficher ou de cacher le formulaire de modification
     const showEditForm = (id) => {
         if (postEdit.is_open) {
             setPostEdit({
@@ -73,10 +71,9 @@ function Posts(props) {
                 id: id,
             });
         }
-        // setPostEdit(!postEdit);
-        // setPostEdit_id(id);
     };
 
+    // Permet d'afficher ou de cacher la liste des commentaires
     const showComments = (id) => {
         if (toggleComments.comments_is_open) {
             setToggleComments({
@@ -99,21 +96,24 @@ function Posts(props) {
     };
 
     useEffect(() => {
+        // Permet de récupérer et d'afficher les articles
         async function fetchData() {
             const res = await fetch(url, reqOptions);
             const data = await res.json();
 
-            setPosts({ posts: data.articlesFound, DataIdLoaded: true });
+            if (res.ok) {
+                setPosts({ posts: data.articlesFound, DataIdLoaded: true });
+            }
         }
         fetchData();
-    }, []);
+    }, [posts]);
 
     const postsData = posts.posts;
 
     if (!posts.DataIdLoaded) {
         return (
             <div>
-                <h1>Aucune donnée a afficher pour le moment...</h1>
+                <h1>Aucun article a afficher pour le moment</h1>
             </div>
         );
     }
@@ -121,7 +121,9 @@ function Posts(props) {
     const showPosts = postsData.map((post) => {
         return (
             <div className="article" key={post.article.id}>
-                <Link to={"/articles/" + post.article.id}>
+                {/* Le lien renvoi vers la page de l'article */}
+                <Link to={"/articles/" + (post.article.shared_id ? post.article.shared_id : post.article.id)}>
+                    {/* Affichage de l'entête des articles*/}
                     <div className="article__header">
                         <div className="article__header--author">
                             <UserData
@@ -142,6 +144,7 @@ function Posts(props) {
                             )}
                         </div>
                     </div>
+
                     {/* Affichage du contenu de l'article */}
                     <div className="article__content">
                         {post.article.is_shared ? (
@@ -155,8 +158,8 @@ function Posts(props) {
                                 </div>
                             </div>
                         ) : null}
-                        <h2 className="article__header--title">{post.article.title}</h2>
 
+                        <h2 className="article__header--title">{post.article.title}</h2>
                         {post.article.content}
                         {!post.article.images ? null : (
                             <img
@@ -174,88 +177,71 @@ function Posts(props) {
                         <div className="social__wrapper">
                             {/* PARTAGER - SHARE */}
                             <div className="social">
-                                <span className="social__icon">
-                                    <ErrorBoundary>
-                                        <SharePost post_id={post.article.id} access={access} />
-                                    </ErrorBoundary>
-                                </span>
-                                <span className="social__count">{post.article.shares}</span>
+                                <ErrorBoundary>
+                                    <SharePost
+                                        post_id={post.article.id}
+                                        access={access}
+                                        commentsCount={post.article.shares}
+                                    />
+                                </ErrorBoundary>
                             </div>
 
                             {/* COMMENTAIRES BUTTON */}
                             <div className="social">
-                                {/* Ce bouton doit ouvrir la div contenant les composants de commentaires */}
-                                <button type="button" className="btn" onClick={() => showComments(post.article.id)}>
+                                <button
+                                    type="button"
+                                    className="btn btn__comments"
+                                    onClick={() => showComments(post.article.id)}
+                                >
+                                    <p hidden>Afficher les commentaires</p>
                                     <BiComment />
-                                    <span className="social__count">{post.article.comments}</span>
+                                    <span className="social__count btn__comments--count">{post.article.comments}</span>
                                 </button>
                             </div>
                         </div>
 
-                        {/* BOUTONS POUR MODIFIER ET SUPPRIMER UN POST */}
-                        {post.article.is_shared ? (
-                            // si l'article est un partage
-                            <div className="social__icon social__postManage">
-                                <div className="social__icon cancelShare">
-                                    {/* Mettre le composant share ici */}
-                                    {user_id === post.article.author ? (
-                                        // Si l'utilisateur est le propriétaire
-                                        <div className="social__icon shareBtn">
-                                            {/* Cancel Sharing */}
+                        {/* BOUTONS POUR MODIFIER ET DE SUPPRESSION DES POSTS */}
+                        <div className="social__icon social__postManage">
+                            {user_id === post.article.author ? (
+                                <div>
+                                    {!post.article.is_shared ? (
+                                        <div className="social__icon editPost">
+                                            {/* Si l'utilisateur est le propriétaire il peut modifier l'article */}
+                                            <button
+                                                type="button"
+                                                className="btn btn__edit"
+                                                onClick={() => showEditForm(post.article.id)}
+                                            >
+                                                <p hidden>Afficher le formulaire de modification</p>
+                                                <BiEditAlt />
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="social__icon">
                                             <SharePost
-                                                // id="cancelShare"
                                                 is_shared={post.article.is_shared}
                                                 post_id={post.article.shared_id}
                                                 access={access}
                                             />
-                                            {/* cancel */}
                                         </div>
-                                    ) : null}
+                                    )}
                                 </div>
-                                <div className="social__icon deletePost">
-                                    {user_id !== post.article.author && role === "admin" ? (
-                                        // Si l'utilisateur n'est pas le propriétaire et qu'il est admin
-                                        <DeletePost
-                                            post_id={post.article.id}
-                                            author_id={post.article.author}
-                                            access={access}
-                                        />
-                                    ) : null}
-                                </div>
+                            ) : null}
+                            <div className="social__icon deletePost">
+                                {user_id === post.article.author || role === "admin" ? (
+                                    <DeletePost
+                                        post_id={post.article.id}
+                                        author_id={post.article.author}
+                                        access={access}
+                                    />
+                                ) : null}
                             </div>
-                        ) : (
-                            // Si c'est un article normal
-                            <div className="social__icon social__postManage">
-                                <div className="social__icon editPost">
-                                    {user_id === post.article.author ? (
-                                        // Si l'utilisateur est le propriétaire il peut modifier l'article
-                                        <button
-                                            type="button"
-                                            className="btn"
-                                            onClick={() => showEditForm(post.article.id)}
-                                        >
-                                            <p hidden>Afficher le formulaire de modification</p>
-                                            <BiEditAlt />
-                                        </button>
-                                    ) : null}
-                                </div>
-                                <div className="social__icon deletePost">
-                                    {user_id === post.article.author || role === "admin" ? (
-                                        <DeletePost
-                                            post_id={post.article.id}
-                                            author_id={post.article.author}
-                                            access={access}
-                                        />
-                                    ) : null}
-                                </div>
-                            </div>
-                        )}
+                        </div>
                     </div>
 
                     {/* AFFICHAGE DES COMPOSANTS DE L'ARTICLE */}
                     <div className="article__displayComponents">
                         {/* AFFICHAGE DU FORMULAIRE POUR MODIFIER L'ARTICLE */}
-
                         {postEdit.id == post.article.id ? (
                             <div
                                 className="article__editPost"
