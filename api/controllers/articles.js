@@ -30,8 +30,6 @@ exports.createArticle = (req, res, next) => {
                 content: article.content,
                 images: article.images,
                 comments: 0,
-                likes: 0,
-                dislikes: 0,
                 shares: 0,
             };
 
