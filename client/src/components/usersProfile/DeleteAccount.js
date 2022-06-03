@@ -61,6 +61,8 @@ function DeleteAccount(props) {
                         window.location.reload();
                     }, 3500);
                 }
+                navigate("/");
+                window.location.reload();
             } else {
                 setDeleteOK(false);
                 throw new Error("Error");

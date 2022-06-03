@@ -231,7 +231,7 @@ function Editprofile(props) {
                             </label>
                         </div>
 
-                        <label htmlFor="birthDate" aria-label="Date de naissance">
+                        {/* <label htmlFor="birthDate" aria-label="Date de naissance">
                             <p hidden>Modifier ou ajoutez votre date de naissance</p>
                             {!birthDate ? (
                                 <input
@@ -253,7 +253,7 @@ function Editprofile(props) {
                                     aria-label="Modifier votre date de naissance"
                                 />
                             )}
-                        </label>
+                        </label> */}
 
                         <label htmlFor="emailInput" aria-label="Modifier votre adress email">
                             <p hidden>Modifier votre adresse email</p>

@@ -239,15 +239,15 @@ exports.modifyProfile = (req, res, next) => {
                             });
                         }
 
-                        if (req.body.birthdate) {
-                            const newBirthdate = req.body.birthdate;
+                        // if (req.body.birthdate) {
+                        //     const newBirthdate = req.body.birthdate;
 
-                            const update = `UPDATE users_profiles SET birthdate = '${newBirthdate}' WHERE user_id = ?`;
+                        //     const update = `UPDATE users_profiles SET birthdate = '${newBirthdate}' WHERE user_id = ?`;
 
-                            connection.query(update, profile_id, (err, result) => {
-                                if (err) throw err;
-                            });
-                        }
+                        //     connection.query(update, profile_id, (err, result) => {
+                        //         if (err) throw err;
+                        //     });
+                        // }
 
                         let newAvatarUrl;
                         if (req.file) {
