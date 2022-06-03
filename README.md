@@ -40,7 +40,7 @@ Depuis le dossier api : `npm start`
 
 Depuis le dossier client : `npm start`
 
-Une fois que tout est configuré, les tables et la base de donnée de l'application sera créé automatiquement au démarrage
+Une fois que tout est configuré, les tables de l'application seront créé automatiquement au démarrage
 
 Un compte utilisateur sera aussi créé avec les identifiants suivant :
 
